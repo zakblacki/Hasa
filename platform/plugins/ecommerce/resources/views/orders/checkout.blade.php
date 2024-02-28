@@ -46,7 +46,9 @@
                                 @if (EcommerceHelper::isTaxEnabled())
                                     <div class="row">
                                         <div class="col-6">
-                                            <p>{{ __('Tax') }}:</p>
+                                            <p>{{ __('Tax') }} @if (Cart::instance('cart')->rawTax())
+                                                    (<small>{{ Cart::instance('cart')->taxClassesName() }}</small>)
+                                                @endif</p>
                                         </div>
                                         <div class="col-6 float-end">
                                             <p class="price-text tax-price-text">
@@ -331,7 +333,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="alert alert-warning my-5">
-                        <span>{!! __('No products in cart. :link!', ['link' => Html::link(route('public.index'), __('Back to shopping'))]) !!}</span>
+                        <span>{!! __('No products in cart. :link!', ['link' => Html::link(BaseHelper::getHomepageUrl(), __('Back to shopping'))]) !!}</span>
                     </div>
                 </div>
             </div>

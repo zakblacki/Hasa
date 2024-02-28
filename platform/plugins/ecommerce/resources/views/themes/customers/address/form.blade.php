@@ -104,8 +104,9 @@
 
 <x-core::form.checkbox
     :label="__('Use this address as default.')"
-    name="send_mail"
+    name="is_default"
     :value="1"
+    :checked="old('city', $address->is_default)"
     :inline="true"
 />
 

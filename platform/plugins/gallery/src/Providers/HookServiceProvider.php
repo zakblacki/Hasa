@@ -8,6 +8,7 @@ use Botble\Base\Facades\Html;
 use Botble\Base\Facades\MetaBox;
 use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\TextField;
+use Botble\Base\Models\BaseModel;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Gallery\Facades\Gallery;
 use Botble\Gallery\Models\Gallery as GalleryModel;
@@ -66,7 +67,7 @@ class HookServiceProvider extends ServiceProvider
     {
         if (
             AdminHelper::isInAdmin(true) &&
-            $object &&
+            $object instanceof BaseModel &&
             in_array($object::class, Gallery::getSupportedModules()) &&
             $context == 'advanced'
         ) {
@@ -98,8 +99,6 @@ class HookServiceProvider extends ServiceProvider
 
     public function render(Shortcode $shortcode): string
     {
-        Gallery::registerAssets();
-
         $limit = (int)$shortcode->limit;
 
         $galleries = GalleryModel::query()

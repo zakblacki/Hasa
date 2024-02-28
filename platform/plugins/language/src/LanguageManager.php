@@ -12,6 +12,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -844,7 +845,7 @@ class LanguageManager
     {
         $attributes = $this->extractAttributes($path);
 
-        $path = str_replace(route('public.index'), '', $path);
+        $path = str_replace(BaseHelper::getHomepageUrl(), '', $path);
 
         if ($path[0] !== '/') {
             $path = '/' . $path;
@@ -1154,7 +1155,7 @@ class LanguageManager
                         'reference_id',
                         'reference_type',
                     ])
-                    ->when(! is_in_admin(), function (Builder $query) {
+                    ->when(! is_in_admin(), function (Builder|Relation $query) {
                         $query->where('lang_meta_code', $this->getCurrentLocaleCode());
                     });
             });

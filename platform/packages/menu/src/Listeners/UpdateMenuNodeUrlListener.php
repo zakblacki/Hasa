@@ -3,6 +3,7 @@
 namespace Botble\Menu\Listeners;
 
 use Botble\Base\Facades\BaseHelper;
+use Botble\Base\Models\BaseModel;
 use Botble\Base\Supports\RepositoryHelper;
 use Botble\Menu\Facades\Menu;
 use Botble\Menu\Models\MenuNode;
@@ -13,7 +14,10 @@ class UpdateMenuNodeUrlListener
 {
     public function handle(UpdatedSlugEvent $event): void
     {
-        if (! in_array($event->data::class, Menu::getMenuOptionModels())) {
+        if (
+            ! $event->data instanceof BaseModel ||
+            ! in_array($event->data::class, Menu::getMenuOptionModels())
+        ) {
             return;
         }
 

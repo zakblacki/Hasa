@@ -31,7 +31,7 @@
                                                     <td>
                                                         <div class="product--cart">
                                                             <div class="product__thumbnail">
-                                                                <a href="{{ $product->original_product->url }}" class="product__overlay">
+                                                                <a href="{{ $product->original_product->url }}" class="product__overlay" title="{{ $product->name }}">
                                                                     <img src="{{ RvMedia::getImageUrl($cartItem->options->image, 'thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->original_product->name }}" loading="lazy" />
                                                                 </a>
                                                             </div>

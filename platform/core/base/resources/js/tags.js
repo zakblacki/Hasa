@@ -1,43 +1,7 @@
 class TagsManager {
     init() {
-        $(document)
-            .find('.tags')
-            .each(function (index, element) {
-                let tagify = new Tagify(element, {
-                    keepInvalidTags:
-                        $(element).data('keep-invalid-tags') !== undefined
-                            ? $(element).data('keep-invalid-tags')
-                            : true,
-                    enforceWhitelist:
-                        $(element).data('enforce-whitelist') !== undefined
-                            ? $(element).data('enforce-whitelist')
-                            : false,
-                    delimiters: $(element).data('delimiters') !== undefined ? $(element).data('delimiters') : ',',
-                    whitelist: element.value.trim().split(/\s*,\s*/),
-                    userInput: $(element).data('user-input') !== undefined ? $(element).data('user-input') : true,
-                })
 
-                if ($(element).data('url')) {
-                    tagify.on('input', (e) => {
-                        tagify.settings.whitelist.length = 0 // reset current whitelist
-                        tagify.loading(true).dropdown.hide.call(tagify) // show the loader animation
-
-                        $httpClient
-                            .make()
-                            .get($(element).data('url'))
-                            .then(({ data }) => {
-                                tagify.settings.whitelist = data
-                                tagify.loading(false).dropdown.show.call(tagify, e.detail.value)
-                            })
-                    })
-                }
-            })
-
-        document.querySelectorAll('.list-tagify').forEach((element) => {
-            if (! element.dataset.list) {
-                return;
-            }
-
+        let tagFromList = function(element) {
             const list = JSON.parse(element.dataset.list)
 
             let whiteList = []
@@ -103,6 +67,49 @@ class TagsManager {
             })
 
             tagify.loadOriginalValues(arrayChosen)
+        }
+
+        $(document)
+            .find('.tags')
+            .each(function (index, element) {
+                if ($(element).data('url')) {
+                    let tagify = new Tagify(element, {
+                        keepInvalidTags:
+                            $(element).data('keep-invalid-tags') !== undefined
+                                ? $(element).data('keep-invalid-tags')
+                                : true,
+                        enforceWhitelist:
+                            $(element).data('enforce-whitelist') !== undefined
+                                ? $(element).data('enforce-whitelist')
+                                : false,
+                        delimiters: $(element).data('delimiters') !== undefined ? $(element).data('delimiters') : ',',
+                        whitelist: element.value.trim().split(/\s*,\s*/),
+                        userInput: $(element).data('user-input') !== undefined ? $(element).data('user-input') : true,
+                    })
+
+                    tagify.on('input', (e) => {
+                        tagify.settings.whitelist.length = 0 // reset current whitelist
+                        tagify.loading(true).dropdown.hide.call(tagify) // show the loader animation
+
+                        $httpClient
+                            .make()
+                            .get($(element).data('url'))
+                            .then(({ data }) => {
+                                tagify.settings.whitelist = data
+                                tagify.loading(false).dropdown.show.call(tagify, e.detail.value)
+                            })
+                    })
+                } else if (element.dataset.list) {
+                    tagFromList(element)
+                }
+            })
+
+        document.querySelectorAll('.list-tagify').forEach((element) => {
+            if (! element.dataset.list) {
+                return;
+            }
+
+            tagFromList(element)
         })
     }
 }

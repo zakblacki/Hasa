@@ -16,7 +16,7 @@
                         <article class="post">
                             <div class="post__wrapper">
                                 <div class="post__thumbnail">
-                                    <a class="post__overlay" href="{{ $post->url }}"></a>
+                                    <a class="post__overlay" href="{{ $post->url }}" title="{{ $post->name }}"></a>
                                     <img src="{{ RvMedia::getImageUrl($post->image, 'medium', false, RvMedia::getDefaultImage()) }}" alt="{{ $post->name }}" />
                                 </div>
                                 <div class="post__content">

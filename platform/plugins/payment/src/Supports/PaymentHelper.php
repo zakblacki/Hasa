@@ -2,6 +2,7 @@
 
 namespace Botble\Payment\Supports;
 
+use Botble\Base\Facades\BaseHelper;
 use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Repositories\Interfaces\PaymentInterface;
@@ -13,12 +14,12 @@ class PaymentHelper
 {
     public static function getRedirectURL(?string $checkoutToken = null): string
     {
-        return apply_filters(PAYMENT_FILTER_REDIRECT_URL, $checkoutToken, route('public.index'));
+        return apply_filters(PAYMENT_FILTER_REDIRECT_URL, $checkoutToken, BaseHelper::getHomepageUrl());
     }
 
     public static function getCancelURL(?string $checkoutToken = null): string
     {
-        return apply_filters(PAYMENT_FILTER_CANCEL_URL, $checkoutToken, route('public.index'));
+        return apply_filters(PAYMENT_FILTER_CANCEL_URL, $checkoutToken, BaseHelper::getHomepageUrl());
     }
 
     public static function storeLocalPayment(array $args = [])

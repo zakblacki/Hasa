@@ -17,6 +17,8 @@ class SelectFieldOption extends FormFieldOptions
 
     protected string $emptyValue;
 
+    protected bool $allowClear = false;
+
     public function choices(array|Collection $choices): static
     {
         $this->choices = $choices;
@@ -97,6 +99,13 @@ class SelectFieldOption extends FormFieldOptions
         return $this->emptyValue;
     }
 
+    public function allowClear(bool $allowClear = true): static
+    {
+        $this->allowClear = $allowClear;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         $data = parent::toArray();
@@ -105,10 +114,16 @@ class SelectFieldOption extends FormFieldOptions
 
         if (isset($this->selected)) {
             $data['selected'] = $this->getSelected();
+        } elseif (isset($this->defaultValue)) {
+            $data['selected'] = $this->getDefaultValue();
         }
 
         if (isset($this->emptyValue)) {
             $data['attr']['placeholder'] = $this->getEmptyValue();
+        }
+
+        if ($this->searchable) {
+            $data['attr']['data-allow-clear'] = $this->allowClear ? 'true' : 'false';
         }
 
         return $data;

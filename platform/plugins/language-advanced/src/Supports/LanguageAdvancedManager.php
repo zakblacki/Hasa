@@ -162,7 +162,6 @@ class LanguageAdvancedManager
             if (! class_exists($item)) {
                 continue;
             }
-
             /**
              * @var Model $item
              */

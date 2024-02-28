@@ -87,7 +87,9 @@ class Post extends BaseModel
 
                 $this->loadMissing('metadata');
 
-                if (($timeToRead = $this->getMetaData('time_to_read', true)) || $timeToRead == 0) {
+                $timeToRead = $this->getMetaData('time_to_read', true);
+
+                if ($timeToRead != null) {
                     return number_format((float)$timeToRead);
                 }
 

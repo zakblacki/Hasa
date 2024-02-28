@@ -2,6 +2,7 @@
 
 namespace Botble\Gallery;
 
+use Botble\Base\Facades\BaseHelper;
 use Botble\Gallery\Models\GalleryMeta;
 use Botble\Language\Facades\Language;
 use Botble\LanguageAdvanced\Supports\LanguageAdvancedManager;
@@ -147,7 +148,7 @@ class GallerySupport
     {
         $pageId = theme_option('galleries_page_id');
 
-        $defaultURL = Route::has('public.galleries') ? route('public.galleries') : route('public.index');
+        $defaultURL = Route::has('public.galleries') ? route('public.galleries') : BaseHelper::getHomepageUrl();
 
         if (! $pageId) {
             return $defaultURL;

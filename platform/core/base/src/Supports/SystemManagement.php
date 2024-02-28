@@ -104,19 +104,19 @@ class SystemManagement
 
         if (preg_match('/^(\d+)(.)$/', $memoryLimit, $matches)) {
             if ($matches[2] === 'M') {
-                return $matches[1];
+                return (int) $matches[1];
             }
 
             if ($matches[2] === 'K') {
-                return (int) ($matches[1] / 1024);
+                return (int) ((int) $matches[1] / 1024);
             }
 
             if ($matches[2] === 'G') {
-                return (int) ($matches[1] * 1024);
+                return (int) ((int) $matches[1] * 1024);
             }
         }
 
-        return $memoryLimit;
+        return (int)$memoryLimit;
     }
 
     public static function getMaximumExecutionTime(): int

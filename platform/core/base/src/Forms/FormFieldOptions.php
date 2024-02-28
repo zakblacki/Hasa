@@ -5,6 +5,7 @@ namespace Botble\Base\Forms;
 use Botble\Base\Supports\Builders\HasAttributes;
 use Botble\Base\Supports\Builders\HasLabel;
 use Botble\Base\Traits\Forms\CanSpanColumns;
+use Botble\Base\Traits\Forms\HasCollapsibleField;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Conditionable;
@@ -12,11 +13,12 @@ use Illuminate\Support\Traits\Tappable;
 
 class FormFieldOptions implements Arrayable
 {
+    use CanSpanColumns;
     use Conditionable;
     use HasAttributes;
+    use HasCollapsibleField;
     use HasLabel;
     use Tappable;
-    use CanSpanColumns;
 
     protected bool $required = false;
 

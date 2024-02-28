@@ -275,6 +275,7 @@ class InvoiceHelper
             'invoice_body_filter' => apply_filters('ecommerce_invoice_body', null, $invoice),
             'ecommerce_invoice_footer' => apply_filters('ecommerce_invoice_footer', null, $invoice),
             'invoice_payment_info_filter' => apply_filters('invoice_payment_info_filter', null, $invoice),
+            'tax_classes_name' => $invoice->taxClassesName,
         ];
 
         $data['settings']['font_css'] = null;

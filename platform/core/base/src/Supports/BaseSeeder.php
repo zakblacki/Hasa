@@ -85,7 +85,9 @@ class BaseSeeder extends Seeder
         }
 
         foreach($storage->files() as $file) {
-            $storage->delete($file);
+            if ($file !== '.gitignore') {
+                $storage->delete($file);
+            }
         }
 
         MediaFile::query()->truncate();

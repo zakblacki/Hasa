@@ -101,64 +101,21 @@
 
         filterSlider()
 
-        let handleError = function(data, form) {
-            if (typeof (data.errors) !== 'undefined' && !_.isArray(data.errors)) {
-                handleValidationError(data.errors, form)
-            } else if (typeof (data.responseJSON) !== 'undefined') {
-                if (typeof (data.responseJSON.errors) !== 'undefined' && data.status === 422) {
-                    handleValidationError(data.responseJSON.errors, form)
-                } else if (typeof (data.responseJSON.message) !== 'undefined') {
-                    $(form).find('.error-message').html(data.responseJSON.message).show()
-                } else {
-                    let message = ''
-                    $.each(data.responseJSON, (index, el) => {
-                        $.each(el, (key, item) => {
-                            message += item + '<br />'
-                        })
-                    })
-
-                    $(form).find('.error-message').html(message).show()
-                }
-            } else {
-                $(form).find('.error-message').html(data.statusText).show()
-            }
-        }
-
-        let handleValidationError = function(errors, form) {
-            let message = ''
-            $.each(errors, (index, item) => {
-                message += item + '<br />'
-            })
-
-            $(form).find('.success-message').html('').hide()
-            $(form).find('.error-message').html('').hide()
-
-            $(form).find('.error-message').html(message).show()
-        }
-
         window.showAlert = (messageType, message) => {
             if (messageType && message !== '') {
-                let alertId = Math.floor(Math.random() * 1000)
-
-                let html = `<div class='alert ${messageType} alert-dismissible' id='${alertId}'>
-                            <span class='close feather icon-x' data-dismiss='alert' aria-label='close'></span>
-                            <i class='feather icon-` + (messageType === 'alert-success' ? 'check-circle' : 'alert-circle') + ` message-icon'></i>
-                            ${message}
-                        </div>`
-
-                $('#alert-container').append(html).ready(() => {
-                    window.setTimeout(() => {
-                        $(`#alert-container #${alertId}`).remove()
-                    }, 6000)
-                })
+                if (messageType === 'alert-success') {
+                    Theme.showSuccess(message)
+                } else {
+                    Theme.showError(message)
+                }
             }
         }
 
-        var showError = message => {
+        let showError = message => {
             window.showAlert('alert-danger', message)
         }
 
-        var showSuccess = message => {
+        let showSuccess = message => {
             window.showAlert('alert-success', message)
         }
 
@@ -200,7 +157,7 @@
                 },
                 error: res => {
                     $(this).prop('disabled', false).removeClass('btn-disabled').html(buttonText)
-                    handleError(res, $(this).closest('form'))
+                    Theme.handleError(res, $(this).closest('form'))
                 },
             })
         })
@@ -480,7 +437,7 @@
                     },
                     error: res => {
                         _self.prop('disabled', false).removeClass('btn-disabled').html(buttonText)
-                        handleError(res, $form)
+                        Theme.handleError(res, $form)
                     },
                 })
             })

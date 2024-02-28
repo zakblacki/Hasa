@@ -290,7 +290,7 @@
     {% if invoice.tax_amount > 0 %}
         <tr>
             <td colspan="4" class="right">
-                {{ 'plugins/ecommerce::products.form.tax'|trans }}
+                {{ 'plugins/ecommerce::products.form.tax'|trans }} <small>({{ tax_classes_name }})</small>
             </td>
             <td class="bold">
                 {{ invoice.tax_amount|price_format }}

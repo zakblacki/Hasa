@@ -47,8 +47,10 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getDateTimeFormat()
  * @method static string joinPaths(array $paths)
  * @method static bool hasIcon(string|null $name)
- * @method static string renderIcon(string $name, string|null $size = null, array $attributes = [])
+ * @method static string renderIcon(string $name, string|null $size = null, array $attributes = [], bool $safe = false)
  * @method static string renderBadge(string $label, string $color = 'primary', array $attributes = [])
+ * @method static string cleanToastMessage(string $message)
+ * @method static mixed getHomepageUrl()
  *
  * @see \Botble\Base\Helpers\BaseHelper
  */

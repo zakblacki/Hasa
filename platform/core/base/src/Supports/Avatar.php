@@ -5,9 +5,10 @@ namespace Botble\Base\Supports;
 use Botble\Media\Facades\RvMedia;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use Intervention\Image\AbstractFont;
-use Intervention\Image\AbstractShape;
-use Intervention\Image\Image;
+use Intervention\Image\Geometry\Factories\CircleFactory;
+use Intervention\Image\Geometry\Factories\RectangleFactory;
+use Intervention\Image\Interfaces\ImageInterface;
+use Intervention\Image\Typography\FontFactory;
 use InvalidArgumentException;
 use Throwable;
 
@@ -55,7 +56,7 @@ class Avatar
 
     protected bool $uppercase = false;
 
-    protected Image $image;
+    protected ImageInterface $image;
 
     protected string $font;
 
@@ -130,7 +131,7 @@ class Avatar
 
         $this->buildAvatar();
 
-        $base64 = (string)$this->image->encode('data-url');
+        $base64 = $this->image->toJpeg()->toDataUri();
 
         Cache::forever($key, $base64);
 
@@ -161,7 +162,7 @@ class Avatar
 
     public function buildAvatar(): self
     {
-        $this->image = RvMedia::imageManager()->canvas($this->width, $this->height);
+        $this->image = RvMedia::imageManager()->create($this->width, $this->height);
 
         $this->createShape();
 
@@ -169,7 +170,7 @@ class Avatar
             $this->make($this->name, $this->chars, $this->uppercase, $this->ascii),
             $this->width / 2,
             $this->height / 2,
-            function (AbstractFont $font) {
+            function (FontFactory $font) {
                 $font->file($this->font);
                 $font->size($this->fontSize);
                 $font->color($this->foreground);
@@ -252,7 +253,7 @@ class Avatar
         return $this;
     }
 
-    public function save(string $path, int $quality = 90): Image
+    public function save(string $path, int $quality = 90): ImageInterface
     {
         $this->buildAvatar();
 
@@ -261,13 +262,13 @@ class Avatar
 
     protected function createCircleShape(): void
     {
-        $this->image->circle(
-            $this->width - $this->borderSize,
+        $this->image->drawCircle(
             intval($this->width / 2),
             intval($this->height / 2),
-            function (AbstractShape $draw) {
+            function (CircleFactory $draw) {
+                $draw->radius($this->width - $this->borderSize);
                 $draw->background($this->background);
-                $draw->border($this->borderSize, $this->getBorderColor());
+                $draw->border($this->getBorderColor(), $this->borderSize);
             }
         );
     }
@@ -291,14 +292,13 @@ class Avatar
         $width = $this->width - $edge;
         $height = $this->height - $edge;
 
-        $this->image->rectangle(
+        $this->image->drawRectangle(
             $edge,
             $edge,
-            $width,
-            $height,
-            function (AbstractShape $draw) {
+            function (RectangleFactory $draw) use ($height, $width) {
+                $draw->size($width, $height);
                 $draw->background($this->background);
-                $draw->border($this->borderSize, $this->getBorderColor());
+                $draw->border($this->getBorderColor(), $this->borderSize);
             }
         );
     }
@@ -306,7 +306,7 @@ class Avatar
     public static function createBase64Image(string|null $name): string
     {
         try {
-            return (new static())->create($name)->toBase64();
+            return (new self())->create($name)->toBase64();
         } catch (Throwable) {
             return RvMedia::getDefaultImage();
         }

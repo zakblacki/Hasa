@@ -1,4 +1,5 @@
 @if ($payment)
+    <br>
     <p>{{ trans('plugins/payment::payment.payment_id') }}: {{ $payment->id }}</p>
     <p>{{ trans('plugins/payment::payment.amount') }}: {{ $payment->amount / 100 }} {{ $payment->currency }}</p>
     <p>{{ trans('plugins/payment::payment.email') }}: {{ $payment->email }}</p>

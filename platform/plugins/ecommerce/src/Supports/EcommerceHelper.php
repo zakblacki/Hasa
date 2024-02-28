@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Js;
 use Illuminate\Validation\Rule;
 
 class EcommerceHelper
@@ -478,7 +479,6 @@ class EcommerceHelper
             ! is_plugin_active('location')
             || ! Country::query()->exists()
             || ! State::query()->exists()
-            || ! City::query()->exists()
         ) {
             return false;
         }
@@ -1281,7 +1281,38 @@ class EcommerceHelper
 
     public function registerThemeAssets(): void
     {
-        Theme::asset()->add('front-ecommerce-css', 'vendor/core/plugins/ecommerce/css/front-ecommerce.css');
-        Theme::asset()->container('footer')->add('front-ecommerce-js', 'vendor/core/plugins/ecommerce/js/front-ecommerce.js', ['jquery', 'lightgallery-js', 'slick-js']);
+        $version = get_cms_version();
+
+        Theme::asset()
+            ->add('front-ecommerce-css', 'vendor/core/plugins/ecommerce/css/front-ecommerce.css', version: $version);
+
+        if (BaseHelper::isRtlEnabled()) {
+            Theme::asset()
+                ->add('front-ecommerce-rtl-css', 'vendor/core/plugins/ecommerce/css/front-ecommerce-rtl.css', ['front-ecommerce-css'], version: $version);
+        }
+
+        Theme::asset()
+            ->container('footer')
+            ->add('front-ecommerce-js', 'vendor/core/plugins/ecommerce/js/front-ecommerce.js', ['jquery', 'lightgallery-js', 'slick-js'], version: $version);
+
+        $currency = get_application_currency();
+
+        $currencyData = Js::from([
+            'display_big_money' => config('plugins.ecommerce.general.display_big_money_in_million_billion'),
+            'billion' => __('billion'),
+            'million' => __('million'),
+            'is_prefix_symbol' => $currency->is_prefix_symbol,
+            'symbol' => $currency->symbol,
+            'title' => $currency->title,
+            'decimal_separator' => get_ecommerce_setting('decimal_separator', '.'),
+            'thousands_separator' => get_ecommerce_setting('thousands_separator', ','),
+            'number_after_dot' => $currency->decimals ?: 0,
+            'show_symbol_or_title' => true,
+        ]);
+
+        Theme::asset()->container('footer')->writeScript(
+            'ecommerce-currencies',
+            "window.currencies = $currencyData;"
+        );
     }
 }

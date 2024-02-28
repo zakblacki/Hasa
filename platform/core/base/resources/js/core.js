@@ -441,7 +441,9 @@ class Botble {
 
     static initResources() {
         $.each($(document).find('select.select-search-full'), function (index, element) {
-            Botble.select(element)
+            Botble.select(element, {
+                allowClear: $(element).data('allow-clear')
+            })
         })
 
         $.each($(document).find('select.select-full'), function (index, element) {
@@ -1423,6 +1425,7 @@ class Botble {
 
         options = {
             width: '100%',
+            placeholder: $(element).data('placeholder') || null,
             ...options,
         }
 

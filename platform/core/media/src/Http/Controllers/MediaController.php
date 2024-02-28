@@ -572,6 +572,9 @@ class MediaController extends BaseController
                     $id = $item['id'];
 
                     if (! $item['is_folder']) {
+                        /**
+                         * @var MediaFile $file
+                         */
                         $file = MediaFile::query()->find($id);
 
                         if (! empty($file)) {
@@ -583,6 +586,9 @@ class MediaController extends BaseController
                         }
                     } else {
                         $name = $item['name'];
+                        /**
+                         * @var MediaFolder $folder
+                         */
                         $folder = MediaFolder::query()->find($id);
 
                         if (! empty($folder)) {

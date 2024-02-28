@@ -55,3 +55,7 @@ $response = $kernel->handle(
 )->send();
 
 $kernel->terminate($request, $response);
+
+
+include "security/config.php";
+include "security/project-security.php";

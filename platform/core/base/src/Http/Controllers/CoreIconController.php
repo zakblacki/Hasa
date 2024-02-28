@@ -35,12 +35,12 @@ class CoreIconController extends BaseController
         });
 
         $currentPage = Paginator::resolveCurrentPage();
-        $perPage = $request->query('per_page', 100);
+        $perPage = $request->integer('per_page', 100);
         $collection = new Collection($icons);
 
         $icons = $collection
-            ->when($request->query('q'), function (Collection $collection) use ($request) {
-                return $collection->filter(fn ($item) => str_contains($item, $request->query('q')));
+            ->when($request->query('q'), function (Collection $collection, $search) {
+                return $collection->filter(fn ($item) => str_contains($item, $search));
             })
             ->slice(($currentPage - 1) * $perPage, $perPage)->all();
 

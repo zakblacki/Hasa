@@ -18,8 +18,8 @@
                         </div>
                     @endif
                 @endif
-                <a class="product__overlay" href="{{ $product->url }}"></a>
-                <img src="{{ RvMedia::getImageUrl($product->image, 'medium', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->url }}" loading="lazy"/>
+                <a class="product__overlay" href="{{ $product->url }}" title="{{ $product->name }}"></a>
+                <img src="{{ RvMedia::getImageUrl($product->image, 'medium', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->name }}" loading="lazy"/>
                 @if (EcommerceHelper::isWishlistEnabled())
                     <a class="product__favorite js-add-to-wishlist-button" href="#" data-url="{{ route('public.wishlist.add', $product->id) }}">
                         <i class="fa fa-heart-o"></i>

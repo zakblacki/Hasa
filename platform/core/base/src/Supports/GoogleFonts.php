@@ -11,12 +11,17 @@ use Illuminate\Support\Str;
 
 class GoogleFonts
 {
-    public function __construct(
-        protected Filesystem $filesystem,
-        protected string $path,
-        protected bool $inline,
-        protected string $userAgent,
-    ) {
+    protected Filesystem $filesystem;
+
+    protected string $path = 'fonts';
+
+    protected bool $inline = true;
+
+    protected string $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15';
+
+    public function __construct()
+    {
+        $this->filesystem = Storage::disk('public');
     }
 
     public function load(string $font, string|null $nonce = null, bool $forceDownload = false): Fonts|null
@@ -63,7 +68,11 @@ class GoogleFonts
         }
 
         if (! str_contains($localizedCss, Storage::disk('public')->url('fonts'))) {
-            $localizedCss = preg_replace('/(http|https):\/\/.*?\/storage\/fonts\//i', Storage::disk('public')->url('fonts/'), $localizedCss);
+            $localizedCss = preg_replace(
+                '/(http|https):\/\/.*?\/storage\/fonts\//i',
+                Storage::disk('public')->url('fonts/'),
+                $localizedCss
+            );
             $this->filesystem->put($fontCssPath, $localizedCss);
         }
 

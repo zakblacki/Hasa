@@ -53,6 +53,10 @@
                                             {!! Form::mediaImage($name, Arr::get($attributes, $key), ['data-name' => $key]) !!}
                                             @break
 
+                                        @case('file')
+                                            {!! Form::mediaFile($name, Arr::get($attributes, $key), ['data-name' => $key]) !!}
+                                            @break
+
                                         @case('color')
                                             {!! Form::customColor($name, Arr::get($attributes, $key), ['data-name' => $key]) !!}
                                             @break

@@ -59,7 +59,7 @@ class HookServiceProvider extends ServiceProvider
         }
 
         if (setting('simple_slider_using_assets', true) && defined('THEME_OPTIONS_MODULE_SCREEN_NAME')) {
-            $version = '1.0.2';
+            $version = '1.0.3';
             $dist = asset('vendor/core/plugins/simple-slider');
 
             Theme::asset()

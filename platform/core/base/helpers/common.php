@@ -22,6 +22,7 @@ if (! function_exists('language_flag')) {
             'title' => $name,
             'class' => 'flag',
             'style' => "height: {$width}px",
+            'loading' => 'lazy',
         ]);
     }
 }
@@ -72,7 +73,7 @@ if (! function_exists('get_cms_version')) {
 if (! function_exists('get_core_version')) {
     function get_core_version(): string
     {
-        return '7.1.9';
+        return '7.2.2';
     }
 }
 

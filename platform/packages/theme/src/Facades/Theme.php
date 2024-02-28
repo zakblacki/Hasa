@@ -64,6 +64,13 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getSocialLinks()
  * @method static array convertSocialLinksToArray(array $data)
  * @method static array getThemeIcons()
+ * @method static static addBodyAttributes(array $bodyAttributes)
+ * @method static string|null getBodyAttribute(string $attribute)
+ * @method static array getBodyAttributes()
+ * @method static string bodyAttributes()
+ * @method static void registerPreloader()
+ * @method static array getPreloaderVersions()
+ * @method static void registerToastNotification()
  *
  * @see \Botble\Theme\Theme
  */

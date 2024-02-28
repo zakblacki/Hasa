@@ -512,6 +512,7 @@ class OrderHelper
                 'image' => $image,
                 'attributes' => $product->is_variation ? $product->variation_attributes : '',
                 'taxRate' => $parentProduct->total_taxes_percentage,
+                'taxClasses' => $parentProduct->taxes->pluck('percentage', 'title')->all(),
                 'options' => $options,
                 'extras' => $request->input('extras', []),
                 'sku' => $product->sku,

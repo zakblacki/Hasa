@@ -16,7 +16,9 @@
                         <div class="item">
                             <div class="categories_box">
                                 <a href="{{ $category->url }}">
-                                    <img src="{{ RvMedia::getImageUrl($category->image, null, false, RvMedia::getDefaultImage()) }}" alt="{{ $category->name }}"/>
+                                    <div class="categories-image">
+                                        <img src="{{ RvMedia::getImageUrl($category->image, null, false, RvMedia::getDefaultImage()) }}" alt="category image" />
+                                    </div>
                                     <span class="d-block text-center">{{ $category->name }}</span>
                                 </a>
                             </div>

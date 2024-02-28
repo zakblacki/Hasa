@@ -12,8 +12,6 @@ class PublicController extends BaseController
 {
     public function getGalleries()
     {
-        Gallery::registerAssets();
-
         $galleries = GalleryModel::query()
             ->wherePublished()
             ->with(['slugable', 'user'])

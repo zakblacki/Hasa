@@ -103,6 +103,32 @@ class ProductTable extends TableAbstract
             })
             ->editColumn('stock_status', function (Product $item) {
                 return BaseHelper::clean($item->stock_status_html);
+            })
+            ->filter(function ($query) {
+                $keyword = request()->input('search.value');
+                if ($keyword) {
+                    $keyword = '%' . $keyword . '%';
+
+                    $query
+                        ->where('ec_products.name', 'LIKE', $keyword)
+                        ->where('is_variation', 0)
+                        ->orWhere(function ($query) use ($keyword) {
+                            $query
+                                ->where('is_variation', 0)
+                                ->where(function ($query) use ($keyword) {
+                                    $query
+                                        ->orWhere('ec_products.sku', 'LIKE', $keyword)
+                                        ->orWhere('ec_products.created_at', 'LIKE', $keyword)
+                                        ->orWhereHas('variations.product', function ($query) use ($keyword) {
+                                            $query->where('sku', 'LIKE', $keyword);
+                                        });
+                                });
+                        });
+
+                    return $query;
+                }
+
+                return $query;
             });
 
         return $this->toJson($data);
@@ -139,7 +165,7 @@ class ProductTable extends TableAbstract
 
     public function htmlDrawCallbackFunction(): string|null
     {
-        return parent::htmlDrawCallbackFunction() . '$(".editable").editable({mode: "inline"});';
+        return parent::htmlDrawCallbackFunction() . 'Botble.initEditable()';
     }
 
     public function columns(): array

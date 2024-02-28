@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string|null getCompanyState()
  * @method static string|null getCompanyCity()
  * @method static string|null getCompanyZipCode()
- * @method static array getLanguageSupport()
+ * @method static string getLanguageSupport()
  *
  * @see \Botble\Ecommerce\Supports\InvoiceHelper
  */

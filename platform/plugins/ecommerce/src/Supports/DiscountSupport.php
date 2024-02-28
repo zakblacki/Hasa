@@ -106,7 +106,7 @@ class DiscountSupport
 
         if ($this->promotions->isEmpty()) {
             $this->promotions = app(DiscountInterface::class)
-                ->getAvailablePromotions(['products', 'customers', 'productCollections'], $forProductSingle);
+                ->getAvailablePromotions(['products', 'customers', 'productCollections', 'productCategories'], $forProductSingle);
         }
 
         return $this->promotions;

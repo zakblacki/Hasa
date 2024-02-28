@@ -178,23 +178,37 @@ $(() => {
             })
     })
 
-    $(document).on('submit', '.form-import-available-data', (e) => {
-        const currentTarget = $(e.currentTarget)
+    $(document).on('submit', '.form-import-available-data', async (e) => {
+        e.preventDefault()
 
-        $httpClient
-            .make()
-            .withButtonLoading(currentTarget.find('button[type=submit]'))
-            .post(currentTarget.prop('action'), currentTarget.serialize())
-            .then(({ error,  data }) => {
+        const currentTarget = $(e.currentTarget)
+        const countries = currentTarget.find('select').val()
+
+        for (const value of countries) {
+            const isLast = value === countries[countries.length - 1]
+
+            try {
+                const formData = new FormData()
+                formData.append('country_code', value)
+                formData.append('continue', isLast ? 0 : 1)
+
+                const { error, data } = await $httpClient
+                    .make()
+                    .withButtonLoading(currentTarget.find('button[type=submit]'))
+                    .post(currentTarget.prop('action'), formData)
+
                 if (error) {
                     Botble.showError(data.message)
-
                     return
                 }
 
-                Botble.showSuccess(data.message)
-
-                currentTarget[0].reset()
-            })
+                if (isLast) {
+                    Botble.showSuccess(data.message)
+                    currentTarget.find('select').val('').trigger('change')
+                }
+            } catch (error) {
+                Botble.showError(error.message)
+            }
+        }
     })
 })

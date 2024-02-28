@@ -21,33 +21,33 @@
 
         {!! Theme::header() !!}
     </head>
-    <body @if (BaseHelper::siteLanguageDirection() == 'rtl') dir="rtl" @endif>
+    <body {!! Theme::bodyAttributes() !!}>
         {!! apply_filters(THEME_FRONT_BODY, null) !!}
         <div id="alert-container"></div>
         <header class="header header--mobile">
             <nav class="navigation--mobile">
                 <div class="navigation__left">
                     <a class="logo" href="{{ route('public.index') }}">
-                        @if (theme_option('logo'))
-                            <img src="{{ RvMedia::getImageUrl(theme_option('logo')) }}" alt="{{ theme_option('site_title') }}" height="60" loading="lazy"/>
+                        @if ($logo = theme_option('logo'))
+                            <img src="{{ RvMedia::getImageUrl($logo) }}" alt="{{ theme_option('site_title') }}" loading="lazy"/>
                         @endif
                     </a>
                 </div>
                 <div class="navigation__right">
                     <div class="header__actions">
-                        <a class="search-btn" href="#"><i class="feather icon icon-search"></i></a>
+                        <a class="search-btn" href="#" title="{{ __('Search') }}"><i class="feather icon icon-search"></i></a>
                         @if (is_plugin_active('ecommerce'))
-                            <a href="{{ route('customer.login') }}"><i class="feather icon icon-user"></i></a>
+                            <a href="{{ route('customer.login') }}" title="{{ __('Login') }}"><i class="feather icon icon-user"></i></a>
                             @if (EcommerceHelper::isWishlistEnabled())
-                                <a class="btn-shopping-cart btn-wishlist" href="{{ route('public.wishlist') }}"><i class="feather icon icon-heart"></i>@if (auth('customer')->check())<span>{{ auth('customer')->user()->wishlist()->count() }}</span> @else <span>{{ Cart::instance('wishlist')->count() }}</span>@endif</a>
+                                <a class="btn-shopping-cart btn-wishlist" href="{{ route('public.wishlist') }}" title="{{ __('Wishlist') }}"><i class="feather icon icon-heart"></i>@if (auth('customer')->check())<span>{{ auth('customer')->user()->wishlist()->count() }}</span> @else <span>{{ Cart::instance('wishlist')->count() }}</span>@endif</a>
                             @endif
                             @if (EcommerceHelper::isCartEnabled())
-                                <a class="btn-shopping-cart panel-trigger" href="#panel-cart">
+                                <a class="btn-shopping-cart panel-trigger" href="#panel-cart" title="{{ __('Cart') }}">
                                     <i class="feather icon icon-shopping-cart"></i><span>{{ Cart::instance('cart')->count() }}</span>
                                 </a>
                             @endif
                         @endif
-                        <a class="panel-trigger" href="#panel-menu"><i class="feather icon icon-menu"></i></a></div>
+                        <a class="panel-trigger" href="#panel-menu" title="{{ __('Menu') }}"><i class="feather icon icon-menu"></i></a></div>
                 </div>
             </nav>
         </header>
@@ -58,11 +58,11 @@
                         <div class="col-md-6 col-lg-5">
                             <div class="d-flex align-items-center justify-content-center justify-content-md-start">
                                 <ul class="contact-detail text-center text-lg-left">
-                                    @if (theme_option('hotline'))
-                                        <li><i class="feather icon icon-phone"></i>&nbsp;<span>{{ theme_option('hotline') }}</span></li>
+                                    @if ($hotline = theme_option('hotline'))
+                                        <li><i class="feather icon icon-phone"></i>&nbsp;<span>{{ $hotline }}</span></li>
                                     @endif
-                                    @if (theme_option('email'))
-                                        <li><i class="feather icon icon-mail"></i>&nbsp;<a href="mailto:{{ theme_option('email') }}">{{ theme_option('email') }}</a></li>
+                                    @if ($email = theme_option('email'))
+                                        <li><i class="feather icon icon-mail"></i>&nbsp;<a href="mailto:{{ $email }}">{{ $email }}</a></li>
                                     @endif
                                 </ul>
                             </div>
@@ -115,8 +115,8 @@
                 <div class="container">
                     <div class="navigation__left">
                         <a class="logo" href="{{ route('public.index') }}">
-                            @if (theme_option('logo'))
-                                <img src="{{ RvMedia::getImageUrl(theme_option('logo')) }}" alt="{{ theme_option('site_title') }}" height="40" loading="lazy"/>
+                            @if ($logo = theme_option('logo'))
+                                <img src="{{ RvMedia::getImageUrl($logo) }}" alt="{{ theme_option('site_title') }}" loading="lazy"/>
                             @endif
                         </a>
                     </div>
@@ -130,13 +130,13 @@
                     </div>
                     <div class="navigation__right">
                         <div class="header__actions">
-                            <a class="search-btn" href="#"><i class="feather icon icon-search"></i></a>
+                            <a class="search-btn" href="#" title="{{ __('Search') }}"><i class="feather icon icon-search"></i></a>
                             @if (is_plugin_active('ecommerce'))
                                 @if (EcommerceHelper::isWishlistEnabled())
                                     <a class="btn-shopping-cart btn-wishlist" href="{{ route('public.wishlist') }}"><i class="feather icon icon-heart"></i>@if (auth('customer')->check())<span>{{ auth('customer')->user()->wishlist()->count() }}</span>@else <span>{{ Cart::instance('wishlist')->count() }}</span>@endif</a>
                                 @endif
                                 @if (EcommerceHelper::isCartEnabled())
-                                    <a class="btn-shopping-cart panel-trigger" href="#panel-cart"><i class="feather icon icon-shopping-cart"></i><span>{{ Cart::instance('cart')->count() }}</span></a>
+                                    <a class="btn-shopping-cart panel-trigger" href="#panel-cart" title="{{ __('Cart') }}"><i class="feather icon icon-shopping-cart"></i><span>{{ Cart::instance('cart')->count() }}</span></a>
                                 @endif
                             @endif
                         </div>

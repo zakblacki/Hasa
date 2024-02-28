@@ -50,7 +50,7 @@ trait HasBlogSeeder
             /**
              * @var Tag $tag
              */
-            $tag = Tag::query()->create($item);
+            $tag = Tag::query()->create(Arr::except($item, ['metadata']));
 
             SlugHelper::createSlug($tag);
 
@@ -83,7 +83,7 @@ trait HasBlogSeeder
             /**
              * @var Post $post
              */
-            $post = Post::query()->create($item);
+            $post = Post::query()->create(Arr::except($item, ['metadata']));
 
             $post->categories()->sync(array_unique([
                 $categoryIds->random(),
@@ -112,9 +112,11 @@ trait HasBlogSeeder
         /**
          * @var Category $category
          */
-        $category = Category::query()->create($item);
+        $category = Category::query()->create(Arr::except($item, ['metadata']));
 
         SlugHelper::createSlug($category);
+
+        $this->createMetadata($category, $item);
 
         return $category;
     }

@@ -18,7 +18,7 @@
             :label="trans('core/base::forms.permalink')"
             name="slug"
             :group-flat="true"
-            :value="route('public.index')"
+            :value="BaseHelper::getHomepageUrl()"
             :readonly="true"
         />
     @else

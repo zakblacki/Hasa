@@ -10,7 +10,6 @@
     $options['label'] = false;
 
     Arr::set($options['attr'], 'class', str_replace('form-control', '', $options['attr']['class']));
-    Arr::set($options['attr'], 'helperText', $options['help_block']['text']);
 @endphp
 
 <x-core::form.field

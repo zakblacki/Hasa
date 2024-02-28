@@ -22,10 +22,10 @@
 
     .widget__links {
         li {
-            margin-bottom: .5em;
+            padding: 0.5em 0;
 
             a {
-                display: block;
+                display: inline-block;
                 line-height: 20px;
             }
 

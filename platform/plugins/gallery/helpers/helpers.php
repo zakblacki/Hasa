@@ -1,7 +1,6 @@
 <?php
 
 use Botble\Base\Enums\BaseStatusEnum;
-use Botble\Gallery\Facades\Gallery;
 use Botble\Gallery\Models\Gallery as GalleryModel;
 use Botble\Gallery\Models\GalleryMeta;
 use Botble\Theme\Facades\Theme;
@@ -58,8 +57,6 @@ if (! function_exists('get_galleries')) {
 if (! function_exists('render_galleries')) {
     function render_galleries(int $limit): string
     {
-        Gallery::registerAssets();
-
         $galleries = get_galleries($limit);
 
         $view = apply_filters('galleries_box_template_view', 'plugins/gallery::shortcodes.gallery');

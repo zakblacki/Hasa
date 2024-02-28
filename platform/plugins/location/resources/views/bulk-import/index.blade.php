@@ -12,10 +12,20 @@
 
         <x-core::card.body>
             <x-core::form :url="route('location.bulk-import.import-location-data')" method="post" class="form-import-available-data">
+                <x-core::alert type="warning">
+                    {!! BaseHelper::clean(
+                        trans(
+                            'plugins/location::bulk-import.import_available_data_help',
+                             ['link' => Html::link(route('country.index'), trans('plugins/location::country.name'))]
+                         )
+                    ) !!}
+                </x-core::alert>
                 <x-core::form.select
                     name="country_code"
-                    :options="$locations"
+                    :options="$countries"
                     :searchable="true"
+                    :multiple="true"
+                    :data-placeholder="trans('plugins/location::bulk-import.choose_country')"
                     :helper-text="trans('plugins/location::bulk-import.available_data_help', ['link' => Html::link('https://github.com/botble/locations', attributes: ['target' => '_blank'])])"
                 />
 

@@ -197,7 +197,7 @@ $primaryColor: var(--primary-color);
     }
 
     table.table.table-bordered.table-striped {
-        td, th {
+        tr, td, th {
             vertical-align: middle;
         }
     }

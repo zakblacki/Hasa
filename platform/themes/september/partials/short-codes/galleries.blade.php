@@ -19,7 +19,7 @@
                 @foreach ($galleries as $gallery)
                     <div class="block--instagram">
                         <img src="{{ RvMedia::getImageUrl($gallery->image, 'medium') }}" alt="{{ $gallery->name }}" loading="lazy"/>
-                        <a href="{{ $gallery->url }}" class="block__overlay"></a>
+                        <a href="{{ $gallery->url }}" class="block__overlay" title="{{ $gallery->name }}"></a>
                         <div class="block__actions">
                             <p class="block__caption">{{ $gallery->name }}</p>
                         </div>

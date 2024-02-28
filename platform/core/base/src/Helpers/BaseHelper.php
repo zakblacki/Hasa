@@ -7,6 +7,7 @@ use Botble\Base\Facades\Html;
 use Botble\Base\View\Components\BadgeComponent;
 use Botble\Base\View\Components\IconComponent;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Blade;
@@ -17,7 +18,7 @@ use Throwable;
 
 class BaseHelper
 {
-    public function formatTime(Carbon $timestamp, string|null $format = 'j M Y H:i'): string
+    public function formatTime(CarbonInterface $timestamp, string|null $format = 'j M Y H:i'): string
     {
         $first = Carbon::create(0000, 0, 0, 00, 00, 00);
 
@@ -28,7 +29,7 @@ class BaseHelper
         return $timestamp->format($format);
     }
 
-    public function formatDate(string|null $date, string|null $format = null): string|null
+    public function formatDate(CarbonInterface|int|string|null $date, string|null $format = null): string|null
     {
         if (empty($format)) {
             $format = $this->getDateFormat();
@@ -36,6 +37,10 @@ class BaseHelper
 
         if (empty($date)) {
             return $date;
+        }
+
+        if ($date instanceof CarbonInterface) {
+            return $this->formatTime($date, $format);
         }
 
         return $this->formatTime(Carbon::parse($date), $format);
@@ -502,8 +507,12 @@ class BaseHelper
         return File::exists(sprintf(core_path('base/resources/views/components/icons/%s.blade.php'), $name));
     }
 
-    public function renderIcon(string $name, string $size = null, array $attributes = []): string
+    public function renderIcon(string $name, string $size = null, array $attributes = [], bool $safe = false): string
     {
+        if ($safe && ! $this->hasIcon($name)) {
+            return '';
+        }
+
         return Blade::renderComponent(
             (new IconComponent($name, $size))->withAttributes($attributes)
         );
@@ -523,5 +532,10 @@ class BaseHelper
         }
 
         return addslashes($message);
+    }
+
+    public function getHomepageUrl()
+    {
+        return apply_filters('cms_homepage_url', rescue(fn () => route('public.index'), report: false));
     }
 }

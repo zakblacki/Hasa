@@ -73,7 +73,7 @@ class PublicCheckoutController extends BaseController
             if (! $order) {
                 return $this
                     ->httpResponse()
-                    ->setNextUrl(route('public.index'));
+                    ->setNextUrl(BaseHelper::getHomepageUrl());
             }
         }
 
@@ -538,7 +538,7 @@ class PublicCheckoutController extends BaseController
             if (! $order) {
                 return $this
                     ->httpResponse()
-                    ->setNextUrl(route('public.index'));
+                    ->setNextUrl(BaseHelper::getHomepageUrl());
             }
         }
 

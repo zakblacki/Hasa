@@ -2,6 +2,7 @@
 
 namespace Botble\Menu\Listeners;
 
+use Botble\Base\Contracts\BaseModel;
 use Botble\Base\Events\DeletedContentEvent;
 use Botble\Menu\Facades\Menu;
 use Botble\Menu\Models\MenuNode;
@@ -10,7 +11,10 @@ class DeleteMenuNodeListener
 {
     public function handle(DeletedContentEvent $event): void
     {
-        if (! in_array($event->data::class, Menu::getMenuOptionModels())) {
+        if (
+            ! $event->data instanceof BaseModel ||
+            ! in_array($event->data::class, Menu::getMenuOptionModels())
+        ) {
             return;
         }
 

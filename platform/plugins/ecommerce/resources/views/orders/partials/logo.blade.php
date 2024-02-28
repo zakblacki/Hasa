@@ -5,7 +5,7 @@
 @if ($logo)
     <div class="checkout-logo">
         <a
-            href="{{ route('public.index') }}"
+            href="{{ BaseHelper::getHomepageUrl() }}"
             title="{{ theme_option('site_title') }}"
         >
             <img

@@ -54,10 +54,24 @@ class ThemeSupport
         $viewPath = $viewPath ?: 'packages/theme::shortcodes';
 
         shortcode()
-            ->register('google-map', __('Google Maps'), __('Add Google Maps iframe'), function (Shortcode $shortcode) use ($viewPath) {
-                return view($viewPath . '.google-map', ['address' => $shortcode->content])
-                    ->render();
-            })
+            ->register(
+                'google-map',
+                __('Google Maps'),
+                __('Add Google Maps iframe'),
+                function (Shortcode $shortcode) use ($viewPath) {
+                    $address = $shortcode->content;
+
+                    if (! $address) {
+                        return '';
+                    }
+
+                    $width = $shortcode->width ?: '100%';
+                    $height = $shortcode->height ?: '500';
+
+                    return view($viewPath . '.google-map', compact('address', 'width', 'height'))
+                        ->render();
+                }
+            )
             ->setPreviewImage('google-map', asset('vendor/core/packages/theme/images/ui-blocks/google-map.jpg'))
             ->setAdminConfig('google-map', function (array $attributes, string|null $content) {
                 return ShortcodeForm::createFromArray($attributes)
@@ -69,6 +83,13 @@ class ThemeSupport
                             'rows' => 3,
                         ],
                         'value' => $content,
+                    ])
+                    ->add('width', NumberField::class, [
+                        'label' => __('Width'),
+                    ])
+                    ->add('height', NumberField::class, [
+                        'label' => __('Height'),
+                        'default_value' => 500,
                     ]);
             });
     }
@@ -81,7 +102,10 @@ class ThemeSupport
             return '';
         }
 
-        if ((! Str::contains($js, '<script') || ! Str::contains($js, '</script>')) && ! Str::contains($js, '<noscript') && ! Str::contains($js, '</noscript>')) {
+        if ((! Str::contains($js, '<script') || ! Str::contains($js, '</script>')) && ! Str::contains(
+            $js,
+            '<noscript'
+        ) && ! Str::contains($js, '</noscript>')) {
             $js = Html::tag('script', $js);
         }
 

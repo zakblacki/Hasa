@@ -516,11 +516,11 @@ body {
     padding: 10px 0;
     transition: all 0.5s ease-in-out;
     background-color: #f6f6f8;
-    color: #878787;
+    color: #656262;
     font-size: 12px;
 
     a {
-        color: #878787;
+        color: #656262;
         font-size: 12px;
 
         &:hover {
@@ -766,6 +766,7 @@ body {
     .logo {
         img {
             max-height: 70px;
+            padding: 15px 0;
         }
     }
 }
@@ -1479,6 +1480,34 @@ body {
                 margin-top: 3px;
             }
         }
+    }
+}
+
+body {
+    .toastify {
+        width: 350px;
+
+        .toastify-icon {
+            width: 20px;
+            height: 20px;
+            margin-inline-end: 10px;
+        }
+    }
+}
+
+.categories_box {
+    text-align: center;
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    justify-content: end;
+    height: 160px;
+
+    .category-image {
+        display: inline-block;
+        width: auto !important;
+        flex: 1;
+        height: 120px;
     }
 }
 

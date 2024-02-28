@@ -387,7 +387,22 @@ final class Core
                 $this->files->deleteDirectory($oldLibrary);
             }
 
+            $bootstrapCachePath = base_path('bootstrap/cache');
+
+            @unlink($bootstrapCachePath . '/packages.php');
+            @unlink($bootstrapCachePath . '/services.php');
+
             if ($zip->extract($filePath, $this->basePath)) {
+                @unlink($bootstrapCachePath . '/packages.php');
+                @unlink($bootstrapCachePath . '/services.php');
+
+                $oldLibrary = core_path('base/resources/data/intervention');
+                if ($this->files->isDirectory($oldLibrary)) {
+                    $this->files->copyDirectory($oldLibrary, base_path('vendor/intervention'));
+                }
+
+                $this->cleanCaches();
+
                 $this->files->delete($filePath);
 
                 SystemUpdateExtractedFiles::dispatch();

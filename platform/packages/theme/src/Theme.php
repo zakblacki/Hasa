@@ -52,6 +52,8 @@ class Theme implements ThemeContract
 
     protected array $widgets = [];
 
+    protected array $bodyAttributes = [];
+
     public function __construct(
         protected Repository $config,
         protected Dispatcher $events,
@@ -137,7 +139,7 @@ class Theme implements ThemeContract
 
     protected function getThemeAssetsPath(): string
     {
-        $publicThemeName =  $this->getPublicThemeName();
+        $publicThemeName = $this->getPublicThemeName();
 
         $currentTheme = $this->getThemeName();
 
@@ -346,7 +348,7 @@ class Theme implements ThemeContract
     public function breadcrumb(): Breadcrumb
     {
         if (! $this->breadcrumb->getCrumbs()) {
-            $this->breadcrumb->add(__('Home'), route('public.index'));
+            $this->breadcrumb->add(__('Home'), BaseHelper::getHomepageUrl());
         }
 
         return $this->breadcrumb;
@@ -963,10 +965,12 @@ class Theme implements ThemeContract
                                 'To show chat box on that website, please go to :link and add :domain to whitelist domains!',
                                 [
                                     'domain' => Html::link(url('')),
-                                    'link' => Html::link(sprintf(
-                                        'https://www.facebook.com/%s/settings/?tab=messenger_platform',
-                                        theme_option('facebook_page_id', '[PAGE_ID]')
-                                    )),
+                                    'link' => Html::link(
+                                        sprintf(
+                                            'https://www.facebook.com/%s/settings/?tab=messenger_platform',
+                                            theme_option('facebook_page_id', '[PAGE_ID]')
+                                        )
+                                    ),
                                 ]
                             ),
                         ],
@@ -1228,5 +1232,106 @@ class Theme implements ThemeContract
     public function getThemeIcons(): array
     {
         return apply_filters('theme_icon_list_icons', []);
+    }
+
+    public function addBodyAttributes(array $bodyAttributes): static
+    {
+        $this->bodyAttributes = [...$this->bodyAttributes, ...$bodyAttributes];
+
+        return $this;
+    }
+
+    public function getBodyAttribute(string $attribute): string|null
+    {
+        return $this->bodyAttributes[$attribute] ?? null;
+    }
+
+    public function getBodyAttributes(): array
+    {
+        return $this->bodyAttributes;
+    }
+
+    public function bodyAttributes(): string
+    {
+        if (BaseHelper::isRtlEnabled()) {
+            $this->bodyAttributes['dir'] = 'rtl';
+        }
+
+        if ($this->get('bodyClass')) {
+            $this->bodyAttributes['class'] = $this->get('bodyClass');
+        }
+
+        return apply_filters('theme_body_attributes', Html::attributes($this->bodyAttributes));
+    }
+
+    public function registerPreloader(): void
+    {
+        add_filter(THEME_FRONT_HEADER, function (string|null $html): string {
+            if (theme_option('preloader_enabled', 'no') != 'yes') {
+                return $html;
+            }
+
+            $preloader = null;
+
+            if (theme_option('preloader_version', 'v1') === 'v1') {
+                $preloader = view('packages/theme::fronts.preloader')->render();
+            }
+
+            return $html . apply_filters('theme_preloader', $preloader);
+        }, 16);
+
+        app('events')->listen(RenderingThemeOptionSettings::class, function () {
+            theme_option()
+                ->setField([
+                    'id' => 'preloader_enabled',
+                    'section_id' => 'opt-text-subsection-general',
+                    'type' => 'customSelect',
+                    'label' => __('Enable Preloader?'),
+                    'attributes' => [
+                        'name' => 'preloader_enabled',
+                        'list' => [
+                            'yes' => __('Yes'),
+                            'no' => __('No'),
+                        ],
+                        'value' => 'no',
+                        'options' => [
+                            'class' => 'form-control',
+                        ],
+                    ],
+                ])
+                ->when(count($this->getPreloaderVersions()) > 1, function () {
+                    return theme_option()
+                        ->setField([
+                            'id' => 'preloader_version',
+                            'section_id' => 'opt-text-subsection-general',
+                            'type' => 'customSelect',
+                            'label' => __('Preloader Version'),
+                            'attributes' => [
+                                'name' => 'preloader_version',
+                                'list' => $this->getPreloaderVersions(),
+                                'value' => 'v1',
+                                'options' => [
+                                    'class' => 'form-control',
+                                ],
+                            ],
+                        ]);
+                });
+        });
+    }
+
+    public function getPreloaderVersions(): array
+    {
+        return apply_filters('theme_preloader_versions', [
+            'v1' => __('Default'),
+        ]);
+    }
+
+    public function registerToastNotification(): void
+    {
+        add_filter(THEME_FRONT_FOOTER, function (string|null $html): string {
+            $toastNotification = view('packages/theme::fronts.toast-notification')->render();
+
+            return $html . apply_filters('theme_toast_notification', $toastNotification);
+        }, 16);
     }
 }

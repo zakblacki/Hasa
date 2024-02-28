@@ -23,7 +23,7 @@ if (! function_exists('get_discount_description')) {
         switch ($type) {
             case DiscountTypeOptionEnum::SHIPPING:
                 if ($target) {
-                    $description[] = __('Free shipping to <strong>:target</strong>', ['target' => $target]);
+                    $description[] = __('Free shipping to <strong>:target</strong>', ['target' => DiscountTargetEnum::getLabel($target)]);
                 } else {
                     $description[] = __('Free shipping for all orders');
                 }
