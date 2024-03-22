@@ -1,0 +1,7 @@
+{
+    "name": "botble/satim",
+    "description": "Saitm Payment Gateway",
+    "type": "package",
+    "require": {
+    }
+}
