@@ -5,6 +5,7 @@ use Botble\Blog\Repositories\Interfaces\PostInterface;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Models\FlashSale;
 use Botble\Ecommerce\Models\ProductCategory;
+use Botble\Ecommerce\Models\ProductCollection;
 use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Faq\Models\FaqCategory;
 use Botble\Faq\Repositories\Interfaces\FaqCategoryInterface;
@@ -137,10 +138,12 @@ app()->booted(function () {
 
         add_shortcode('all-products', __('All Products'), __('All Products'), function (Shortcode $shortcode) {
             $categoryIds = ShortcodeFacade::fields()->getIds('category_ids', $shortcode);
+            $collectionIds = ShortcodeFacade::fields()->getIds('collection_ids', $shortcode);
 
             $products = app(ProductInterface::class)->filterProducts(
                 [
                     'categories' => $categoryIds,
+                    'collections' => $collectionIds,
                 ],
                 [
                     'condition' => [
@@ -175,7 +178,12 @@ app()->booted(function () {
                 ->select(['id', 'name', 'parent_id'])
                 ->get();
 
-            return Theme::partial('short-codes.all-products-admin-config', compact('attributes', 'categories'));
+            $collections = ProductCollection::query()
+                ->wherePublished()
+                ->select(['id', 'name'])
+                ->get();
+
+            return Theme::partial('short-codes.all-products-admin-config', compact('attributes', 'categories', 'collections'));
         });
 
         add_shortcode('all-brands', __('All Brands'), __('All Brands'), function (Shortcode $shortcode) {

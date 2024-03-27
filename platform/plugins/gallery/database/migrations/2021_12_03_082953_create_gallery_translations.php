@@ -11,7 +11,7 @@ return new class () extends Migration {
             Schema::create('galleries_translations', function (Blueprint $table) {
                 $table->string('lang_code', 20);
                 $table->foreignId('galleries_id');
-                $table->string('name', 255)->nullable();
+                $table->string('name')->nullable();
                 $table->longText('description')->nullable();
 
                 $table->primary(['lang_code', 'galleries_id'], 'galleries_translations_primary');

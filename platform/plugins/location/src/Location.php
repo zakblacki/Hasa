@@ -206,9 +206,7 @@ class Location
 
             $zip->extract($destination, storage_path('app'));
 
-            if (File::exists($destination)) {
-                File::delete($destination);
-            }
+            File::delete($destination);
         }
 
         $dataPath = storage_path('app/locations-master/' . $countryCode);

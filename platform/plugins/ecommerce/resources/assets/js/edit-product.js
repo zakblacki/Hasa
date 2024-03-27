@@ -653,7 +653,7 @@ class EcommerceProduct {
     }
 
     static tableInitComplete = (table, settings) => {
-        if (!settings.oInit.paging) {
+        if (! settings.oInit.paging) {
             return
         }
 
@@ -698,7 +698,7 @@ class EcommerceProduct {
             const th = $(document.createElement('th')).appendTo($(tr))
 
             if (setting.searchable) {
-                if (setting?.search_data?.type == 'customSelect') {
+                if (setting?.search_data?.type == 'customSelect' && typeof window.CustomDataApdapterSelect2 !== 'undefined') {
                     let select = $(
                         `<div><select class='form-select input-sm' data-placeholder='${
                             setting.search_data.placeholder || 'Select'

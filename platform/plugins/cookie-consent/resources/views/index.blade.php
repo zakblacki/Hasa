@@ -12,7 +12,7 @@
                 {!! BaseHelper::clean(theme_option('cookie_consent_message', trans('plugins/cookie-consent::cookie-consent.message'))) !!}
                 @if (($learnMoreUrl = theme_option('cookie_consent_learn_more_url')) && ($learnMoreText = theme_option('cookie_consent_learn_more_text')))
                     <a
-                        href="{{ BaseHelper::getHomepageUrl() }}/{{ $learnMoreUrl }}">{{ $learnMoreText }}</a>
+                        href="{{ Str::startsWith($learnMoreUrl, ['http://', 'https://']) ? $learnMoreUrl : BaseHelper::getHomepageUrl() . '/' . $learnMoreUrl }}">{{ $learnMoreText }}</a>
                 @endif
             </span>
 

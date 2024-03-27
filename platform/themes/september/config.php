@@ -47,9 +47,9 @@ return [
             $theme->asset()->usePath()->add('slick-css', 'plugins/slick/slick.css');
             $theme->asset()->usePath()->add('jquery-bar-rating', 'plugins/jquery-bar-rating/themes/fontawesome-stars.css');
             $theme->asset()->usePath()->add('nouislider-css', 'plugins/nouislider/nouislider.min.css');
-            $theme->asset()->usePath()->add('owl.carousel', 'plugins/owl-carousel/css/owl.carousel.min.css', [], [], $version);
-            $theme->asset()->usePath()->add('owl.theme', 'plugins/owl-carousel/css/owl.theme.css', [], [], $version);
-            $theme->asset()->usePath()->add('owl.theme.default', 'plugins/owl-carousel/css/owl.theme.default.min.css', [], [], $version);
+            $theme->asset()->usePath()->add('owl.carousel', 'plugins/owl-carousel/css/owl.carousel.min.css');
+            $theme->asset()->usePath()->add('owl.theme', 'plugins/owl-carousel/css/owl.theme.css');
+            $theme->asset()->usePath()->add('owl.theme.default', 'plugins/owl-carousel/css/owl.theme.default.min.css');
             $theme->asset()->usePath()->add('style', 'css/style.css', [], [], $version);
 
             if (BaseHelper::isRtlEnabled()) {
@@ -63,7 +63,7 @@ return [
             $theme->asset()->container('footer')->usePath()->add('jquery-bar-rating-js', 'plugins/jquery-bar-rating/jquery.barrating.min.js');
             $theme->asset()->container('footer')->usePath()->add('nouislider-js', 'plugins/nouislider/nouislider.min.js');
             $theme->asset()->container('footer')->usePath()->add('equal-height-js', 'plugins/jquery.matchHeight-min.js');
-            $theme->asset()->container('footer')->usePath()->add('carousel-js', 'plugins/owl-carousel/js/owl.carousel.min.js', ['jquery'], [], $version);
+            $theme->asset()->container('footer')->usePath()->add('carousel-js', 'plugins/owl-carousel/js/owl.carousel.min.js', ['jquery']);
             $theme->asset()->container('footer')->usePath()->add('jquery.countdown-js', 'plugins/jquery.countdown.min.js');
             $theme->asset()->container('footer')->usePath()->add('script', 'js/script.js', [], [], $version);
             $theme->asset()->container('footer')->usePath()->add('backend-js', 'js/backend.js', [], [], $version);

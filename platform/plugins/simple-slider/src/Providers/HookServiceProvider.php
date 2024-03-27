@@ -54,12 +54,12 @@ class HookServiceProvider extends ServiceProvider
             ->where('key', $shortcode->key)
             ->first();
 
-        if (empty($slider)) {
+        if (empty($slider) || $slider->sliderItems->isEmpty()) {
             return null;
         }
 
         if (setting('simple_slider_using_assets', true) && defined('THEME_OPTIONS_MODULE_SCREEN_NAME')) {
-            $version = '1.0.3';
+            $version = '1.0.2';
             $dist = asset('vendor/core/plugins/simple-slider');
 
             Theme::asset()

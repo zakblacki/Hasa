@@ -5,6 +5,8 @@ namespace Botble\Base\Supports;
 use Botble\Media\Facades\RvMedia;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\Geometry\Factories\CircleFactory;
 use Intervention\Image\Geometry\Factories\RectangleFactory;
 use Intervention\Image\Interfaces\ImageInterface;
@@ -162,22 +164,25 @@ class Avatar
 
     public function buildAvatar(): self
     {
-        $this->image = RvMedia::imageManager()->create($this->width, $this->height);
+        $this->image = RvMedia::imageManager(extension_loaded('imagick') ? ImagickDriver::class : GdDriver::class)
+            ->create($this->width, $this->height);
 
         $this->createShape();
 
-        $this->image->text(
-            $this->make($this->name, $this->chars, $this->uppercase, $this->ascii),
-            $this->width / 2,
-            $this->height / 2,
-            function (FontFactory $font) {
-                $font->file($this->font);
-                $font->size($this->fontSize);
-                $font->color($this->foreground);
-                $font->align('center');
-                $font->valign('middle');
-            }
-        );
+        if (extension_loaded('imagick') || app()->isLocal()) {
+            $this->image->text(
+                $this->make($this->name, $this->chars, $this->uppercase, $this->ascii),
+                $this->width / 2,
+                $this->height / 2,
+                function (FontFactory $font) {
+                    $font->filename($this->font);
+                    $font->size($this->fontSize);
+                    $font->color($this->foreground);
+                    $font->align('center');
+                    $font->valign('middle');
+                }
+            );
+        }
 
         return $this;
     }
@@ -189,11 +194,15 @@ class Avatar
             return $this->$method();
         }
 
-        throw new InvalidArgumentException('Shape [' . $this->shape . '] currently not supported.');
+        throw new InvalidArgumentException(sprintf('Shape [%s] currently not supported.', $this->shape));
     }
 
-    public function make(string|array|null|object $name, int $length = 1, bool $uppercase = false, bool $ascii = false): string
-    {
+    public function make(
+        string|array|null|object $name,
+        int $length = 1,
+        bool $uppercase = false,
+        bool $ascii = false
+    ): string {
         $this->setName($name, $ascii);
 
         $words = collect(explode(' ', $this->name));

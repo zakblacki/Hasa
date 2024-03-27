@@ -37,7 +37,7 @@
                 <x-core::card class="h-100">
                     <div
                         class="position-relative img-responsive img-responsive-3x1 card-img-top border-bottom"
-                        @style(['background-color: var(--bb-primary-lt)', "background-image: url('$plugin->image')" => $plugin->image])
+                        @style(['background-color: #efefef', "background-image: url('$plugin->image')" => $plugin->image])
                     >
                         @if (! $plugin->image)
                             <x-core::icon class="position-absolute" style="top: calc(50% - 28px); left: calc(50% - 28px)" name="ti ti-puzzle" size="lg" />
@@ -85,6 +85,8 @@
                                     class="btn-trigger-change-status"
                                     data-plugin="{{ $plugin->path }}"
                                     data-status="{{ $plugin->status }}"
+                                    :data-check-requirement-url="route('plugins.check-requirement', ['name' => $plugin->path])"
+                                    :data-change-status-url="route('plugins.change.status', ['name' => $plugin->path])"
                                 >
                                     @if ($plugin->status)
                                         {{ trans('packages/plugin-management::plugin.deactivate') }}
@@ -101,6 +103,8 @@
                                     style="display: none;"
                                     data-name="{{ $plugin->path }}"
                                     data-check-update="{{ $plugin->id ?? 'plugin-' . $plugin->path }}"
+                                    :data-check-update-url="route('plugins.marketplace.ajax.check-update')"
+                                    :data-update-url="route('plugins.marketplace.ajax.update', ['id' => '__id__', 'name' => $plugin->path])"
                                     data-version="{{ $plugin->version }}"
                                 >
                                     {{ trans('packages/plugin-management::plugin.update') }}
@@ -112,6 +116,7 @@
                                     type="button"
                                     class="btn-trigger-remove-plugin"
                                     data-plugin="{{ $plugin->path }}"
+                                    :data-url="route('plugins.remove', ['plugin' => $plugin->path])"
                                 >
                                     {{ trans('packages/plugin-management::plugin.remove') }}
                                 </x-core::button>

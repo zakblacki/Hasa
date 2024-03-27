@@ -306,9 +306,21 @@ class AssetContainer
             ? ThemeFacade::getInheritTheme()
             : ThemeFacade::getThemeName();
 
+        $isLocal = ! Str::startsWith($source, ['http://', 'https://']);
+
         // Switch path to another theme.
         if (! is_bool($this->usePath) && ThemeFacade::exists($this->usePath)) {
             $source = str_replace($currentTheme, $this->usePath, $source);
+        }
+
+        // If this is a child theme, and the file (local) does not exist in the child theme, use the parent theme.
+        if (
+            ThemeFacade::hasInheritTheme()
+            && ! $this->isInheritTheme()
+            && $isLocal
+            && ! File::exists(public_path($source))
+        ) {
+            $source = str_replace($currentTheme, ThemeFacade::getInheritTheme(), $source);
         }
 
         $publicThemeName = $this->isInheritTheme() ? $currentTheme : ThemeFacade::getPublicThemeName();

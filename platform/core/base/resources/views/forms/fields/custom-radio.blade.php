@@ -10,8 +10,8 @@
 >
     {!! Form::customRadio(
         $name,
-        $options['choices'] ?? $options['values'],
-        $options['value'] ?? $options['selected'] ?? null,
+        $options['choices'] ?: $options['values'],
+        $options['selected'] ?: $options['value'] ?? null,
         $options['attr'],
         $options['default_value'],
     ) !!}

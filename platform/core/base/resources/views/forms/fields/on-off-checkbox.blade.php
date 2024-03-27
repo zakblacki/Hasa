@@ -8,8 +8,6 @@
     }
 
     $options['label'] = false;
-
-    Arr::set($options['attr'], 'class', str_replace('form-control', '', $options['attr']['class']));
 @endphp
 
 <x-core::form.field

@@ -32,7 +32,8 @@
     <x-slot:footer>
         @include('core/base::global-search.form')
         @include('core/media::partials.media')
-        @routes
+
+        {!! rescue(fn () => app(Tighten\Ziggy\BladeRouteGenerator::class)->generate(), report: false) !!}
 
         @if(App::hasDebugModeEnabled())
             <x-core::debug-badge />

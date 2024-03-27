@@ -43,7 +43,9 @@ class PermalinkField {
         $(document).on('click', '[data-bb-toggle="generate-slug"]', (e) => {
             e.preventDefault()
 
-            const $fromField = $(e.currentTarget).closest('.js-base-form').find(`input[name=${$slugBox.data('field-name')}]`)
+            const $fromField = $(e.currentTarget)
+                .closest('.js-base-form')
+                .find(`input[name=${$slugBox.data('field-name')}]`)
 
             if ($fromField.val() !== null && $fromField.val() !== '') {
                 createSlug($fromField.val(), $slugBox.find('.slug-data').data('id') || 0)

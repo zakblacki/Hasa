@@ -217,7 +217,8 @@ class Manager
         $themeTranslationsFilePath = $this->getThemeTranslationPath($locale);
         $defaultEnglishFile = theme_path(BaseHelper::joinPaths([$theme, 'lang', 'en.json']));
 
-        if ($defaultEnglishFile && ($locale !== 'en' || $defaultEnglishFile !== $themeTranslationsFilePath)) {
+        if (File::exists($defaultEnglishFile)
+            && ($locale !== 'en' || $defaultEnglishFile !== $themeTranslationsFilePath)) {
             return BaseHelper::getFileData($defaultEnglishFile);
         }
 
@@ -269,7 +270,11 @@ class Manager
                 $themeLangPath = theme_path("$theme/lang/en.json");
             }
 
-            File::copy($themeLangPath, $localeFilePath);
+            if (File::exists($themeLangPath)) {
+                File::copy($themeLangPath, $localeFilePath);
+            } else {
+                File::put($localeFilePath, '{}');
+            }
         }
 
         return $localeFilePath;

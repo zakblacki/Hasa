@@ -1,6 +1,6 @@
 @if (function_exists('get_galleries'))
     @php $galleries = get_galleries($limit); @endphp
-    @if (!$galleries->isEmpty())
+    @if ($galleries->isNotEmpty())
         <section class="section--instagram">
             @if ($title)
                 <div class="section__follow-instagram">

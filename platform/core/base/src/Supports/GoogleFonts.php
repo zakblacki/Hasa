@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class GoogleFonts
 {
-    protected Filesystem $filesystem;
+    protected Filesystem $files;
 
     protected string $path = 'fonts';
 
@@ -21,7 +21,7 @@ class GoogleFonts
 
     public function __construct()
     {
-        $this->filesystem = Storage::disk('public');
+        $this->files = Storage::disk('public');
     }
 
     public function load(string $font, string|null $nonce = null, bool $forceDownload = false): Fonts|null
@@ -53,16 +53,16 @@ class GoogleFonts
 
     protected function loadLocal(string $url, string|null $nonce): ?Fonts
     {
-        if (! $this->filesystem->exists($this->path($url, 'fonts.css'))) {
+        if (! $this->files->exists($this->path($url, 'fonts.css'))) {
             return null;
         }
 
         $fontCssPath = $this->path($url, 'fonts.css');
 
-        $localizedCss = $this->filesystem->get($fontCssPath);
+        $localizedCss = $this->files->get($fontCssPath);
 
         if (str_contains($localizedCss, '<!DOCTYPE html>')) {
-            $this->filesystem->delete($fontCssPath);
+            $this->files->delete($fontCssPath);
 
             return null;
         }
@@ -73,12 +73,12 @@ class GoogleFonts
                 Storage::disk('public')->url('fonts/'),
                 $localizedCss
             );
-            $this->filesystem->put($fontCssPath, $localizedCss);
+            $this->files->put($fontCssPath, $localizedCss);
         }
 
         return new Fonts(
             googleFontsUrl: $url,
-            localizedUrl: $this->filesystem->url($fontCssPath),
+            localizedUrl: $this->files->url($fontCssPath),
             localizedCss: $localizedCss,
             nonce: $nonce,
             preferInline: $this->inline,
@@ -105,8 +105,8 @@ class GoogleFonts
 
             $storedFontPath = $this->path($url, $localizedFontUrl);
 
-            if (! $this->filesystem->exists($storedFontPath)) {
-                $this->filesystem->put(
+            if (! $this->files->exists($storedFontPath)) {
+                $this->files->put(
                     $storedFontPath,
                     Http::withoutVerifying()->get($fontUrl)->body(),
                 );
@@ -114,16 +114,16 @@ class GoogleFonts
 
             $localizedCss = str_replace(
                 $fontUrl,
-                $this->filesystem->url($storedFontPath),
+                $this->files->url($storedFontPath),
                 $localizedCss,
             );
         }
 
-        $this->filesystem->put($this->path($url, 'fonts.css'), $localizedCss);
+        $this->files->put($this->path($url, 'fonts.css'), $localizedCss);
 
         return new Fonts(
             googleFontsUrl: $url,
-            localizedUrl: $this->filesystem->url($this->path($url, 'fonts.css')),
+            localizedUrl: $this->files->url($this->path($url, 'fonts.css')),
             localizedCss: $localizedCss,
             nonce: $nonce,
             preferInline: $this->inline,

@@ -25,7 +25,7 @@
                         @endif
                     </x-core::card.header>
 
-                    <x-core::table :hover="false" :striped="false">
+                    <x-core::table :hover="false" :striped="false" class="order-products-table">
                         <x-core::table.body>
                             @foreach ($order->products as $orderProduct)
                                 @php

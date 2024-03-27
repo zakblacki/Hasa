@@ -1032,11 +1032,17 @@ class LanguageManager
     public function getForcedLocale(): string|null
     {
         return Env::get(static::ENV_ROUTE_KEY, function () {
+            if (! function_exists('getenv')) {
+                return null;
+            }
+
             $value = getenv(static::ENV_ROUTE_KEY);
 
             if ($value !== false) {
                 return $value;
             }
+
+            return null;
         });
     }
 
@@ -1108,7 +1114,7 @@ class LanguageManager
         if ($locale && ! in_array($locale, $localeKeys) && (! $this->hideDefaultLocaleInURL() || $locale != $this->getDefaultLocale())) {
             $path = substr($path, 0, -4) . '_' . $locale . '.php';
 
-            if (file_exists($path)) {
+            if (file_exists($path) && function_exists('putenv')) {
                 putenv('APP_ROUTES_CACHE=' . $path);
             }
         }

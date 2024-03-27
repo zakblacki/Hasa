@@ -1,6 +1,6 @@
 <section class="section--homepage" style="padding-top: 30px;">
     <div class="container">
-        @if (clean($title))
+        @if (BaseHelper::clean($title))
             <div class="section__header">
                 <h3>{!! BaseHelper::clean($title) !!}</h3>
                 @if ($subtitle)
@@ -9,7 +9,7 @@
             </div>
         @endif
         <div class="section__content">
-            @if ($brands->count() > 0)
+            @if ($brands->isNotEmtpy())
                 <div class="row">
                     @foreach($brands as $brand)
                         <div class="col-md-3 col-6" style="margin-bottom: 10px;">

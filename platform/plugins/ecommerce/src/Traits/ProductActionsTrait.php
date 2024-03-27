@@ -30,7 +30,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Throwable;
 
 trait ProductActionsTrait
 {
@@ -162,15 +164,27 @@ trait ProductActionsTrait
         $addedAttributeSets = array_filter((array)$request->input('added_attribute_sets', []));
 
         if ($addedAttributes && $addedAttributeSets) {
-            $result = ProductVariation::getVariationByAttributesOrCreate($id, $addedAttributes);
+            try {
+                DB::beginTransaction();
 
-            $storeAttributesOfProductService->execute($product, $addedAttributeSets, $addedAttributes);
+                $result = ProductVariation::getVariationByAttributesOrCreate($id, $addedAttributes);
 
-            $variation = $result['variation']->toArray();
-            $variation['variation_default_id'] = $variation['id'];
-            $variation['auto_generate_sku'] = true;
+                $storeAttributesOfProductService->execute($product, $addedAttributeSets, $addedAttributes);
 
-            $this->postSaveAllVersions([$variation['id'] => $variation], $id, $response);
+                $variation = $result['variation']->toArray();
+                $variation['variation_default_id'] = $variation['id'];
+                $variation['auto_generate_sku'] = true;
+
+                $this->postSaveAllVersions([$variation['id'] => $variation], $id, $response);
+
+                DB::commit();
+            } catch (Throwable $exception) {
+                DB::rollBack();
+
+                return $response
+                    ->setError()
+                    ->setMessage($exception->getMessage());
+            }
         }
 
         return $response->withUpdatedSuccessMessage();

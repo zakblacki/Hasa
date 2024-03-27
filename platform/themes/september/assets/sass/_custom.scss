@@ -1501,7 +1501,7 @@ body {
     align-items: end;
     flex-wrap: wrap;
     justify-content: end;
-    height: 160px;
+    min-height: 160px;
 
     .category-image {
         display: inline-block;

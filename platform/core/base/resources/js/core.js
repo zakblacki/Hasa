@@ -15,7 +15,11 @@ class Botble {
         Botble.handleCounterUp()
         Botble.initMediaIntegrate()
 
-        if (BotbleVariables && BotbleVariables.authorized === '0' && typeof route !== 'undefined') {
+        if (
+            BotbleVariables &&
+            BotbleVariables.authorized === '0' &&
+            typeof BotbleVariables.authorize_url !== 'undefined'
+        ) {
             this.processAuthorize()
         }
 
@@ -27,7 +31,7 @@ class Botble {
 
         const formatTemplate = ({ id, text }) => {
             if (typeof id === 'undefined') {
-                id = '';
+                id = ''
             }
 
             return $(`<span><span class="dropdown-item-indicator">${text}</span> ${id}</span>`)
@@ -44,7 +48,7 @@ class Botble {
                         page: params.page || 1,
                     }
                 },
-                processResults: function (data) {
+                processResults: function ({ data }) {
                     return {
                         results: $.map(data.data, function (icon, name) {
                             return {
@@ -61,7 +65,7 @@ class Botble {
             placeholder: $coreIcon.data('placeholder'),
             templateResult: formatTemplate,
             templateSelection: formatTemplate,
-        })
+        }, true)
     }
 
     static blockUI(options) {
@@ -441,9 +445,7 @@ class Botble {
 
     static initResources() {
         $.each($(document).find('select.select-search-full'), function (index, element) {
-            Botble.select(element, {
-                allowClear: $(element).data('allow-clear')
-            })
+            Botble.select(element)
         })
 
         $.each($(document).find('select.select-full'), function (index, element) {
@@ -507,16 +509,18 @@ class Botble {
         })
 
         $.each($(document).find('.select-search-ajax'), function (index, element) {
-            if ($(element).data('url')) {
+            const $element = $(element)
+
+            if ($element.data('url')) {
                 let options = {
-                    placeholder: $(element).data('placeholder') || '--Select--',
-                    minimumInputLength: $(element).data('minimum-input') || 1,
+                    placeholder: $element.data('placeholder') || '--Select--',
+                    minimumInputLength: $element.data('minimum-input') || 1,
                     width: '100%',
                     delay: 250,
                     ajax: {
-                        url: $(element).data('url'),
+                        url: $element.data('url'),
                         dataType: 'json',
-                        type: $(element).data('type') || 'GET',
+                        type: $element.data('type') || 'GET',
                         quietMillis: 50,
                         data: function (params) {
                             // Query parameters will be ?search=[term]&page=[page]
@@ -553,6 +557,14 @@ class Botble {
                 }
 
                 Botble.select(element, options)
+                const selected = $element.data('selected')
+
+                if (Object.keys(selected).length > 0) {
+                    Object.keys(selected).forEach((key) => {
+                        const option = new Option(selected[key], key, true, true)
+                        $element.append(option).trigger('change')
+                    })
+                }
             }
         })
 
@@ -859,8 +871,7 @@ class Botble {
                         <div class='image-picker-backdrop'></div>
                         <span class='image-picker-remove-button'>
                             <button data-bb-toggle='image-picker-remove' class='btn btn-sm btn-icon'>
-                                <span class="icon-tabler-wrapper icon-sm icon-left">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                   <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                   <path d="M18 6l-12 12" />
                                   <path d="M6 6l12 12" />
@@ -1224,7 +1235,7 @@ class Botble {
     processAuthorize() {
         $httpClient
             .makeWithoutErrorHandler()
-            .post(route('membership.authorize'))
+            .post(BotbleVariables.authorize_url)
             .catch(() => {})
     }
 
@@ -1233,7 +1244,7 @@ class Botble {
         if ($menuItems.length) {
             $httpClient
                 .make()
-                .get(route('menu-items-count'))
+                .get($menuItems.data('url'))
                 .then(({ data }) => {
                     data.data.map((x) => {
                         if (x.value > 0) {
@@ -1417,19 +1428,23 @@ class Botble {
     /**
      * @param {HTMLElement} element
      * @param {object} options
+     * @param {boolean} force
      */
-    static select(element, options = {}) {
-        if (! jQuery().select2) {
-            return;
+    static select(element, options = {}, force = false) {
+        const $element = $(element)
+
+        if (!jQuery().select2 || ($element.hasClass('select2-hidden-accessible') && ! force)) {
+            return
         }
 
         options = {
             width: '100%',
-            placeholder: $(element).data('placeholder') || null,
+            placeholder: $element.data('placeholder') || null,
+            allowClear: $element.data('allow-clear') || false,
             ...options,
         }
 
-        let parent = $(element).closest('div[data-select2-dropdown-parent]') || $(element).closest('.modal')
+        let parent = $element.closest('div[data-select2-dropdown-parent]') || $element.closest('.modal')
 
         if (parent.length) {
             options.dropdownParent = parent
@@ -1437,7 +1452,7 @@ class Botble {
             options.minimumResultsForSearch = -1
         }
 
-        $(element).select2(options)
+        $element.select2(options)
     }
 
     /**
@@ -1797,23 +1812,23 @@ class Botble {
     }
 
     static initEditable() {
-        const $element = $('.editable');
+        const $element = $('.editable')
 
-        if (! $element.length) {
+        if (!$element.length) {
             return
         }
 
         $element.editable({
             mode: 'inline',
-            success: function(response) {
+            success: function (response) {
                 if (response.error && response.message) {
                     Botble.showError(response.message)
                 }
             },
-            error: function(response) {
+            error: function (response) {
                 Botble.handleError(response)
-            }
-        });
+            },
+        })
     }
 
     static unmaskInputNumber($form, formData) {

@@ -8,7 +8,7 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('media_folders', function (Blueprint $table) {
-            $table->string('color', 250)->nullable()->change();
+            $table->string('color')->nullable()->change();
         });
     }
 };

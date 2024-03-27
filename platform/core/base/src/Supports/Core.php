@@ -42,7 +42,6 @@ use Illuminate\Contracts\Session\Session;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
@@ -396,11 +395,6 @@ final class Core
                 @unlink($bootstrapCachePath . '/packages.php');
                 @unlink($bootstrapCachePath . '/services.php');
 
-                $oldLibrary = core_path('base/resources/data/intervention');
-                if ($this->files->isDirectory($oldLibrary)) {
-                    $this->files->copyDirectory($oldLibrary, base_path('vendor/intervention'));
-                }
-
                 $this->cleanCaches();
 
                 $this->files->delete($filePath);
@@ -418,6 +412,11 @@ final class Core
 
             return false;
         } catch (Throwable $exception) {
+            $bootstrapCachePath = base_path('bootstrap/cache');
+
+            @unlink($bootstrapCachePath . '/packages.php');
+            @unlink($bootstrapCachePath . '/services.php');
+
             if ($this->files->exists($coreTempPath)) {
                 $this->files->move($coreTempPath, $this->coreDataFilePath);
             }

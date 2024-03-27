@@ -12,7 +12,7 @@
                 {{ RvMedia::image($customer->avatar_url, $customer->name, attributes: ['class' => 'bb-customer-profile-avatar-img', 'data-bb-value' => 'customer-avatar']) }}
                 <div class="bb-customer-profile-avatar-overlay">
                     <input type="file" id="customer-avatar" name="avatar" data-bb-toggle="change-customer-avatar" data-url="{{ route('customer.avatar') }}" />
-                    <label for="customer-avatar"><x-core::icon name="ti ti-camera" :wrapper="false" /></label>
+                    <label for="customer-avatar"><x-core::icon name="ti ti-camera" /></label>
                 </div>
             </div>
 

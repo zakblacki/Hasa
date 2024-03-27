@@ -61,6 +61,7 @@
                                         color="primary"
                                         icon="ti ti-check"
                                         class="btn-trigger-active-theme"
+                                        :data-url="route('theme.active', ['theme' => $key])"
                                         data-theme="{{ $key }}"
                                     >
                                         {{ trans('packages/theme::theme.active') }}
@@ -71,6 +72,7 @@
                                         type="button"
                                         icon="ti ti-trash"
                                         class="btn-trigger-remove-theme"
+                                        :data-url="route('theme.remove', ['theme' => $key])"
                                         data-theme="{{ $key }}"
                                     >
                                         {{ trans('packages/theme::theme.remove') }}

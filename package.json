@@ -16,12 +16,12 @@
         "hot": "mix watch --hot",
         "prod": "npm run production",
         "production": "mix --production",
-        "format": "npx prettier platform/**/resources/js/**/*.{js,vue} platform/**/resources/sass/*.scss platform/**/resources/views/**/*.blade.php platform/themes/*/{views,partials}/**/*.blade.php platform/themes/*/assets/**/*.{js,scss} --write"
+        "format": "npx prettier platform/**/resources/js/**/*.{js,vue} platform/**/resources/sass/*.scss platform/**/resources/views/**/*.blade.php platform/themes/*/{layouts,partials,views,widgets}/**/*.blade.php platform/themes/*/assets/**/*.{js,scss} --write"
     },
     "devDependencies": {
         "@fullhuman/postcss-purgecss": "^5.0.0",
         "@shufo/prettier-plugin-blade": "^1.14.1",
-        "autoprefixer": "^10.4.17",
+        "autoprefixer": "^10.4.18",
         "cross-env": "^7.0.3",
         "css-loader": "^6.10.0",
         "glob": "^10.3.10",

@@ -47,7 +47,7 @@ class HandleApplyPromotionsService
         foreach ($productItems as $product) {
             $promotion = Discount::promotionForProduct([$product->id]);
 
-            if ($promotion && $availablePromotions->doesntContain($promotion)) {
+            if ($promotion && $promotion->qty > 1 && $availablePromotions->doesntContain($promotion)) {
                 $availablePromotions = $availablePromotions->push($promotion);
             }
         }

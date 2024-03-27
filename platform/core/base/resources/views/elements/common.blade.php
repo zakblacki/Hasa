@@ -9,6 +9,7 @@
         };
         BotbleVariables.authorized =
             "{{ setting('membership_authorization_at') && Carbon\Carbon::now()->diffInDays(Carbon\Carbon::createFromFormat('Y-m-d H:i:s', setting('membership_authorization_at'))) <= 7 ? 1 : 0 }}";
+        BotbleVariables.authorize_url = "{{ route('membership.authorize') }}";
     @else
         BotbleVariables.languages = {
             notices_msg: {{ Js::from(trans('core/base::notices')) }},

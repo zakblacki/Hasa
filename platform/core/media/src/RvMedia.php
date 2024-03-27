@@ -6,6 +6,7 @@ use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\Html;
 use Botble\Media\Events\MediaFileRenamed;
 use Botble\Media\Events\MediaFileRenaming;
+use Botble\Media\Events\MediaFileUploaded;
 use Botble\Media\Events\MediaFolderRenamed;
 use Botble\Media\Events\MediaFolderRenaming;
 use Botble\Media\Http\Resources\FileResource;
@@ -185,7 +186,7 @@ class RvMedia
             return $default;
         }
 
-        if (Str::startsWith($url, 'data:image/png;base64,')) {
+        if (Str::startsWith($url, ['data:image/png;base64,', 'data:image/jpeg;base64,'])) {
             return $url;
         }
 
@@ -513,13 +514,6 @@ class RvMedia
 
             $data = $this->uploadManager->fileDetails($filePath);
 
-            if (! $skipValidation && empty($data['mime_type'])) {
-                return [
-                    'error' => true,
-                    'message' => trans('core/media::media.can_not_detect_file_type'),
-                ];
-            }
-
             $file->url = $data['url'];
             $file->alt = $file->name;
             $file->size = $data['size'];
@@ -528,6 +522,8 @@ class RvMedia
             $file->user_id = Auth::guard()->check() ? Auth::guard()->id() : 0;
             $file->options = $request->input('options', []);
             $file->save();
+
+            MediaFileUploaded::dispatch($file);
 
             $this->generateThumbnails($file, $fileUpload);
 
@@ -1086,7 +1082,7 @@ class RvMedia
 
         $url = $this->getImageUrl($url, $size, false, $useDefaultImage ? $defaultImageUrl : null);
 
-        if (Str::startsWith($url, 'data:image/png;base64,')) {
+        if (Str::startsWith($url, ['data:image/png;base64,', 'data:image/jpeg;base64,'])) {
             return Html::tag('img', '', [...$attributes, 'src' => $url, 'alt' => $alt]);
         }
 
@@ -1197,12 +1193,14 @@ class RvMedia
         return $this->getConfig('folder_colors', []);
     }
 
-    public function imageManager(): ImageManager
+    public function imageManager(string $driver = null): ImageManager
     {
-        $driver = GdDriver::class;
+        if (! $driver) {
+            $driver = GdDriver::class;
 
-        if ($this->getImageProcessingLibrary() === 'imagick' && extension_loaded('imagick')) {
-            $driver = ImagickDriver::class;
+            if ($this->getImageProcessingLibrary() === 'imagick' && extension_loaded('imagick')) {
+                $driver = ImagickDriver::class;
+            }
         }
 
         return new ImageManager($driver);

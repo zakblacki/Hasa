@@ -9,6 +9,7 @@ use Botble\Base\Forms\Fields\EmailField;
 use Botble\Base\Forms\Fields\HtmlField;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Captcha\Facades\Captcha;
+use Botble\Captcha\Forms\Fields\ReCaptchaField;
 
 class NewsletterForm extends FormAbstract
 {
@@ -42,14 +43,7 @@ class NewsletterForm extends FormAbstract
             ->when(is_plugin_active('captcha') && Captcha::reCaptchaEnabled(), function (FormAbstract $form) {
                 $form->add(
                     'captcha',
-                    HtmlField::class,
-                    HtmlFieldOption::make()
-                        ->when(
-                            Captcha::reCaptchaType() === 'v2',
-                            fn (HtmlFieldOption $option) => $option->content(sprintf('<div class="mt-2">%s</div>', Captcha::display())),
-                            fn (HtmlFieldOption $option) => $option->content(Captcha::display())
-                        )
-                        ->toArray()
+                    ReCaptchaField::class,
                 );
             });
     }

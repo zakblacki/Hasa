@@ -9,6 +9,10 @@ use Botble\Base\Facades\EmailHandler;
 use Botble\Base\Facades\Form;
 use Botble\Base\Facades\Html;
 use Botble\Base\Facades\MetaBox;
+use Botble\Base\Forms\FieldOptions\NumberFieldOption;
+use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
+use Botble\Base\Forms\Fields\NumberField;
+use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Base\Rules\OnOffRule;
 use Botble\Base\Supports\TwigCompiler;
@@ -40,6 +44,9 @@ use Botble\Menu\Events\RenderingMenuOptions;
 use Botble\Menu\Facades\Menu;
 use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Enums\PaymentStatusEnum;
+use Botble\Payment\Forms\BankTransferPaymentMethodForm;
+use Botble\Payment\Forms\CODPaymentMethodForm;
+use Botble\Payment\Http\Requests\PaymentMethodRequest;
 use Botble\Payment\Services\Gateways\BankTransferPaymentService;
 use Botble\Payment\Services\Gateways\CodPaymentService;
 use Botble\Payment\Supports\PaymentHelper;
@@ -47,6 +54,7 @@ use Botble\Shortcode\Compilers\Shortcode;
 use Botble\Shortcode\Forms\ShortcodeForm;
 use Botble\Slug\Facades\SlugHelper;
 use Botble\Slug\Models\Slug;
+use Botble\Support\Http\Requests\Request as BaseRequest;
 use Botble\Theme\Events\RenderingThemeOptionSettings;
 use Botble\Theme\Facades\Theme;
 use Botble\Theme\Supports\ThemeSupport;
@@ -238,19 +246,50 @@ class HookServiceProvider extends ServiceProvider
                 }, 123);
             }
 
-            if (defined('PAYMENT_METHOD_SETTINGS_CONTENT')) {
-                add_filter(PAYMENT_METHOD_SETTINGS_CONTENT, function ($html, $paymentMethod) {
-                    return match ($paymentMethod) {
-                        PaymentMethodEnum::COD => $html . view(
-                            'plugins/ecommerce::settings.additional-cod-settings'
-                        )->render(),
-                        PaymentMethodEnum::BANK_TRANSFER => $html . view(
-                            'plugins/ecommerce::settings.additional-bank-transfer-settings'
-                        )->render(),
-                        default => $html,
-                    };
-                }, 123, 2);
+            if (is_plugin_active('payment')) {
+                CODPaymentMethodForm::extend(function (CODPaymentMethodForm $form) {
+                    $form->add(
+                        get_payment_setting_key('minimum_amount', PaymentMethodEnum::COD),
+                        NumberField::class,
+                        NumberFieldOption::make()
+                            ->label(trans(
+                                'plugins/ecommerce::setting.payment_method_cod_minimum_amount',
+                                ['currency' => get_application_currency()->title]
+                            ))
+                            ->value(setting('payment_cod_minimum_amount', 0))
+                            ->toArray()
+                    );
+                });
+
+                BankTransferPaymentMethodForm::extend(function (BankTransferPaymentMethodForm $form) {
+                    $form->add(
+                        get_payment_setting_key('display_bank_info_at_the_checkout_success_page', PaymentMethodEnum::BANK_TRANSFER),
+                        OnOffCheckboxField::class,
+                        OnOffFieldOption::make()
+                            ->label(trans('plugins/ecommerce::setting.display_bank_info_at_the_checkout_success_page'))
+                            ->value(setting('payment_bank_transfer_display_bank_info_at_the_checkout_success_page', false))
+                            ->toArray()
+                    );
+                });
             }
+
+            add_filter('core_request_rules', function (array $rules, BaseRequest $request) {
+                if ($request instanceof PaymentMethodRequest) {
+                    $rules = match ($request->input('type')) {
+                        PaymentMethodEnum::COD => [
+                            ...$rules,
+                            get_payment_setting_key('minimum_amount', PaymentMethodEnum::COD) => ['nullable', 'numeric', 'min:0'],
+                        ],
+                        PaymentMethodEnum::BANK_TRANSFER => [
+                            ...$rules,
+                            get_payment_setting_key('display_bank_info_at_the_checkout_success_page', PaymentMethodEnum::BANK_TRANSFER) => [new OnOffRule()],
+                        ],
+                        default => $rules,
+                    };
+                }
+
+                return $rules;
+            }, 999, 2);
 
             if (config('packages.theme.general.enable_custom_js')) {
                 add_filter('ecommerce_checkout_header', function ($html) {

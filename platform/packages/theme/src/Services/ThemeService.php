@@ -11,6 +11,7 @@ use Botble\Theme\Events\ThemeRemoveEvent;
 use Botble\Theme\Facades\Theme;
 use Botble\Theme\Facades\ThemeOption;
 use Botble\Widget\Models\Widget;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
@@ -39,10 +40,11 @@ class ThemeService
             ];
         }
 
+        $config = $this->getThemeConfig($theme);
+        $inheritTheme = Arr::get($config, 'inherit');
+
         try {
             $content = BaseHelper::getFileData($this->getPath($theme, 'theme.json'));
-            $config = $this->getThemeConfig($theme);
-            $inheritTheme = Arr::get($config, 'inherit');
 
             if (! Theme::exists($inheritTheme)) {
                 return [
@@ -64,6 +66,40 @@ class ThemeService
                 'error' => true,
                 'message' => $exception->getMessage(),
             ];
+        }
+
+        if (! empty($inheritTheme)) {
+            $themeOptions = ThemeOption::getOptions();
+
+            if (! empty($themeOptions)) {
+                $copiedOptions = [];
+                foreach ($themeOptions as $key => $option) {
+                    $key = str_replace(ThemeOption::getOptionKey(''), 'theme-' . $theme . '-', $key);
+                    $copiedOptions[] = [
+                        'key' => $key,
+                        'value' => $option,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ];
+                }
+
+                Setting::query()
+                    ->insertOrIgnore($copiedOptions);
+
+                $copiedWidgets = Widget::query()
+                    ->where('theme', $inheritTheme)
+                    ->get()
+                    ->toArray();
+
+                foreach ($copiedWidgets as $key => $widget) {
+                    $copiedWidgets[$key]['theme'] = $theme;
+                    $copiedWidgets[$key]['data'] = json_encode($widget['data']);
+                    unset($copiedWidgets[$key]['id']);
+                }
+
+                Widget::query()
+                    ->insertOrIgnore($copiedWidgets);
+            }
         }
 
         Theme::setThemeName($theme);

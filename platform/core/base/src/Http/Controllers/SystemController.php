@@ -46,7 +46,7 @@ class SystemController extends BaseSystemController
     {
         $response = $this->httpResponse();
 
-        if (! config('core.base.general.enable_system_updater')) {
+        if (! config('core.base.general.enable_system_updater') || BaseHelper::hasDemoModeEnabled()) {
             return $response;
         }
 

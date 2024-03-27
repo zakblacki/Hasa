@@ -41,7 +41,6 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 
 class BaseServiceProvider extends ServiceProvider
@@ -86,6 +85,8 @@ class BaseServiceProvider extends ServiceProvider
         $this->prepareAliasesIfMissing();
 
         config()->set(['session.cookie' => 'botble_session']);
+
+        $this->overrideDefaultConfigs();
     }
 
     public function boot(): void
@@ -101,9 +102,7 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app['blade.compiler']->anonymousComponentPath($this->getViewsPath() . '/components', 'core');
 
-        Schema::defaultStringLength(191);
-
-        $this->overrideDefaultConfigs();
+        $this->overridePackagesConfigs();
 
         $this->app->booted(function () {
             do_action(BASE_ACTION_INIT);
@@ -213,29 +212,7 @@ class BaseServiceProvider extends ServiceProvider
     {
         $config = $this->getConfig();
 
-        $baseConfig = $this->getBaseConfig();
-
-        /**
-         * @var SettingStore $setting
-         */
-        $setting = $this->app[SettingStore::class];
-        $timezone = $setting->get('time_zone', $config->get('app.timezone'));
-        $locale = $setting->get('locale', Arr::get($baseConfig, 'locale', $config->get('app.locale')));
-
-        $this->app->setLocale($locale);
-
-        if (in_array($timezone, DateTimeZone::listIdentifiers())) {
-            date_default_timezone_set($timezone);
-        }
-
         $config->set([
-            'app.locale' => $locale,
-            'app.timezone' => $timezone,
-            'purifier.settings' => [
-                ...$config->get('purifier.settings', []),
-                ...Arr::get($baseConfig, 'purifier', []),
-            ],
-            'ziggy.except' => ['debugbar.*'],
             'app.debug_blacklist' => [
                 '_ENV' => [
                     'APP_KEY',
@@ -263,17 +240,11 @@ class BaseServiceProvider extends ServiceProvider
                     'password',
                 ],
             ],
-            'datatables-buttons.pdf_generator' => 'excel',
-            'excel.exports.csv.use_bom' => true,
-            'dompdf.public_path' => public_path(),
             'debugbar.enabled' => $this->app->hasDebugModeEnabled() &&
                 ! $this->app->runningInConsole() &&
                 ! $this->app->environment(['testing', 'production']),
             'debugbar.capture_ajax' => false,
             'debugbar.remote_sites_path' => '',
-            'database.connections.mysql.strict' => Arr::get($baseConfig, 'db_strict_mode'),
-            'excel.imports.ignore_empty' => true,
-            'excel.imports.csv.input_encoding' => Arr::get($baseConfig, 'csv_import_input_encoding', 'UTF-8'),
         ]);
 
         if (
@@ -288,6 +259,42 @@ class BaseServiceProvider extends ServiceProvider
                 ],
             ]);
         }
+    }
+
+    protected function overridePackagesConfigs(): void
+    {
+        $config = $this->getConfig();
+
+        $baseConfig = $this->getBaseConfig();
+
+        /**
+         * @var SettingStore $setting
+         */
+        $setting = $this->app[SettingStore::class];
+        $timezone = $setting->get('time_zone', $config->get('app.timezone'));
+        $locale = $setting->get('locale', Arr::get($baseConfig, 'locale', $config->get('app.locale')));
+
+        $this->app->setLocale($locale);
+
+        if (in_array($timezone, DateTimeZone::listIdentifiers())) {
+            date_default_timezone_set($timezone);
+        }
+
+        $config->set([
+            'app.locale' => $locale,
+            'app.timezone' => $timezone,
+            'purifier.settings' => [
+                ...$config->get('purifier.settings', []),
+                ...Arr::get($baseConfig, 'purifier', []),
+            ],
+            'ziggy.except' => ['debugbar.*'],
+            'datatables-buttons.pdf_generator' => 'excel',
+            'excel.exports.csv.use_bom' => true,
+            'dompdf.public_path' => public_path(),
+            'database.connections.mysql.strict' => Arr::get($baseConfig, 'db_strict_mode'),
+            'excel.imports.ignore_empty' => true,
+            'excel.imports.csv.input_encoding' => Arr::get($baseConfig, 'csv_import_input_encoding', 'UTF-8'),
+        ]);
     }
 
     protected function registerRouteMacros(): void

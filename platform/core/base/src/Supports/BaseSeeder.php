@@ -76,20 +76,6 @@ class BaseSeeder extends Seeder
 
     public function prepareRun(): void
     {
-        $storage = Storage::disk('public');
-
-        foreach($storage->directories() as $directory) {
-            if ($directory !== 'fonts') {
-                $storage->deleteDirectory($directory);
-            }
-        }
-
-        foreach($storage->files() as $file) {
-            if ($file !== '.gitignore') {
-                $storage->delete($file);
-            }
-        }
-
         MediaFile::query()->truncate();
         MediaFolder::query()->truncate();
 

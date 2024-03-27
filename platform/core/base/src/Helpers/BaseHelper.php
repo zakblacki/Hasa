@@ -5,7 +5,8 @@ namespace Botble\Base\Helpers;
 use Botble\Base\Facades\AdminAppearance;
 use Botble\Base\Facades\Html;
 use Botble\Base\View\Components\BadgeComponent;
-use Botble\Base\View\Components\IconComponent;
+use Botble\Icon\Facades\Icon as IconFacade;
+use Botble\Icon\View\Components\Icon;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
@@ -46,17 +47,13 @@ class BaseHelper
         return $this->formatTime(Carbon::parse($date), $format);
     }
 
-    public function formatDateTime(string|null $date, string $format = null): string|null
+    public function formatDateTime(CarbonInterface|int|string|null $date, string $format = null): string|null
     {
         if (empty($format)) {
             $format = $this->getDateTimeFormat();
         }
 
-        if (empty($date)) {
-            return $date;
-        }
-
-        return $this->formatTime(Carbon::parse($date), $format);
+        return $this->formatDate($date, $format);
     }
 
     public function humanFilesize(float $bytes, int $precision = 2): string
@@ -502,9 +499,7 @@ class BaseHelper
             return false;
         }
 
-        $name = str_replace('ti ti-', '', $name);
-
-        return File::exists(sprintf(core_path('base/resources/views/components/icons/%s.blade.php'), $name));
+        return IconFacade::has($name);
     }
 
     public function renderIcon(string $name, string $size = null, array $attributes = [], bool $safe = false): string
@@ -514,7 +509,7 @@ class BaseHelper
         }
 
         return Blade::renderComponent(
-            (new IconComponent($name, $size))->withAttributes($attributes)
+            (new Icon($name, $size))->withAttributes($attributes)
         );
     }
 
@@ -527,7 +522,7 @@ class BaseHelper
 
     public function cleanToastMessage(string $message): string
     {
-        if (str_contains('http://', $message) || str_contains('https://', $message)) {
+        if (Str::startsWith($message, ['http://', 'https://'])) {
             return $message;
         }
 

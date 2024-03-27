@@ -394,8 +394,8 @@ class HandleFrontPages
         ?ProductCategory $category = null
     ): array {
         $total = $products->total();
-        $message = $total > 1 ? __(':total Products found', compact('total')) : __(
-            ':total Product found',
+        $message = $total === 1 ? __(':total Product found', compact('total')) : __(
+            ':total Products found',
             compact('total')
         );
 

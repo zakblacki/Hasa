@@ -29,9 +29,10 @@ export class MediaDetails {
         let useClipboard = false
         Helpers.forEach(data, (val, index) => {
             if (Helpers.inArray(_self.onlyFields, index) && val) {
-                if (!Helpers.inArray(['size', 'mime_type'], index)) {
-                    description += _self.descriptionItemTemplate.replace(/__title__/gi, Helpers.trans(index)).replace(
-                        /__url__/gi,
+                if (!Helpers.inArray(['mime_type'], index)) {
+                    description += _self.descriptionItemTemplate
+                        .replace(/__title__/gi, Helpers.trans(index))
+                        .replace(/__url__/gi,
                         val
                             ? index === 'full_url'
                                 ? `<div class="input-group">

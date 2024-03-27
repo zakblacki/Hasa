@@ -122,7 +122,7 @@
                 <div class="w-100 p-2 rv-media-top-header flex-wrap gap-3 d-flex justify-content-between align-items-start border-bottom bg-body">
                     <div class="d-flex gap-2 justify-content-between w-100 w-md-auto rv-media-actions">
                         <x:core::button
-                            class="d-block d-md-none"
+                            class="d-flex d-md-none"
                             icon="ti ti-menu-2"
                             :icon-only="true"
                             data-bs-toggle="offcanvas"
@@ -357,7 +357,7 @@
                         <x-core::button
                             tag="label"
                             for="media_details_collapse"
-                            class="collapse-panel ms-2 d-none d-sm-block"
+                            class="collapse-panel ms-2 d-none d-sm-flex"
                             icon="ti ti-arrow-bar-right"
                             :icon-only="true"
                         />

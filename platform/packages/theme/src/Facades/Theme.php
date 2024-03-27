@@ -71,6 +71,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void registerPreloader()
  * @method static array getPreloaderVersions()
  * @method static void registerToastNotification()
+ * @method static string|null getSiteCopyright()
  *
  * @see \Botble\Theme\Theme
  */

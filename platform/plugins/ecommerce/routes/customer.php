@@ -249,6 +249,11 @@ if (defined('THEME_MODULE_SCREEN_NAME')) {
                 'uses' => 'UploadProofController@upload',
             ])->wherePrimaryKey();
 
+            Route::get('orders/{id}/download-proof', [
+                'as' => 'orders.download-proof',
+                'uses' => 'UploadProofController@download',
+            ])->wherePrimaryKey();
+
             Route::delete('orders/{id}/download-proof', [
                 'as' => 'orders.download-proof',
                 'uses' => 'UploadProofController@delete',

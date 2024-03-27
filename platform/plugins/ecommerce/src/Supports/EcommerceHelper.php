@@ -1113,6 +1113,8 @@ class EcommerceHelper
                             $query->whereIn('ec_product_categories.id', $categoryIds);
                         });
                     }
+
+                    $query->where('status', BaseStatusEnum::PUBLISHED);
                 },
             ])
             ->orderBy('order')
@@ -1137,6 +1139,8 @@ class EcommerceHelper
                             $query->whereIn('ec_product_categories.id', $categoryIds);
                         });
                     }
+
+                    $query->where('status', BaseStatusEnum::PUBLISHED);
                 },
             ])
             ->with('slugable')

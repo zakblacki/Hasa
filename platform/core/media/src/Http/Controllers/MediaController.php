@@ -408,7 +408,7 @@ class MediaController extends BaseController
                                 $folderData['name'] = $oldFolder->name . '-(copy)';
                                 $folderData['user_id'] = Auth::guard()->id();
                                 $folderData['parent_id'] = $folder->id;
-                                $folder = $this->folderRepository->create($folderData);
+                                $folder = MediaFolder::query()->create($folderData);
 
                                 $parentFiles = $this->fileRepository->getFilesByFolderId($parentId, [], false);
                                 foreach ($parentFiles as $parentFile) {
@@ -427,7 +427,7 @@ class MediaController extends BaseController
                                 $subFolderData['user_id'] = Auth::guard()->id();
                                 $subFolderData['parent_id'] = $folder->id;
 
-                                $sub = $this->folderRepository->create($subFolderData);
+                                $sub = MediaFolder::query()->create($subFolderData);
 
                                 foreach ($subFiles as $subFile) {
                                     $this->copyFile($subFile, $sub->getKey());
@@ -435,7 +435,7 @@ class MediaController extends BaseController
                             }
                         }
 
-                        $allFiles = Storage::allFiles($this->folderRepository->getFullPath($oldFolder->id));
+                        $allFiles = Storage::allFiles($this->folderRepository->getFullPath($oldFolder->getKey()));
                         foreach ($allFiles as $file) {
                             Storage::copy($file, str_replace($oldFolder->slug, $folder->slug, $file));
                         }
@@ -683,6 +683,7 @@ class MediaController extends BaseController
         unset($file->is_folder);
         unset($file->slug);
         unset($file->parent_id);
+        unset($file->color);
 
         $file->save();
 

@@ -18,8 +18,7 @@ register_sidebar([
     'description' => __('Footer sidebar'),
 ]);
 
-RvMedia::setUploadPathAndURLToPublic()
-    ->addSize('medium', 570, 570)
+RvMedia::addSize('medium', 570, 570)
     ->addSize('small', 570, 268);
 
 app()->booted(function () {
