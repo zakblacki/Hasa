@@ -40,8 +40,15 @@ class ProductRequest extends Request
     {
         $rules = [
             'name' => 'required|string|max:250',
-            'price' => 'numeric|nullable|min:0|max:100000000000',
-            'sale_price' => 'numeric|nullable|min:0|max:100000000000',
+            'price' => [
+                'numeric',
+                'nullable',
+                'min:0',
+                Rule::when($this->input('sale_price'), function () {
+                    return 'gt:sale_price';
+                }),
+            ],
+            'sale_price' => 'numeric|nullable|min:0',
             'start_date' => 'date|nullable|required_if:sale_type,1',
             'end_date' => 'date|nullable|after:' . ($this->input('start_date') ?? Carbon::now()->toDateTimeString()),
             'wide' => 'numeric|nullable|min:0|max:100000000',
@@ -50,8 +57,8 @@ class ProductRequest extends Request
             'length' => 'numeric|nullable|min:0|max:100000000',
             'images' => 'sometimes|array',
             'images.*' => 'nullable|string',
-            'status' => Rule::in(BaseStatusEnum::values()),
             'quantity' => 'numeric|nullable|min:0|max:100000000',
+            'status' => Rule::in(BaseStatusEnum::values()),
             'product_type' => Rule::in(ProductTypeEnum::values()),
             'product_files_input' => 'nullable|array',
             'product_files_input.*' => 'nullable|file|mimes:' . config('plugins.ecommerce.general.digital_products.allowed_mime_types'),
@@ -60,13 +67,14 @@ class ProductRequest extends Request
             'product_files_external.*.link' => 'required|url|max:400',
             'product_files_external.*.size' => 'nullable|numeric|min:0|max:100000000',
             'taxes' => 'nullable|array',
-            'cost_per_item' => 'numeric|nullable|min:0|max:100000000000',
             'barcode' => [
                 'nullable',
+                'max:50',
                 'string',
                 'max:50',
                 Rule::unique('ec_products')->ignore($this->route('product.id')),
             ],
+            'cost_per_item' => 'nullable|numeric|min:0',
             'general_license_code' => 'nullable|in:0,1',
             'categories' => 'nullable|array',
             'categories.*' => 'nullable|exists:ec_product_categories,id',
@@ -76,6 +84,7 @@ class ProductRequest extends Request
             'cross_sale_products.*.id' => ['nullable', 'string', 'exists:ec_products,id'],
             'cross_sale_products.*.price' => ['nullable', 'numeric', 'min:0', 'max:100000000000'],
             'cross_sale_products.*.price_type' => ['nullable', 'string', Rule::in(CrossSellPriceType::values())],
+
             'ancien_prix' => 'nullable|numeric',
             'type_de_taille' => 'nullable|string',
             'type_de_tissu' => 'nullable|string',
@@ -107,6 +116,8 @@ class ProductRequest extends Request
             'size' => 'nullable|integer',
             'images_for_website' => 'nullable|string',
 
+            'minimum_order_quantity' => 'nullable|numeric|min:0',
+            'maximum_order_quantity' => 'nullable|numeric|min:0',
         ];
 
         if (EcommerceHelper::isEnabledProductOptions()) {
