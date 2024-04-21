@@ -25,7 +25,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
@@ -38,6 +37,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\Failure;
+use Illuminate\Support\Facades\DB;
 
 class ProductImport implements
     ToModel,
@@ -81,6 +81,8 @@ class ProductImport implements
 
     protected Collection $barcodes;
 
+    private static $methodCallCount = 0;
+
     public function __construct(
         protected StoreProductTagService $storeProductTagService,
         protected Request $request
@@ -123,8 +125,7 @@ class ProductImport implements
 
         if ($importType == 'variations' && $row['import_type'] == 'variation') {
             $product = $this->getProduct($name, $slug);
-
-            return $this->storeVariant($product);
+            return $this->storeVariant($product, $row);
         }
 
         if ($row['import_type'] == 'variation') {
@@ -145,14 +146,14 @@ class ProductImport implements
             } else {
                 $product = $this->getProduct($name, $slug);
             }
-
-            return $this->storeVariant($product);
+            
+            return $this->storeVariant($product, $row);
         }
-
+        
         return $this->storeProduct();
     }
 
-    protected function getProduct(string $name, ?string $slug): Model|Builder|null
+    protected function getProduct(string $name, string|null $slug): Model|Builder|null
     {
         if ($slug) {
             $slug = SlugHelper::getSlug($slug, SlugHelper::getPrefix(Product::class), Product::class);
@@ -180,15 +181,29 @@ class ProductImport implements
     public function storeProduct(): Product|Model|null
     {
         if (
-            ($sku = $this->request->input('sku')) &&
-            $existingProduct = Product::query()->where('sku', $sku)->first()
+            ($sku = $this->request->input('sku')) && $this->request->import_type == 'product' &&
+            $existingProduct = Product::query()->where(['sku' => $sku, 'is_variation' => 0])->first()
         ) {
+            // update product
+            $product = $this->updateProductData($existingProduct);
+
+            self::$methodCallCount = 0;
+
+            $collect = collect([
+                'name' => $product->name,
+                'slug' => $this->request->input('slug'),
+                'import_type' => 'product',
+                'attribute_sets' => [],
+                'model' => $product,
+            ]);
+
+            $this->onSuccess($collect);
             return $existingProduct;
         }
 
         $product = new Product();
 
-        $this->request->merge(['images' => $this->getImageURLs((array) $this->request->input('images', []))]);
+        $this->request->merge(['images' => $this->getImageURLs((array)$this->request->input('images', []))]);
 
         if ($description = $this->request->input('description')) {
             $this->request->merge(['description' => BaseHelper::clean($description)]);
@@ -202,7 +217,7 @@ class ProductImport implements
 
         $product = (new StoreProductService())->execute($this->request, $product);
 
-        $tagsInput = (array) $this->request->input('tags', []);
+        $tagsInput = (array)$this->request->input('tags', []);
         if ($tagsInput) {
             $tags = [];
             foreach ($tagsInput as $tag) {
@@ -229,12 +244,151 @@ class ProductImport implements
         return $product;
     }
 
+    protected function updateProductData($existingProduct)
+    {
+        if(!$existingProduct->is_variation) {
+            // Update labels
+            $labels = (!empty($this->request->input('labels'))) ? $this->request->input('labels') : [];
+            $labelIds = $this->getIdsFromNames('ec_product_labels', 'name', $labels);
+            $this->updateData($labelIds, 'ec_product_label_products', $existingProduct->id, 'product_id', 'product_label_id');
+
+            // Update taxes
+            $taxes = (!empty($this->request->input('taxes'))) ? $this->request->input('taxes') : [];
+            $taxIds = $this->getIdsFromNames('ec_taxes', 'title', $taxes);
+            $this->updateData($taxIds, 'ec_tax_products', $existingProduct->id, 'product_id', 'tax_id');
+
+            // Update tags
+            $tags = (!empty($this->request->input('tags'))) ? $this->request->input('tags') : [];
+            $tagsIds = $this->getIdsFromNames('ec_product_tags', 'name', $tags);
+            $this->updateData($tagsIds, 'ec_product_tag_product', $existingProduct->id, 'product_id', 'tag_id');
+
+            // Update categories
+            $categories = (!empty($this->request->input('categories'))) ? $this->request->input('categories') : [];
+            $categorieIds = $this->getIdsFromNames('ec_product_tags', 'name', $categories);
+            $this->updateData($categorieIds, 'ec_product_category_product', $existingProduct->id, 'product_id', 'category_id');
+
+            // Update collections
+            $productCollections = (!empty($this->request->input('product_collections'))) ? $this->request->input('product_collections') : [];
+            $categorieIds = $this->getIdsFromNames('ec_product_collections', 'name', $productCollections);
+            $this->updateData($categorieIds, 'ec_product_collection_products', $existingProduct->id, 'product_id', 'product_collection_id');
+        }
+
+        // Update attributes
+        $attributes = (!empty($this->request->input('product_attributes'))) ? $this->request->input('product_attributes') : [];
+        $attributeIds = $this->getIdsFromNames('ec_product_attributes', 'title', $attributes);
+        $this->updateData($attributeIds, 'ec_product_with_attribute_set', $existingProduct->id, 'product_id', 'attribute_set_id');
+
+        // update images
+        if ($images = $this->request->input('images')) {
+            $this->request->merge(['images' => json_encode($images)]);
+        }
+
+        // Extract the product data from the existing product object
+        $productData = $existingProduct->toArray();
+
+        // Merge the product data with the new values from the request
+        $productData = array_merge($productData, $this->request->except('sku'));
+
+        unset(
+            $productData['sku'], 
+            $productData['original_price'], 
+            $productData['front_sale_price'],
+
+            $productData['_token'],
+            $productData['type'],
+            $productData['product_name'],
+            $productData['slug'],
+            $productData['auto_generate_sku'],
+            $productData['categories'],
+            $productData['brand'],
+
+            $productData['product_collections'],
+            $productData['labels'],
+            $productData['taxes'],
+            $productData['product_attributes'],
+            $productData['import_type'],
+            $productData['is_variation_default'],
+            $productData['start_date_sale_price'],
+
+            $productData['end_date_sale_price'],
+            $productData['tags'],
+            $productData['is_slug_editable'],
+            $productData['product_labels'],
+            $productData['attribute_sets'],
+            $productData['file'],
+
+            $productData['created_at'],
+            $productData['updated_at'],
+            $productData['variation_info'],
+            $productData['tag'],
+        );
+
+        // Update the product in the database using the DB facade
+        DB::table('ec_products')
+            ->where('id', $existingProduct->id)
+            ->update($productData);
+
+        $collect = collect([
+            'name' => $existingProduct->name,
+            'slug' => $this->request->input('slug'),
+            'import_type' => 'product',
+            'attribute_sets' => [],
+            'model' => $existingProduct,
+        ]);
+
+        $this->onSuccess($collect);
+
+        return $existingProduct;
+    }
+
+    protected function getIdsFromNames($tableName, $columnName, $labels)
+    {
+        $ids = [];
+
+        foreach ($labels as $label) {
+            if (is_string($label)) {
+                // If $label is a string, retrieve the ID from the specified table
+                $id = DB::table($tableName)->where($columnName, $label)->value('id');
+                if ($id !== null) {
+                    // If a matching ID is found, push it into the $ids array
+                    $ids[] = $id;
+                }
+            } else {
+                // If $label is not a string, assume it's already an ID and push it into the $ids array
+                $ids[] = $label;
+            }
+        }
+
+        return $ids;
+    }
+
+    // Define a function to update data into a table
+    protected function updateData($data, $tableName, $existingProductId, $foreignKeyName = 'product_id', $foreignKeyNameToUpdate = 'foreign_id') {
+        // Delete all records with the existing product ID
+        DB::table($tableName)
+          ->where($foreignKeyName, $existingProductId)
+          ->delete();
+      
+        // Insert new records from the data array
+        collect($data)->each(function ($item) use ($tableName, $foreignKeyNameToUpdate, $existingProductId, $foreignKeyName) {
+          $tableData = [
+            $foreignKeyNameToUpdate => $item,
+            $foreignKeyName => $existingProductId
+          ];
+          DB::table($tableName)->insert($tableData);
+        });
+    }
+
     protected function getImageURLs(array $images): array
     {
         $images = array_values(array_filter($images));
 
         foreach ($images as $key => $image) {
-            $images[$key] = str_replace(RvMedia::getUploadURL() . '/', '', trim($image));
+            $image = trim(strtolower($image));
+
+            if (! setting('media_use_original_name_for_file_path')) {
+                $images[$key] = str_replace(RvMedia::getUploadURL() . '/', '', $image);
+            }
 
             if (Str::startsWith($images[$key], ['http://', 'https://'])) {
                 $images[$key] = $this->uploadImageFromURL($images[$key]);
@@ -244,22 +398,20 @@ class ProductImport implements
         return $images;
     }
 
-    protected function uploadImageFromURL(?string $url): ?string
+    protected function uploadImageFromURL(string|null $url): string|null
     {
         $result = RvMedia::uploadFromUrl($url, 0, 'products');
 
         if (! $result['error']) {
             $url = $result['data']->url;
-        } else {
-            Log::error($result['message']);
         }
 
         return $url;
     }
 
-    public function storeVariant($product): ProductVariation|Model|null
+    public function storeVariant($product, $row = []): ProductVariation|Model|null
     {
-        if (! $product) {
+        if (! $product ) {
             if (method_exists($this, 'onFailure')) {
                 $failures[] = new Failure(
                     $this->rowCurrent,
@@ -273,8 +425,23 @@ class ProductImport implements
             return null;
         }
 
+        if ($row['import_type'] == 'variation') {
+            // update variant
+            $where = ['is_variation' => 1, 'name' => $row['product_name']];
+            
+            if ($productVariant = Product::where($where)->skip(self::$methodCallCount)->first()) {
+                // update product
+                $product = $this->updateProductData($productVariant);
+                self::$methodCallCount++;
+                return $product;
+            }
+        }
+
+        self::$methodCallCount++;
+        
         $addedAttributes = $this->request->input('attribute_sets', []);
         $result = ProductVariation::getVariationByAttributesOrCreate($product->id, $addedAttributes);
+        
         if (! $result['created']) {
             if (method_exists($this, 'onFailure')) {
                 $failures[] = new Failure(
@@ -353,7 +520,7 @@ class ProductImport implements
         $productRelatedToVariation->height = Arr::get($version, 'height', $product->height);
         $productRelatedToVariation->weight = Arr::get($version, 'weight', $product->weight);
 
-        $productRelatedToVariation->sale_type = (int) Arr::get($version, 'sale_type', $product->sale_type);
+        $productRelatedToVariation->sale_type = (int)Arr::get($version, 'sale_type', $product->sale_type);
 
         if ($productRelatedToVariation->sale_type == 0) {
             $productRelatedToVariation->start_date = null;
@@ -368,7 +535,7 @@ class ProductImport implements
         }
 
         $productRelatedToVariation->images = json_encode(
-            $this->getImageURLs((array) Arr::get($version, 'images', []) ?: [])
+            $this->getImageURLs((array)Arr::get($version, 'images', []) ?: [])
         );
 
         $productRelatedToVariation->status = strtolower(Arr::get($version, 'status', $product->status));
@@ -444,7 +611,7 @@ class ProductImport implements
         return $row;
     }
 
-    protected function getTaxByKeyword(string|int $keyword): ?Tax
+    protected function getTaxByKeyword(string|int $keyword): Tax|null
     {
         return $this->allTaxes->filter(function ($item) use ($keyword) {
             if (is_numeric($keyword)) {
@@ -586,7 +753,7 @@ class ProductImport implements
 
     public function mapLocalization(array $row): array
     {
-        $row['stock_status'] = (string) Arr::get($row, 'stock_status');
+        $row['stock_status'] = (string)Arr::get($row, 'stock_status');
         if (! in_array($row['stock_status'], StockStatusEnum::toArray())) {
             $row['stock_status'] = StockStatusEnum::IN_STOCK;
         }
@@ -609,7 +776,7 @@ class ProductImport implements
         $row['name'] = Arr::get($row, 'product_name');
         $row['is_slug_editable'] = true;
 
-        $row['barcode'] = (string) Arr::get($row, 'barcode');
+        $row['barcode'] = (string)Arr::get($row, 'barcode');
 
         $this->setValues($row, [
             ['key' => 'slug', 'type' => 'string', 'default' => 'name'],
@@ -725,7 +892,7 @@ class ProductImport implements
                 if (Str::lower($value) == 'false' || $value == '0' || Str::lower($value) == 'no') {
                     $value = false;
                 }
-                $value = (bool) $value;
+                $value = (bool)$value;
 
                 break;
             case 'datetime':
