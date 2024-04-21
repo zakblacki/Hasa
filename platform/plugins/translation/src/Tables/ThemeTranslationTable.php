@@ -69,12 +69,12 @@ class ThemeTranslationTable extends TableAbstract
         return $this;
     }
 
-    protected function formatKeyAndValue(string|null $value): string|null
+    protected function formatKeyAndValue(?string $value): ?string
     {
         return htmlentities($value, ENT_QUOTES, 'UTF-8', false);
     }
 
-    public function htmlDrawCallbackFunction(): string|null
+    public function htmlDrawCallbackFunction(): ?string
     {
         return parent::htmlDrawCallbackFunction() . 'Botble.initEditable()';
     }

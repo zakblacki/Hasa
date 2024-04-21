@@ -122,15 +122,15 @@ class MediaServiceProvider extends ServiceProvider
         $config->set([
             'filesystems.default' => $mediaDriver,
             'filesystems.disks.public.throw' => true,
-            'core.media.media.chunk.enabled' => (bool)$setting->get(
+            'core.media.media.chunk.enabled' => (bool) $setting->get(
                 'media_chunk_enabled',
                 $config->get('core.media.media.chunk.enabled')
             ),
-            'core.media.media.chunk.chunk_size' => (int)$setting->get(
+            'core.media.media.chunk.chunk_size' => (int) $setting->get(
                 'media_chunk_size',
                 $config->get('core.media.media.chunk.chunk_size')
             ),
-            'core.media.media.chunk.max_file_size' => (int)$setting->get(
+            'core.media.media.chunk.max_file_size' => (int) $setting->get(
                 'media_max_file_size',
                 $config->get('core.media.media.chunk.max_file_size')
             ),

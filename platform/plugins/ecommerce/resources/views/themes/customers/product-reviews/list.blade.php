@@ -1,7 +1,7 @@
 @extends(EcommerceHelper::viewPath('customers.master'))
 
 @section('content')
-    @include('plugins/ecommerce::themes.customers.product-reviews.icons')
+    @include(EcommerceHelper::viewPath('customers.product-reviews.icons'))
 
     <h3 class="customer-page-title mb-4">{{ SeoHelper::getTitle() }}</h3>
 
@@ -84,10 +84,10 @@
             </div>
 
             <div class="tab-pane fade @if (request()->has('page')) show active @endif" id="reviewed-tab-pane" role="tabpanel" aria-labelledby="reviewed-tab" tabindex="0">
-                @include('plugins/ecommerce::themes.customers.product-reviews.reviewed')
+                @include(EcommerceHelper::viewPath('customers.product-reviews.reviewed'))
             </div>
         </div>
 
-        @include('plugins/ecommerce::themes.customers.product-reviews.modal')
+        @include(EcommerceHelper::viewPath('customers.product-reviews.modal'))
     </div>
 @endsection

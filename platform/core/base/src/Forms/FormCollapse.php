@@ -25,11 +25,11 @@ class FormCollapse
 
     protected string $targetFieldValue = '1';
 
-    protected Closure $fieldsetCallback;
+    protected array $fieldsetCallback = [];
 
-    protected Closure|null $beforeRegisterFieldset = null;
+    protected ?Closure $beforeRegisterFieldset = null;
 
-    protected Closure|null $afterRegisterFieldset = null;
+    protected ?Closure $afterRegisterFieldset = null;
 
     protected bool $isOpened = false;
 
@@ -66,9 +66,18 @@ class FormCollapse
         return $this;
     }
 
-    public function fieldset(Closure $callback): static
-    {
-        $this->fieldsetCallback = $callback;
+    public function fieldset(
+        Closure $callback,
+        ?string $targetFieldName = null,
+        ?string $targetFieldValue = null,
+        ?bool $isOpened = null
+    ): static {
+        $this->fieldsetCallback[] = [
+            'callback' => $callback,
+            'targetFieldName' => $targetFieldName,
+            'targetFieldValue' => $targetFieldValue,
+            'isOpened' => $isOpened,
+        ];
 
         return $this;
     }
@@ -113,31 +122,41 @@ class FormCollapse
             call_user_func($this->beforeRegisterFieldset, $form);
         }
 
+        foreach ($this->fieldsetCallback as $key => $fieldsetCallback) {
+            $this->buildFieldset($form, $fieldsetCallback, $key);
+        }
+
+        if ($this->afterRegisterFieldset) {
+            call_user_func($this->afterRegisterFieldset, $form);
+        }
+    }
+
+    protected function buildFieldset(FormAbstract $form, array $fieldset, int $key): void
+    {
+        $postfix = ($fieldset['targetFieldName'] ? '_' . $fieldset['targetFieldName'] : '');
+        $postfix = $postfix . '_' . hash('sha1', $key);
+
         $form->add(
-            sprintf('open_fieldset_%s', $this->id),
+            sprintf('open_fieldset_%s', $this->id . $postfix),
             HtmlField::class,
             HtmlFieldOption::make()
                 ->content(sprintf(
                     '<fieldset class="%s form-fieldset" data-bb-value="%s" style="display: %s"/>',
                     $this->getId(),
-                    $this->targetFieldValue,
-                    $this->isOpened ? 'block' : 'none',
+                    $fieldset['targetFieldValue'] !== null ? $fieldset['targetFieldValue'] : $this->targetFieldValue,
+                    ($fieldset['isOpened'] !== null ? $fieldset['isOpened'] : $this->isOpened) ? 'block' : 'none',
                 ))
                 ->toArray()
         );
 
-        if (isset($this->fieldsetCallback)) {
-            call_user_func($this->fieldsetCallback, $form);
+        if (isset($fieldset['callback']) && is_callable($fieldset['callback'])) {
+            call_user_func($fieldset['callback'], $form);
         }
 
         $form->add(
-            sprintf('close_fieldset_%s', $this->id),
+            sprintf('close_fieldset_%s', $this->id . $postfix),
             HtmlField::class,
             HtmlFieldOption::make()->content('</fieldset>')->toArray()
         );
-
-        if ($this->afterRegisterFieldset) {
-            call_user_func($this->afterRegisterFieldset, $form);
-        }
     }
 }

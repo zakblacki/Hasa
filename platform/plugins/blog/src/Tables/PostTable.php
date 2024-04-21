@@ -154,7 +154,7 @@ class PostTable extends TableAbstract
                     EloquentBuilder|QueryBuilder|EloquentRelation $query,
                     string $key,
                     string $operator,
-                    string|null $value
+                    ?string $value
                 ) {
                     if (! $value || $key !== 'category') {
                         return false;
@@ -166,7 +166,7 @@ class PostTable extends TableAbstract
                     );
                 }
             )
-            ->onSavingBulkChangeItem(function (Post $item, string $inputKey, string|null $inputValue) {
+            ->onSavingBulkChangeItem(function (Post $item, string $inputKey, ?string $inputValue) {
                 if ($inputKey !== 'category') {
                     return null;
                 }

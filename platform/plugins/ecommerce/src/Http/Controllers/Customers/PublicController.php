@@ -4,11 +4,10 @@ namespace Botble\Ecommerce\Http\Controllers\Customers;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Http\Controllers\BaseController;
+use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ProductTypeEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
-use Botble\Ecommerce\Facades\InvoiceHelper;
-use Botble\Ecommerce\Facades\OrderHelper;
 use Botble\Ecommerce\Facades\OrderReturnHelper;
 use Botble\Ecommerce\Http\Requests\AddressRequest;
 use Botble\Ecommerce\Http\Requests\AvatarRequest;
@@ -37,6 +36,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PublicController extends BaseController
@@ -144,84 +144,6 @@ class PublicController extends BaseController
         return $this
             ->httpResponse()
             ->setMessage(trans('acl::users.password_update_success'));
-    }
-
-    public function getListOrders()
-    {
-        SeoHelper::setTitle(__('Orders'));
-
-        $orders = Order::query()
-            ->where([
-                'user_id' => auth('customer')->id(),
-                'is_finished' => 1,
-            ])
-            ->withCount(['products'])
-            ->orderByDesc('created_at')
-            ->paginate(10);
-
-        Theme::breadcrumb()
-            ->add(__('Orders'), route('customer.orders'));
-
-        return Theme::scope(
-            'ecommerce.customers.orders.list',
-            compact('orders'),
-            'plugins/ecommerce::themes.customers.orders.list'
-        )->render();
-    }
-
-    public function getViewOrder(int|string $id)
-    {
-        $order = Order::query()
-            ->where([
-                'id' => $id,
-                'user_id' => auth('customer')->id(),
-            ])
-            ->with(['address', 'products'])
-            ->firstOrFail();
-
-        SeoHelper::setTitle(__('Order detail :id', ['id' => $order->code]));
-
-        Theme::breadcrumb()
-            ->add(
-                __('Order detail :id', ['id' => $order->code]),
-                route('customer.orders.view', $id)
-            );
-
-        return Theme::scope(
-            'ecommerce.customers.orders.view',
-            compact('order'),
-            'plugins/ecommerce::themes.customers.orders.view'
-        )->render();
-    }
-
-    public function getCancelOrder(int|string $id)
-    {
-        $order = Order::query()
-            ->where([
-                'id' => $id,
-                'user_id' => auth('customer')->id(),
-            ])
-            ->with(['address', 'products'])
-            ->firstOrFail();
-
-        if (! $order->canBeCanceled()) {
-            return $this
-                ->httpResponse()
-                ->setError()
-                ->setMessage(trans('plugins/ecommerce::order.cancel_error'));
-        }
-
-        OrderHelper::cancelOrder($order);
-
-        OrderHistory::query()->create([
-            'action' => 'cancel_order',
-            'description' => __('Order was cancelled by custom :customer', ['customer' => $order->address->name]),
-            'order_id' => $order->getKey(),
-        ]);
-
-        return $this
-            ->httpResponse()
-            ->setMessage(trans('plugins/ecommerce::order.cancel_success'));
     }
 
     public function getListAddresses()
@@ -359,26 +281,6 @@ class PublicController extends BaseController
             ->withUpdatedSuccessMessage();
     }
 
-    public function getPrintOrder(int|string $id, Request $request)
-    {
-        $order = Order::query()
-            ->where([
-                'id' => $id,
-                'user_id' => auth('customer')->id(),
-            ])
-            ->firstOrFail();
-
-        if (! $order->isInvoiceAvailable()) {
-            abort(404);
-        }
-
-        if ($request->input('type') == 'print') {
-            return InvoiceHelper::streamInvoice($order->invoice);
-        }
-
-        return InvoiceHelper::downloadInvoice($order->invoice);
-    }
-
     public function postAvatar(AvatarRequest $request, ThumbnailService $thumbnailService)
     {
         try {
@@ -476,9 +378,10 @@ class PublicController extends BaseController
             $orderReturnData['reason'] = $reason;
         }
 
-        $orderReturnData['items'] = Arr::where($request->input('return_items'), function ($value) {
-            return isset($value['is_return']);
-        });
+        $orderReturnData['items'] = Arr::where(
+            $request->input('return_items'),
+            fn ($value) => isset($value['is_return'])
+        );
 
         if (empty($orderReturnData['items'])) {
             return $this
@@ -505,7 +408,7 @@ class PublicController extends BaseController
             }
             $qty = $orderProduct->qty;
             if (EcommerceHelper::allowPartialReturn()) {
-                $qty = (int)Arr::get($item, 'qty') ?: $qty;
+                $qty = (int) Arr::get($item, 'qty') ?: $qty;
                 $qty = min($qty, $orderProduct->qty);
             }
             $item['qty'] = $qty;
@@ -523,7 +426,7 @@ class PublicController extends BaseController
         }
 
         OrderHistory::query()->create([
-            'action' => 'return_order',
+            'action' => OrderHistoryActionEnum::RETURN_ORDER,
             'description' => __(':customer has requested return product(s)', ['customer' => $order->address->name]),
             'order_id' => $order->getKey(),
         ]);
@@ -571,6 +474,7 @@ class PublicController extends BaseController
                 'id' => $id,
                 'user_id' => auth('customer')->id(),
             ])
+            ->with('latestHistory')
             ->firstOrFail();
 
         Theme::breadcrumb()
@@ -682,7 +586,7 @@ class PublicController extends BaseController
         $product = $orderProduct->product;
         $productFiles = $product->id ? $product->productFiles : $orderProduct->productFiles;
 
-        if (! $productFiles->count()) {
+        if ($productFiles->isEmpty()) {
             return $this
                 ->httpResponse()
                 ->setError()
@@ -714,7 +618,7 @@ class PublicController extends BaseController
         }
 
         $internalProductFiles = $productFiles->filter(fn ($productFile) => ! $productFile->is_external_link);
-        if (! $internalProductFiles->count()) {
+        if ($internalProductFiles->isEmpty()) {
             return $this
                 ->httpResponse()
                 ->setError()
@@ -724,7 +628,7 @@ class PublicController extends BaseController
         $zipName = Str::slug($orderProduct->product_name) . Str::random(5) . '-' . Carbon::now()->format(
             'Y-m-d-h-i-s'
         ) . '.zip';
-        $fileName = RvMedia::getRealPath($zipName);
+        $fileName = Storage::disk('local')->path($zipName);
         $zip = new Zipper();
         $zip->make($fileName);
 
@@ -736,7 +640,7 @@ class PublicController extends BaseController
                 }
             } else {
                 $zip->addString(
-                    $file->file_name,
+                    $file->base_name,
                     file_get_contents(str_replace('https://', 'http://', $filePath))
                 );
             }

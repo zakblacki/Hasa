@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array processOrderInCheckout($sessionData, $request, $cartItems, $order, array $generalData)
  * @method static mixed createOrder(\Illuminate\Http\Request $request, string|int $currentUserId, string $token, array $cartItems)
  * @method static bool confirmPayment(\Botble\Ecommerce\Models\Order $order)
- * @method static \Botble\Ecommerce\Models\Order cancelOrder(\Botble\Ecommerce\Models\Order $order)
+ * @method static \Botble\Ecommerce\Models\Order cancelOrder(\Botble\Ecommerce\Models\Order $order, string|null $reason = null, string|null $reasonDescription = null)
  * @method static \Botble\Ecommerce\Models\Order shippingStatusDelivered(\Botble\Ecommerce\Models\Shipment $shipment, \Illuminate\Http\Request $request, string|int $userId = 0)
  * @method static string|null getOrderBankInfo(\Botble\Ecommerce\Models\Order|\Illuminate\Database\Eloquent\Collection $orders)
  *

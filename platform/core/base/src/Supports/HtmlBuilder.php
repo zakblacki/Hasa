@@ -16,7 +16,7 @@ class HtmlBuilder
         Componentable::__call as componentCall;
     }
 
-    protected UrlGenerator|null $url;
+    protected ?UrlGenerator $url;
 
     protected Factory $view;
 
@@ -175,7 +175,7 @@ class HtmlBuilder
         $html = "<dl{$attributes}>";
 
         foreach ($list as $key => $value) {
-            $value = (array)$value;
+            $value = (array) $value;
 
             $html .= "<dt>$key</dt>";
 
@@ -231,7 +231,7 @@ class HtmlBuilder
     {
         $html = [];
 
-        foreach ((array)$attributes as $key => $value) {
+        foreach ((array) $attributes as $key => $value) {
             $element = $this->attributeElement($key, $value);
 
             if (! empty($element)) {

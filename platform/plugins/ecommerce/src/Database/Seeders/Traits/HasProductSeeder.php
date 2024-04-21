@@ -154,78 +154,80 @@ trait HasProductSeeder
                 $this->random(1, 20, [$key]),
             ]);
 
-            for ($j = 0; $j < $faker->numberBetween(1, 5); $j++) {
-                /**
-                 * @var Product $variation
-                 * @var Product $product
-                 */
-                $variation = Product::query()->create([
-                    'name' => $product->name,
-                    'status' => BaseStatusEnum::PUBLISHED,
-                    'sku' => $product->sku . '-A' . $j,
-                    'quantity' => $product->quantity,
-                    'weight' => $product->weight,
-                    'height' => $product->height,
-                    'wide' => $product->wide,
-                    'length' => $product->length,
-                    'price' => $product->price,
-                    'sale_price' => $key % 4 == 0 ? ($product->price - $product->price * $faker->numberBetween(
-                        10,
-                        30
-                    ) / 100) : null,
-                    'brand_id' => $product->brand_id,
-                    'with_storehouse_management' => $product->with_storehouse_management,
-                    'is_variation' => true,
-                    'images' => json_encode([$product->images[$j] ?? Arr::first($product->images)]),
-                    'product_type' => $product->product_type,
-                ]);
-
-                $productVariation = ProductVariation::query()->create([
-                    'product_id' => $variation->getKey(),
-                    'configurable_product_id' => $product->getKey(),
-                    'is_default' => $j == 0,
-                ]);
-
-                if ($productVariation->is_default) {
-                    $product->update([
-                        'sku' => $variation->sku,
-                        'sale_price' => $variation->sale_price,
+            if ($faker->boolean()) {
+                for ($j = 0; $j < $faker->numberBetween(1, 5); $j++) {
+                    /**
+                     * @var Product $variation
+                     * @var Product $product
+                     */
+                    $variation = Product::query()->create([
+                        'name' => $product->name,
+                        'status' => BaseStatusEnum::PUBLISHED,
+                        'sku' => $product->sku . '-A' . $j,
+                        'quantity' => $product->quantity,
+                        'weight' => $product->weight,
+                        'height' => $product->height,
+                        'wide' => $product->wide,
+                        'length' => $product->length,
+                        'price' => $product->price,
+                        'sale_price' => $key % 4 == 0 ? ($product->price - $product->price * $faker->numberBetween(
+                            10,
+                            30
+                        ) / 100) : null,
+                        'brand_id' => $product->brand_id,
+                        'with_storehouse_management' => $product->with_storehouse_management,
+                        'is_variation' => true,
+                        'images' => json_encode([$product->images[$j] ?? Arr::first($product->images)]),
+                        'product_type' => $product->product_type,
                     ]);
-                }
 
-                ProductVariationItem::query()->create([
-                    'attribute_id' => $faker->numberBetween(
-                        $key >= 24 ? 11 : 1,
-                        $key >= 24 ? 15 : 5
-                    ),
-                    'variation_id' => $productVariation->id,
-                ]);
+                    $productVariation = ProductVariation::query()->create([
+                        'product_id' => $variation->getKey(),
+                        'configurable_product_id' => $product->getKey(),
+                        'is_default' => $j == 0,
+                    ]);
 
-                ProductVariationItem::query()->create([
-                    'attribute_id' => $faker->numberBetween(
-                        $key >= 24 ? 16 : 6,
-                        $key >= 24 ? 20 : 10
-                    ),
-                    'variation_id' => $productVariation->id,
-                ]);
+                    if ($productVariation->is_default) {
+                        $product->update([
+                            'sku' => $variation->sku,
+                            'sale_price' => $variation->sale_price,
+                        ]);
+                    }
 
-                if ($product->isTypeDigital()) {
-                    foreach ($product->images as $img) {
-                        $productFile = database_path('seeders/files/' . $img);
+                    ProductVariationItem::query()->create([
+                        'attribute_id' => $faker->numberBetween(
+                            $key >= 24 ? 11 : 1,
+                            $key >= 24 ? 15 : 5
+                        ),
+                        'variation_id' => $productVariation->id,
+                    ]);
 
-                        if (! File::isFile($productFile)) {
-                            continue;
+                    ProductVariationItem::query()->create([
+                        'attribute_id' => $faker->numberBetween(
+                            $key >= 24 ? 16 : 6,
+                            $key >= 24 ? 20 : 10
+                        ),
+                        'variation_id' => $productVariation->id,
+                    ]);
+
+                    if ($product->isTypeDigital()) {
+                        foreach ($product->images as $img) {
+                            $productFile = database_path('seeders/files/' . $img);
+
+                            if (! File::isFile($productFile)) {
+                                continue;
+                            }
+
+                            $fileUpload = new UploadedFile(
+                                $productFile,
+                                Str::replace('products/', '', $img),
+                                'image/jpeg',
+                                null,
+                                true
+                            );
+                            $productFileData = $storeProductService->saveProductFile($fileUpload);
+                            $variation->productFiles()->create($productFileData);
                         }
-
-                        $fileUpload = new UploadedFile(
-                            $productFile,
-                            Str::replace('products/', '', $img),
-                            'image/jpeg',
-                            null,
-                            true
-                        );
-                        $productFileData = $storeProductService->saveProductFile($fileUpload);
-                        $variation->productFiles()->create($productFileData);
                     }
                 }
             }

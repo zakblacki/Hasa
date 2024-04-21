@@ -8,7 +8,7 @@ use Botble\Media\Facades\RvMedia;
 use Botble\Media\Models\MediaFile;
 use Botble\Setting\Forms\MediaSettingForm;
 use Botble\Setting\Http\Requests\MediaSettingRequest;
-use Exception;
+use Throwable;
 
 class MediaSettingController extends SettingController
 {
@@ -46,7 +46,8 @@ class MediaSettingController extends SettingController
                      * @var MediaFile $file
                      */
                     RvMedia::generateThumbnails($file);
-                } catch (Exception) {
+                } catch (Throwable $exception) {
+                    BaseHelper::logError($exception);
                     $errors[] = $file->url;
                 }
             }

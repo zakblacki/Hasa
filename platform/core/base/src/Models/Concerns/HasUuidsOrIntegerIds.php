@@ -17,12 +17,12 @@ trait HasUuidsOrIntegerIds
         });
     }
 
-    public function newUniqueId(): string|null
+    public function newUniqueId(): ?string
     {
         return match (self::getTypeOfId()) {
-            'ULID' => (string)Str::ulid(),
+            'ULID' => (string) Str::ulid(),
             'BIGINT' => null,
-            default => (string)Str::orderedUuid(),
+            default => (string) Str::orderedUuid(),
         };
     }
 
@@ -65,5 +65,12 @@ trait HasUuidsOrIntegerIds
         }
 
         return strtoupper(config('core.base.general.type_id', 'BIGINT'));
+    }
+
+    public function ensureIdCanBeCreated(): void
+    {
+        if (self::getTypeOfId() !== 'BIGINT') {
+            $this->id = $this->newUniqueId();
+        }
     }
 }

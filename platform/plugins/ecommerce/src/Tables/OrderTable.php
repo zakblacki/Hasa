@@ -3,6 +3,7 @@
 namespace Botble\Ecommerce\Tables;
 
 use Botble\Base\Facades\BaseHelper;
+use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
@@ -18,6 +19,7 @@ use Botble\Table\Actions\EditAction;
 use Botble\Table\BulkActions\DeleteBulkAction;
 use Botble\Table\Columns\Column;
 use Botble\Table\Columns\CreatedAtColumn;
+use Botble\Table\Columns\FormattedColumn;
 use Botble\Table\Columns\IdColumn;
 use Botble\Table\Columns\StatusColumn;
 use Exception;
@@ -68,12 +70,6 @@ class OrderTable extends TableAbstract
             ->formatColumn('shipping_amount', PriceFormatter::class)
             ->editColumn('user_id', function (Order $item) {
                 return BaseHelper::clean($item->user->name ?: $item->address->name);
-            })
-            ->editColumn('customer_email', function (Order $item) {
-                return BaseHelper::clean($item->user->email ?: $item->address->email);
-            })
-            ->editColumn('customer_phone', function (Order $item) {
-                return BaseHelper::clean($item->user->phone ?: $item->address->phone) ?: '&mdash;';
             });
 
         if (EcommerceHelper::isTaxEnabled()) {
@@ -139,29 +135,22 @@ class OrderTable extends TableAbstract
             Column::make('user_id')
                 ->title(trans('plugins/ecommerce::order.customer_label'))
                 ->alignStart(),
-            Column::make('customer_email')
+            FormattedColumn::make('customer_email')
                 ->title(trans('plugins/ecommerce::order.email'))
                 ->alignStart()
-                ->orderable(false),
-            Column::make('customer_phone')
-                ->title(trans('plugins/ecommerce::order.phone'))
-                ->alignStart()
-                ->orderable(false),
+                ->orderable(false)
+                ->renderUsing(function (FormattedColumn $column) {
+                    $item = $column->getItem();
+
+                    return sprintf(
+                        '%s <br> %s',
+                        $item->user->email ?: $item->address->email,
+                        $item->user->phone ?: $item->address->phone
+                    );
+                }),
             Column::formatted('amount')
                 ->title(trans('plugins/ecommerce::order.amount')),
         ];
-
-        if (EcommerceHelper::isTaxEnabled()) {
-            $columns = array_merge($columns, [
-                Column::formatted('tax_amount')
-                    ->title(trans('plugins/ecommerce::order.tax_amount')),
-            ]);
-        }
-
-        $columns = array_merge($columns, [
-            Column::formatted('shipping_amount')
-                ->title(trans('plugins/ecommerce::order.shipping_amount')),
-        ]);
 
         if (is_plugin_active('payment')) {
             $columns = array_merge($columns, [
@@ -175,9 +164,22 @@ class OrderTable extends TableAbstract
             ]);
         }
 
+        $columns[] = StatusColumn::make()->alignStart();
+
+        if (EcommerceHelper::isTaxEnabled()) {
+            $columns = array_merge($columns, [
+                Column::formatted('tax_amount')
+                    ->title(trans('plugins/ecommerce::order.tax_amount')),
+            ]);
+        }
+
+        $columns = array_merge($columns, [
+            Column::formatted('shipping_amount')
+                ->title(trans('plugins/ecommerce::order.shipping_amount')),
+        ]);
+
         return array_merge($columns, [
             CreatedAtColumn::make(),
-            StatusColumn::make(),
         ]);
     }
 
@@ -277,7 +279,7 @@ class OrderTable extends TableAbstract
         return array_merge(['export'], parent::getDefaultButtons());
     }
 
-    public function saveBulkChangeItem(Model|Order $item, string $inputKey, string|null $inputValue): Model|bool
+    public function saveBulkChangeItem(Model|Order $item, string $inputKey, ?string $inputValue): Model|bool
     {
         if ($inputKey === 'status' && $inputValue == OrderStatusEnum::CANCELED) {
             /**
@@ -290,7 +292,7 @@ class OrderTable extends TableAbstract
             OrderHelper::cancelOrder($item);
 
             OrderHistory::query()->create([
-                'action' => 'cancel_order',
+                'action' => OrderHistoryActionEnum::CANCEL_ORDER,
                 'description' => trans('plugins/ecommerce::order.order_was_canceled_by'),
                 'order_id' => $item->getKey(),
                 'user_id' => Auth::id(),
@@ -306,7 +308,7 @@ class OrderTable extends TableAbstract
         Builder|QueryBuilder|Relation $query,
         string $key,
         string $operator,
-        string|null $value
+        ?string $value
     ): Builder|QueryBuilder|Relation {
         switch ($key) {
             case 'customer_name':
@@ -379,7 +381,7 @@ class OrderTable extends TableAbstract
         Builder|QueryBuilder|Relation $query,
         string $column,
         string $operator,
-        string|null $value
+        ?string $value
     ): Builder|QueryBuilder|Relation {
         if ($operator === 'like') {
             $value = '%' . $value . '%';

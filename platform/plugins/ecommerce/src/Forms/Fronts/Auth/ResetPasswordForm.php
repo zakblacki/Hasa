@@ -11,6 +11,11 @@ use Botble\Ecommerce\Http\Requests\Fronts\Auth\ResetPasswordRequest;
 
 class ResetPasswordForm extends AuthForm
 {
+    public static function formTitle(): string
+    {
+        return __('Customer reset password form');
+    }
+
     public function setup(): void
     {
         parent::setup();

@@ -59,7 +59,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool hasComponent($name)
  * @method static \Illuminate\Contracts\View\View|mixed componentCall(string $method, array $parameters)
  *
- * @see \Botble\Base\Supports\FormBuilder
+ * @see \Kris\LaravelFormBuilder\Supports\FormBuilder
  */
 class Form extends Facade
 {

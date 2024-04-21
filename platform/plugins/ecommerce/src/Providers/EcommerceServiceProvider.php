@@ -16,10 +16,19 @@ use Botble\Ecommerce\Facades\InvoiceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
 use Botble\Ecommerce\Facades\OrderReturnHelper;
 use Botble\Ecommerce\Facades\ProductCategoryHelper;
+use Botble\Ecommerce\Forms\Fronts\Auth\ForgotPasswordForm;
+use Botble\Ecommerce\Forms\Fronts\Auth\LoginForm;
+use Botble\Ecommerce\Forms\Fronts\Auth\RegisterForm;
+use Botble\Ecommerce\Forms\Fronts\Auth\ResetPasswordForm;
+use Botble\Ecommerce\GoogleAnalytics\GoogleTagManager;
 use Botble\Ecommerce\Http\Middleware\CaptureCouponMiddleware;
 use Botble\Ecommerce\Http\Middleware\CaptureFootprintsMiddleware;
 use Botble\Ecommerce\Http\Middleware\RedirectIfCustomer;
 use Botble\Ecommerce\Http\Middleware\RedirectIfNotCustomer;
+use Botble\Ecommerce\Http\Requests\Fronts\Auth\ForgotPasswordRequest;
+use Botble\Ecommerce\Http\Requests\Fronts\Auth\ResetPasswordRequest;
+use Botble\Ecommerce\Http\Requests\LoginRequest;
+use Botble\Ecommerce\Http\Requests\RegisterRequest;
 use Botble\Ecommerce\Models\Address;
 use Botble\Ecommerce\Models\Brand;
 use Botble\Ecommerce\Models\Currency;
@@ -141,6 +150,7 @@ use Botble\Slug\Facades\SlugHelper;
 use Botble\SocialLogin\Facades\SocialService;
 use Botble\Theme\Events\ThemeRoutingBeforeEvent;
 use Botble\Theme\Facades\SiteMapManager;
+use Botble\Theme\FormFrontManager;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\RouteMatched;
@@ -326,6 +336,8 @@ class EcommerceServiceProvider extends ServiceProvider
 
         $this->app->singleton(ProductCrossSalePriceService::class);
 
+        $this->app->singleton(GoogleTagManager::class);
+
         Request::macro('footprint', function () {
             return app(FootprinterInterface::class)->footprint(app()->make('request'));
         });
@@ -368,6 +380,8 @@ class EcommerceServiceProvider extends ServiceProvider
             ->loadRoutes([
                 'base',
                 'product',
+                'product-inventory',
+                'product-price',
                 'tax',
                 'review',
                 'shipping',
@@ -676,7 +690,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 })
                 ->registerItem([
                     'id' => 'cms-plugins-ecommerce-order',
-                    'priority' => 1,
+                    'priority' => 10,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::order.menu',
                     'icon' => 'ti ti-truck-delivery',
@@ -685,7 +699,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-ecommerce-invoice',
-                    'priority' => 2,
+                    'priority' => 20,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::invoice.name',
                     'icon' => 'ti ti-file-invoice',
@@ -694,7 +708,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-ecommerce-incomplete-order',
-                    'priority' => 2,
+                    'priority' => 30,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::order.incomplete_order',
                     'icon' => 'ti ti-basket-cancel',
@@ -703,7 +717,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-ecommerce-order-return',
-                    'priority' => 3,
+                    'priority' => 40,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::order.order_return',
                     'icon' => 'ti ti-basket-down',
@@ -712,16 +726,34 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-ecommerce.product',
-                    'priority' => 3,
+                    'priority' => 50,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::products.name',
-                    'icon' => 'ti ti-camera',
+                    'icon' => 'ti ti-package',
                     'url' => fn () => route('products.index'),
                     'permissions' => ['products.index'],
                 ])
                 ->registerItem([
+                    'id' => 'cms-plugins-ecommerce.product.price',
+                    'priority' => 51,
+                    'parent_id' => 'cms-plugins-ecommerce',
+                    'name' => 'plugins/ecommerce::product-prices.name',
+                    'icon' => 'ti ti-currency-dollar',
+                    'url' => fn () => route('ecommerce.product-prices.index'),
+                    'permissions' => ['ecommerce.product-prices.index'],
+                ])
+                ->registerItem([
+                    'id' => 'cms-plugins-ecommerce.product.inventory',
+                    'priority' => 52,
+                    'parent_id' => 'cms-plugins-ecommerce',
+                    'name' => 'plugins/ecommerce::product-inventory.name',
+                    'icon' => 'ti ti-home-check',
+                    'url' => fn () => route('ecommerce.product-inventory.index'),
+                    'permissions' => ['ecommerce.product-inventory.index'],
+                ])
+                ->registerItem([
                     'id' => 'cms-plugins-product-categories',
-                    'priority' => 4,
+                    'priority' => 60,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::product-categories.name',
                     'icon' => 'ti ti-archive',
@@ -730,7 +762,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-product-tag',
-                    'priority' => 4,
+                    'priority' => 70,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::product-tag.name',
                     'icon' => 'ti ti-tag',
@@ -739,7 +771,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-product-attribute',
-                    'priority' => 5,
+                    'priority' => 80,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::product-attributes.name',
                     'icon' => 'ti ti-album',
@@ -748,7 +780,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-ecommerce-global-options',
-                    'priority' => 3,
+                    'priority' => 90,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::product-option.name',
                     'icon' => 'ti ti-database',
@@ -757,7 +789,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-brands',
-                    'priority' => 6,
+                    'priority' => 100,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::brands.name',
                     'icon' => 'ti ti-registered',
@@ -766,7 +798,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-product-collections',
-                    'priority' => 7,
+                    'priority' => 110,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::product-collections.name',
                     'icon' => 'ti ti-album',
@@ -775,7 +807,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-product-label',
-                    'priority' => 8,
+                    'priority' => 120,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::product-label.name',
                     'icon' => 'ti ti-tags',
@@ -784,7 +816,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-ecommerce-review',
-                    'priority' => 9,
+                    'priority' => 130,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::review.name',
                     'icon' => 'ti ti-star',
@@ -793,7 +825,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-ecommerce-shipping-shipments',
-                    'priority' => 11,
+                    'priority' => 140,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::shipping.shipments',
                     'icon' => 'ti ti-truck-loading',
@@ -802,7 +834,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-ecommerce-discount',
-                    'priority' => 12,
+                    'priority' => 150,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::discount.name',
                     'icon' => 'ti ti-discount',
@@ -811,7 +843,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'cms-plugins-ecommerce-customer',
-                    'priority' => 13,
+                    'priority' => 160,
                     'parent_id' => 'cms-plugins-ecommerce',
                     'name' => 'plugins/ecommerce::customer.name',
                     'icon' => 'ti ti-users',
@@ -828,13 +860,6 @@ class EcommerceServiceProvider extends ServiceProvider
                     'name' => __('Overview'),
                     'url' => fn () => route('customer.overview'),
                     'icon' => 'ti ti-home',
-                ])
-                ->registerItem([
-                    'id' => 'cms-customer-edit-account',
-                    'priority' => 20,
-                    'name' => __('Profile'),
-                    'url' => fn () => route('customer.edit-account'),
-                    'icon' => 'ti ti-user',
                 ])
                 ->registerItem([
                     'id' => 'cms-customer-orders',
@@ -878,11 +903,11 @@ class EcommerceServiceProvider extends ServiceProvider
                     'icon' => 'ti ti-book',
                 ])
                 ->registerItem([
-                    'id' => 'cms-customer-change-password',
+                    'id' => 'cms-customer-edit-account',
                     'priority' => 70,
-                    'name' => __('Change Password'),
-                    'url' => fn () => route('customer.change-password'),
-                    'icon' => 'ti ti-key',
+                    'name' => __('Account Settings'),
+                    'url' => fn () => route('customer.edit-account'),
+                    'icon' => 'ti ti-settings',
                 ])
                 ->registerItem([
                     'id' => 'cms-customer-logout',
@@ -926,6 +951,11 @@ class EcommerceServiceProvider extends ServiceProvider
                     'redirect_url' => route('public.index'),
                 ]);
             }
+
+            FormFrontManager::register(LoginForm::class, LoginRequest::class);
+            FormFrontManager::register(RegisterForm::class, RegisterRequest::class);
+            FormFrontManager::register(ForgotPasswordForm::class, ForgotPasswordRequest::class);
+            FormFrontManager::register(ResetPasswordForm::class, ResetPasswordRequest::class);
         });
 
         $this->app->register(EventServiceProvider::class);

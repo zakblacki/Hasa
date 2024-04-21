@@ -33,6 +33,13 @@ class ShortcodeTabsFieldOption extends FormFieldOptions
         return $this;
     }
 
+    public function min(int $min): static
+    {
+        $this->addAttribute('min', $min);
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         $data = parent::toArray();

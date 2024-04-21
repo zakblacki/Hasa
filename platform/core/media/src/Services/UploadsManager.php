@@ -24,7 +24,7 @@ class UploadsManager
         ];
     }
 
-    public function fileMimeType(string $path): string|null
+    public function fileMimeType(string $path): ?string
     {
         return RvMedia::getMimeType($path);
     }

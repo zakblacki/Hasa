@@ -26,7 +26,7 @@ class MediaFileRepository extends RepositoriesAbstract implements MediaFileInter
         return MediaFile::createName($name, $folder);
     }
 
-    public function createSlug(string $name, string $extension, string|null $folderPath): string
+    public function createSlug(string $name, string $extension, ?string $folderPath): string
     {
         return MediaFile::createSlug($name, $extension, $folderPath);
     }

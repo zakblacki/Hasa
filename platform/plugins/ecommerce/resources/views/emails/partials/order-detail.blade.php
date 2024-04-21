@@ -54,7 +54,7 @@
                         </div>
                     @endif
 
-                    @include('plugins/ecommerce::themes.includes.cart-item-options-extras', [
+                    @include(EcommerceHelper::viewPath('includes.cart-item-options-extras'), [
                         'options' => $orderProduct->options,
                     ])
                 </td>

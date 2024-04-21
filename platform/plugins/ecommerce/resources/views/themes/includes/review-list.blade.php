@@ -3,15 +3,15 @@
 
     <div @class(['row pb-3 mb-3 review-item', 'border-bottom' => ! $loop->last, 'opacity-50' => ! $review->is_approved])>
         <div class="col-auto">
-            <img class="rounded-circle" src="{{ $review->user->avatar_url }}" alt="{{ $review->user->name }}" width="60">
+            <img class="rounded-circle" src="{{ $review->customer_avatar_url }}" alt="{{ $review->user->name ?: $review->customer_name }}" width="60">
         </div>
         <div class="col">
             <div class="d-flex flex-wrap align-items-center gap-2 mb-2 review-item__header">
                 <div class="fw-medium">
                     @if (get_ecommerce_setting('show_customer_full_name', true))
-                        {{ $review->user->name }}
+                        {{ $review->user->name ?: $review->customer_name }}
                     @else
-                        {{ Str::mask($review->user->name, '*', 1, -1) }}
+                        {{ Str::mask($review->user->name ?: $review->customer_name, '*', 1, -1) }}
                     @endif
                 </div>
                 <time class="text-muted small" datetime="{{ $review->created_at->translatedFormat('Y-m-d\TH:i:sP') }}">

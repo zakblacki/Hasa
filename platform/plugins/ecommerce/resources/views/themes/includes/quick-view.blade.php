@@ -1,1 +1,1 @@
-@include('plugins/ecommerce::themes.includes.product-detail')
+@include(EcommerceHelper::viewPath('includes.product-detail'))

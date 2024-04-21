@@ -4,7 +4,7 @@ use Botble\Base\Facades\AdminHelper;
 use Illuminate\Support\Facades\Route;
 
 AdminHelper::registerRoutes(function () {
-    Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers'], function () {
+    Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'prefix' => 'ecommerce'], function () {
         Route::group([
             'prefix' => 'shipping-methods',
             'permission' => 'shipping_methods.index',
@@ -49,7 +49,7 @@ AdminHelper::registerRoutes(function () {
             });
         });
 
-        Route::group(['prefix' => 'ecommerce', 'as' => 'ecommerce.'], function () {
+        Route::group(['as' => 'ecommerce.'], function () {
             Route::group([
                 'prefix' => 'shipping-rule-items',
                 'as' => 'shipping-rule-items.',

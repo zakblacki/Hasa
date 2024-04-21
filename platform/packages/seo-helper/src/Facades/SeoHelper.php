@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Botble\SeoHelper\SeoHelper setSeoTwitter(\Botble\SeoHelper\Contracts\SeoTwitterContract $seoTwitter)
  * @method static \Botble\SeoHelper\Contracts\SeoOpenGraphContract openGraph()
  * @method static \Botble\SeoHelper\SeoHelper setTitle(string|null $title, string|null $siteName = null, string|null $separator = null)
+ * @method static \Botble\SeoHelper\Contracts\SeoHelperContract setImage(string|null $image)
  * @method static \Botble\SeoHelper\Contracts\SeoMetaContract meta()
  * @method static \Botble\SeoHelper\Contracts\SeoTwitterContract twitter()
  * @method static string|null getTitle()

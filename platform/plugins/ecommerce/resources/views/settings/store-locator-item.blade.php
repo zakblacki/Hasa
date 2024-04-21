@@ -11,6 +11,7 @@
             :value="$locator ? $locator->name : null"
             :placeholder="trans('plugins/ecommerce::store-locator.store_name')"
             :label="trans('plugins/ecommerce::store-locator.store_name')"
+            :required="true"
         />
 
         <x-core::form.text-input
@@ -19,6 +20,7 @@
             :value="$locator ? $locator->phone : null"
             :placeholder="trans('plugins/ecommerce::ecommerce.phone')"
             :label="trans('plugins/ecommerce::ecommerce.phone')"
+            :required="true"
         />
 
         <x-core::form.text-input
@@ -34,6 +36,7 @@
             :value="$locator ? $locator->address : null"
             :placeholder="trans('plugins/ecommerce::ecommerce.address')"
             :label="trans('plugins/ecommerce::ecommerce.address')"
+            :required="true"
         />
 
         <x-core::form.select
@@ -44,6 +47,7 @@
             :label="trans('plugins/ecommerce::ecommerce.country')"
             :options="EcommerceHelper::getAvailableCountries()"
             :value="$locator ? $locator->country : null"
+            :required="true"
         />
         @if (EcommerceHelper::loadCountriesStatesCitiesFromPluginLocation())
             @php
@@ -63,6 +67,7 @@
                 :label="trans('plugins/ecommerce::ecommerce.state')"
                 :options="$stateOptions"
                 :value="$locator ? $locator->state : null"
+                :required="true"
             />
         @else
             <x-core::form.text-input
@@ -72,6 +77,7 @@
                 :value="$locator ? $locator->state : null"
                 :placeholder="trans('plugins/ecommerce::ecommerce.state')"
                 :label="trans('plugins/ecommerce::ecommerce.state')"
+                :required="true"
             />
         @endif
 
@@ -83,6 +89,7 @@
                 :value="$locator ? $locator->city : null"
                 :placeholder="trans('plugins/ecommerce::ecommerce.city')"
                 :label="trans('plugins/ecommerce::ecommerce.city')"
+                :required="true"
             />
 
         @else
@@ -102,6 +109,7 @@
                 :label="trans('plugins/ecommerce::ecommerce.city')"
                 :options="$cityOptions"
                 :value="$locator ? $locator->city : null"
+                :required="true"
             />
         @endif
 

@@ -53,4 +53,11 @@ return [
     'breadcrumb_enabled' => 'Enable breadcrumb?',
     'themes' => 'Themes',
     'child_of' => 'Child of ":theme"',
+    'typography' => 'Typography',
+    'robots_txt_editor' => 'Robots.txt Editor',
+    'robots_txt_content' => 'Robots.txt Content',
+    'robots_txt_not_writable' => 'Cannot write robots.txt file! Please chmod to make it writable! (Your robots.txt file is located at :path)',
+    'robots_txt_content_helper' => 'After saved, you can check your robots.txt here: :link',
+    'robots_txt_file' => 'Upload robots.txt file',
+    'robots_txt_file_helper' => 'If you want to upload a robots.txt file, please select it here.',
 ];

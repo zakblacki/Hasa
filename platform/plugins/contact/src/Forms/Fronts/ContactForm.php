@@ -6,21 +6,33 @@ use Botble\Base\Forms\FieldOptions\ButtonFieldOption;
 use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
 use Botble\Base\Forms\FieldOptions\TextareaFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
+use Botble\Base\Forms\Fields\EmailField;
 use Botble\Base\Forms\Fields\HtmlField;
 use Botble\Base\Forms\Fields\TextareaField;
 use Botble\Base\Forms\Fields\TextField;
-use Botble\Base\Forms\FormAbstract;
-use Botble\Captcha\Facades\Captcha;
-use Botble\Captcha\Forms\Fields\MathCaptchaField;
 use Botble\Contact\Http\Requests\ContactRequest;
+use Botble\Contact\Models\Contact;
+use Botble\Theme\FormFront;
 use Closure;
+use Illuminate\Support\Arr;
 
-class ContactForm extends FormAbstract
+class ContactForm extends FormFront
 {
+    public static function formTitle(): string
+    {
+        return trans('plugins/contact::contact.contact_form');
+    }
+
     public function setup(): void
     {
+        $data = $this->getModel();
+
+        $displayFields = array_filter(explode(',', (string) Arr::get($data, 'display_fields'))) ?: ['phone', 'email', 'address', 'subject'];
+        $mandatoryFields = array_filter(explode(',', (string) Arr::get($data, 'mandatory_fields'))) ?: ['email'];
+
         $this
             ->contentOnly()
+            ->model(Contact::class)
             ->setUrl(route('public.send.contact'))
             ->setValidatorClass(ContactRequest::class)
             ->setFormOption('class', 'contact-form')
@@ -31,12 +43,25 @@ class ContactForm extends FormAbstract
                     ->content(apply_filters('pre_contact_form', null))
                     ->toArray()
             )
-            ->addRowWrapper(
-                'name_and_email',
-                function (self $form) {
-                    $form
-                        ->addColumnWrapper('name', function (self $form) {
-                            $form->add(
+            ->add(
+                'required_fields',
+                'hidden',
+                TextFieldOption::make()
+                    ->value(Arr::get($data, 'mandatory_fields'))
+                    ->toArray()
+            )
+            ->add(
+                'display_fields',
+                'hidden',
+                TextFieldOption::make()
+                    ->value(Arr::get($data, 'display_fields'))
+                    ->toArray()
+            )
+            ->addRowWrapper('form_wrapper', function (self $form) use ($displayFields, $mandatoryFields) {
+                $form
+                    ->addColumnWrapper('name_wrapper', function (self $form) {
+                        $form
+                            ->add(
                                 'name',
                                 TextField::class,
                                 TextFieldOption::make()
@@ -48,65 +73,74 @@ class ContactForm extends FormAbstract
                                     ->maxLength(-1)
                                     ->toArray()
                             );
-                        })
-                        ->addColumnWrapper('email', function (self $form) {
-                            $form->add(
-                                'email',
-                                TextField::class,
-                                TextFieldOption::make()
-                                    ->required()
-                                    ->label(__('Email'))
-                                    ->placeholder(__('Email'))
-                                    ->wrapperAttributes(['class' => 'contact-form-group'])
-                                    ->cssClass('contact-form-input')
-                                    ->maxLength(-1)
-                                    ->toArray()
-                            );
+                    })
+                    ->when(in_array('email', $displayFields), function (self $form) use ($mandatoryFields) {
+                        $form
+                            ->addColumnWrapper('email_wrapper', function (self $form) use ($mandatoryFields) {
+                                $form
+                                    ->add(
+                                        'email',
+                                        EmailField::class,
+                                        TextFieldOption::make()
+                                            ->when(in_array('email', $mandatoryFields), function (TextFieldOption $option) {
+                                                $option->required();
+                                            })
+                                            ->label(__('Email'))
+                                            ->placeholder(__('Email'))
+                                            ->wrapperAttributes(['class' => 'contact-form-group'])
+                                            ->cssClass('contact-form-input')
+                                            ->maxLength(-1)
+                                            ->toArray()
+                                    );
+                            });
+                    })
+                    ->when(in_array('address', $displayFields), function (self $form) use ($mandatoryFields) {
+                        $form->addColumnWrapper('address_wrapper', function (self $form) use ($mandatoryFields) {
+                            $form
+                                ->add(
+                                    'address',
+                                    TextField::class,
+                                    TextFieldOption::make()
+                                        ->when(in_array('address', $mandatoryFields), function (TextFieldOption $option) {
+                                            $option->required();
+                                        })
+                                        ->label(__('Address'))
+                                        ->placeholder(__('Address'))
+                                        ->wrapperAttributes(['class' => 'contact-form-group'])
+                                        ->cssClass('contact-form-input')
+                                        ->maxLength(-1)
+                                        ->toArray()
+                                );
                         });
-                }
-            )
-            ->addRowWrapper(
-                'address_and_phone',
-                function (self $form) {
-                    $form
-                        ->addColumnWrapper('address', function (self $form) {
-                            $form->add(
-                                'address',
-                                TextField::class,
-                                TextFieldOption::make()
-                                    ->label(__('Address'))
-                                    ->placeholder(__('Address'))
-                                    ->wrapperAttributes(['class' => 'contact-form-group'])
-                                    ->cssClass('contact-form-input')
-                                    ->maxLength(-1)
-                                    ->toArray()
-                            );
-                        })
-                        ->addColumnWrapper('phone', function (self $form) {
-                            $form->add(
-                                'phone',
-                                TextField::class,
-                                TextFieldOption::make()
-                                    ->label(__('Phone'))
-                                    ->placeholder(__('Phone'))
-                                    ->wrapperAttributes(['class' => 'contact-form-group'])
-                                    ->cssClass('contact-form-input')
-                                    ->maxLength(-1)
-                                    ->toArray()
-                            );
+                    })
+                    ->when(in_array('phone', $displayFields), function (self $form) use ($mandatoryFields) {
+                        $form->addColumnWrapper('phone_wrapper', function (self $form) use ($mandatoryFields) {
+                            $form
+                                ->add(
+                                    'phone',
+                                    TextField::class,
+                                    TextFieldOption::make()
+                                        ->when(in_array('phone', $mandatoryFields), function (TextFieldOption $option) {
+                                            $option->required();
+                                        })
+                                        ->label(__('Phone'))
+                                        ->placeholder(__('Phone'))
+                                        ->wrapperAttributes(['class' => 'contact-form-group'])
+                                        ->cssClass('contact-form-input')
+                                        ->maxLength(-1)
+                                        ->toArray()
+                                );
                         });
-                }
-            )
-            ->addRowWrapper(
-                'subject',
-                function (self $form) {
-                    $form->addColumnWrapper(
-                        'subject',
-                        function (self $form) {
+                    })
+                    ->when(in_array('subject', $displayFields), function (self $form) use ($mandatoryFields) {
+                        $form->addColumnWrapper('subject_wrapper', function (self $form) use ($mandatoryFields) {
                             $form->add(
                                 'subject',
                                 TextField::class,
                                 TextFieldOption::make()
+                                    ->when(in_array('subject', $mandatoryFields), function (TextFieldOption $option) {
+                                        $option->required();
+                                    })
                                     ->label(__('Subject'))
                                     ->placeholder(__('Subject'))
                                     ->wrapperAttributes(['class' => 'contact-form-group'])
@@ -114,11 +148,9 @@ class ContactForm extends FormAbstract
                                     ->maxLength(-1)
                                     ->toArray()
                             );
-                        },
-                        12
-                    );
-                }
-            )
+                        }, 12);
+                    });
+            })
             ->addRowWrapper(
                 'content',
                 function (self $form) {
@@ -130,8 +162,8 @@ class ContactForm extends FormAbstract
                                 TextareaField::class,
                                 TextareaFieldOption::make()
                                     ->required()
-                                    ->label(__('Message'))
-                                    ->placeholder(__('Message'))
+                                    ->label(__('Content'))
+                                    ->placeholder(__('Content'))
                                     ->wrapperAttributes(['class' => 'contact-form-group'])
                                     ->cssClass('contact-form-input')
                                     ->rows(5)
@@ -143,35 +175,6 @@ class ContactForm extends FormAbstract
                     );
                 }
             )
-            ->when(is_plugin_active('captcha'), function (self $form) {
-                $form
-                    ->when(Captcha::reCaptchaEnabled(), function (self $form) {
-                        $form->addRowWrapper(
-                            'captcha',
-                            function (self $form) {
-                                $form->addColumnWrapper(
-                                    'captcha',
-                                    function (self $form) {
-                                        $form->addWrappedField(
-                                            'captcha',
-                                            HtmlField::class,
-                                            HtmlFieldOption::make()
-                                                ->content(Captcha::display())
-                                                ->toArray()
-                                        );
-                                    },
-                                    12
-                                );
-                            }
-                        );
-                    })
-                    ->when(Captcha::mathCaptchaEnabled() && setting('enable_math_captcha_for_contact_form', 0), function (self $form) {
-                        $form->add(
-                            'math_captcha',
-                            MathCaptchaField::class,
-                        );
-                    });
-            })
             ->add(
                 'filters_after_form',
                 HtmlField::class,
@@ -180,7 +183,7 @@ class ContactForm extends FormAbstract
                     ->toArray()
             )
             ->addWrappedField(
-                'button',
+                'submit',
                 'submit',
                 ButtonFieldOption::make()
                     ->cssClass('contact-button')
@@ -238,7 +241,7 @@ class ContactForm extends FormAbstract
         $this->add(
             "open_{$name}_column_wrapper",
             HtmlField::class,
-            HtmlFieldOption::make()->content(sprintf('<div class="contact-column-%s col-md-%s">', $column, $column))->toArray()
+            HtmlFieldOption::make()->content(sprintf('<div class="contact-column-%s col-md-%s contact-field-%s">', $column, $column, $name))->toArray()
         );
 
         $callback($this);

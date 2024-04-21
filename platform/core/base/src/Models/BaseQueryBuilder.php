@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class BaseQueryBuilder extends Builder
 {
-    public function addSearch(string $column, string|null $term, bool $isPartial = true, bool $or = true): static
+    public function addSearch(string $column, ?string $term, bool $isPartial = true, bool $or = true): static
     {
         $term = trim($term);
         $term = str_replace('&', '&amp;', $term);

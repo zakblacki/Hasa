@@ -127,7 +127,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            <div class="mb-3" :class="{'col-md-4': type_option !== 'shipping', 'col-md-8' : type_option === 'shipping'}">
                                 <div class="input-group input-group-flat">
                                     <span class="input-group-text">{{ value_label }}</span>
                                     <input
@@ -802,6 +802,7 @@ export default {
                     break
                 case 'shipping':
                     context.value_label = context.__('discount.when_shipping_fee_less_than')
+                    context.target = 'all-orders'
                     break
                 case 'same-price':
                     context.target = 'group-products'

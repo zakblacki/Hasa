@@ -56,7 +56,7 @@ class FormattedColumn extends Column implements FormattedColumnContract
         return $text ?: '';
     }
 
-    public function formattedValue($value): string|null
+    public function formattedValue($value): ?string
     {
         return $value;
     }

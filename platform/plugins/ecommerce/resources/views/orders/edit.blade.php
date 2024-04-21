@@ -66,7 +66,7 @@
                                         @endif
 
                                         @include(
-                                            'plugins/ecommerce::themes.includes.cart-item-options-extras',
+                                            EcommerceHelper::viewPath('includes.cart-item-options-extras'),
                                             ['options' => $orderProduct->options]
                                         )
 
@@ -346,9 +346,17 @@
                         @if ($order->status == Botble\Ecommerce\Enums\OrderStatusEnum::CANCELED || is_plugin_active('payment') && $order->payment->id)
                             <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                                 @if ($order->status == Botble\Ecommerce\Enums\OrderStatusEnum::CANCELED)
-                                    <div class="text-uppercase">
+                                    <div class="d-flex align-items-start gap-1">
                                         <x-core::icon name="ti ti-circle-off" />
-                                        <span>{{ trans('plugins/ecommerce::order.order_was_canceled') }}</span>
+                                        <div>
+                                            <span class="text-uppercase">{{ trans('plugins/ecommerce::order.order_was_canceled') }}</span>
+
+                                            @if($order->cancellation_reason)
+                                                <div class="text-muted small">
+                                                    {{ trans('plugins/ecommerce::order.cancellation_reason', ['reason' => $order->cancellation_reason_message]) }}
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 @elseif (is_plugin_active('payment') && $order->payment->id)
                                     <div class="text-uppercase">
@@ -756,10 +764,10 @@
                                             <a
                                                 class="btn-trigger-update-tax-information"
                                                 href="#"
-                                                    data-placement="top"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-original-title="{{ trans('plugins/ecommerce::order.tax_info.update') }}"
-                                                >
+                                                data-placement="top"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-original-title="{{ trans('plugins/ecommerce::order.tax_info.update') }}"
+                                            >
                                                 <x-core::icon name="ti ti-pencil" />
                                             </a>
                                         </div>

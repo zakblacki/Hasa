@@ -69,7 +69,7 @@ class HookServiceProvider extends ServiceProvider
             echo "<div class='form-group' id='termsbox'>
                 <div class='form-check'>
                     <input class='form-check-input' type='checkbox' id='terms' name='terms' required>
-                    <label class='form-check-label' for='terms'>" . trans('plugins/satim::satim.i_agree_to_the'). "<a href='#'>" . trans('plugins/satim::satim.terms_and_conditions'). "</a></label>
+                    <label class='form-check-label' for='terms'>" . trans('plugins/satim::satim.i_agree_to_the'). "<a href='https://matacor.com/conditions-generales'>" . trans('plugins/satim::satim.terms_and_conditions'). "</a></label>
                 </div>
                 </div>";
         });
@@ -96,6 +96,22 @@ class HookServiceProvider extends ServiceProvider
                         printButton[i].attr("data-html2canvas-ignore", "true");
                     }
                 }
+
+                function sendemail(){
+                    $.ajax({
+                        url: "' . route('payments.satim.invoice',[request()->route()->token,request()->input('charge_id'),"mail"]) . '",
+                        type: "GET",
+                        success: function(response){
+                            alert("mail sent");
+                            console.log(response);
+                        },
+                        error: function(xhr, status, error){
+                            // Handle errors
+                            console.log(xhr.responseText);
+                        }
+                    });
+                }
+
                 </script>';
 
                 
@@ -110,7 +126,7 @@ class HookServiceProvider extends ServiceProvider
                 $msg .='<p><span class="d-inline-block" style="color:green;">'.trans('plugins/satim::satim.in_case_of_payment_problem_please_contact_the_toll_free_number_of') . '</span></p> <img class="filter-black" src="' . url('vendor/core/plugins/satim/images/3020.png') . '" alt="satim">';
                 $msg .='<p><span class="d-inline-block">'.trans('plugins/satim::satim.thank_you_for_your_purchase').'</span></p>';
                 echo $msg;
-                $button = '<a data-html2canvas-ignore="true" class="btn btn-primary me-2 printButtonClass" href="#" onclick="print()"> <i class="fa fa-print"></i>' . trans('plugins/ecommerce::order.print_invoice') . '</a> <a data-html2canvas-ignore="true" class="btn btn-info me-2 printButtonClass" href="' . route('payments.satim.invoice',[request()->route()->token,request()->input('charge_id'),"download"]) . '"> <i class="fa fa-download"></i>' . trans('plugins/ecommerce::order.download_invoice') . '</a><a data-html2canvas-ignore="true" class="btn btn-info printButtonClass" href="#" onclick="alert(\'Email Sent\')"> <i class="fa fa-download"></i>' . trans('plugins/contact::contact.tables.email') . '</a>';
+                $button = '<a data-html2canvas-ignore="true" class="btn btn-primary me-2 printButtonClass" href="#" onclick="print()"> <i class="fa fa-print"></i>' . trans('plugins/ecommerce::order.print_invoice') . '</a> <a data-html2canvas-ignore="true" class="btn btn-info me-2 printButtonClass" href="' . route('payments.satim.invoice',[request()->route()->token,request()->input('charge_id'),"download"]) . '"> <i class="fa fa-download"></i>' . trans('plugins/ecommerce::order.download_invoice') . '</a><a data-html2canvas-ignore="true" class="btn btn-info printButtonClass" href="#" onclick="sendemail()"> <i class="fa fa-download"></i>' . trans('plugins/contact::contact.tables.email') . '</a>';
                 echo $button;
             }
         });

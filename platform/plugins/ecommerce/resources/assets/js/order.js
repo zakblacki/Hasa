@@ -231,6 +231,12 @@ class OrderAdminManagement {
                     } else {
                         Botble.showError(data.message)
                     }
+
+                    if (_self.closest('.modal')) {
+                        _self.closest('.modal').modal('hide')
+
+                        $('.page-body').load(`${window.location.href} .page-body > *`)
+                    }
                 })
         })
 

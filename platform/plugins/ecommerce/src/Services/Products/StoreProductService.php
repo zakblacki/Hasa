@@ -53,7 +53,7 @@ class StoreProductService
         $images = [];
 
         if ($imagesInput = $request->input('images', [])) {
-            $images = array_values(array_filter((array)$imagesInput));
+            $images = array_values(array_filter((array) $imagesInput));
         }
 
         $product->images = json_encode($images);
@@ -135,7 +135,7 @@ class StoreProductService
         }
 
         if (EcommerceHelper::isEnabledProductOptions() && $request->input('has_product_options')) {
-            $this->saveProductOptions((array)$request->input('options', []), $product);
+            $this->saveProductOptions((array) $request->input('options', []), $product);
         }
 
         event(new ProductQuantityUpdatedEvent($product));

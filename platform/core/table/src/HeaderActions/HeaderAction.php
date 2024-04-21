@@ -36,7 +36,7 @@ class HeaderAction implements Arrayable
     public function toArray(): array
     {
         return [
-            'className' => sprintf('action-item %s %s', $this->getColor(), $this->getAttribute('class')),
+            'className' => $this->getClassName(),
             'text' => view('core/table::includes.header-action', ['action' => $this])->render(),
         ];
     }
@@ -48,5 +48,20 @@ class HeaderAction implements Arrayable
             ->permission($route);
 
         return $this;
+    }
+
+    public function getClassName(): string
+    {
+        return sprintf(
+            '%s %s %s',
+            $this->getAttribute('data-default-action', true) ? 'action-item' : '',
+            $this->getColor(),
+            $this->getAttribute('class')
+        );
+    }
+
+    public function withDefaultAction(bool $isDefault = true): static
+    {
+        return $this->addAttribute('data-default-action', $isDefault);
     }
 }

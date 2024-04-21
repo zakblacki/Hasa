@@ -15,3 +15,15 @@ if (! defined('BASE_FILTER_TABLE_BUTTONS')) {
 if (! defined('BASE_FILTER_TABLE_QUERY')) {
     define('BASE_FILTER_TABLE_QUERY', 'base_filter_table_query');
 }
+
+if (! defined('BASE_FILTER_TABLE_BEFORE_RENDER')) {
+    define('BASE_FILTER_TABLE_BEFORE_RENDER', 'base_filter_table_before_render');
+}
+
+if (! defined('BASE_FILTER_TABLE_AFTER_RENDER')) {
+    define('BASE_FILTER_TABLE_AFTER_RENDER', 'base_filter_table_after_render');
+}
+
+if (! defined('BASE_FILTER_TABLE_FOOTER_RENDER')) {
+    define('BASE_FILTER_TABLE_FOOTER_RENDER', 'base_filter_table_footer_render');
+}

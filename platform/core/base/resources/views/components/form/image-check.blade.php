@@ -5,7 +5,7 @@
 ])
 
 @php
-    $id = $attributes->get('id', $name);
+    $id = sprintf('%s-%s', $attributes->get('id', $name), uniqid());
 @endphp
 
 <div class="row g-2">

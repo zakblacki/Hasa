@@ -16,6 +16,7 @@ class ShortcodeTabsField extends FormField
         return [
             'fields' => [],
             'shortcode_attributes' => [],
+            'min' => 1,
             'max' => 20,
         ];
     }

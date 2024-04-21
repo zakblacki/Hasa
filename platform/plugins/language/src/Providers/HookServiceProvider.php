@@ -69,7 +69,7 @@ class HookServiceProvider extends ServiceProvider
                 ->modify('locale', HtmlField::class, HtmlFieldOption::make()->view('plugins/language::forms.general-setting-form-label')->toArray());
         });
 
-        add_filter('cms_language_flag', function (string|null $flag, string|null $name = null) {
+        add_filter('cms_language_flag', function (?string $flag, ?string $name = null) {
             if (! $name) {
                 return $flag;
             }
@@ -82,7 +82,7 @@ class HookServiceProvider extends ServiceProvider
         }, 50, 2);
     }
 
-    public function settingEmailTemplateMetaBoxes(string|null $data, array $params = []): string
+    public function settingEmailTemplateMetaBoxes(?string $data, array $params = []): string
     {
         $languages = Language::getActiveLanguage(['lang_id', 'lang_name', 'lang_code', 'lang_flag']);
 
@@ -148,7 +148,7 @@ class HookServiceProvider extends ServiceProvider
         }
     }
 
-    public function addLanguageMetaBoxForThemeOptionsAndWidgets(string|null $data, string $screen): string|null
+    public function addLanguageMetaBoxForThemeOptionsAndWidgets(?string $data, string $screen): ?string
     {
         $route = null;
         switch ($screen) {
@@ -201,7 +201,7 @@ class HookServiceProvider extends ServiceProvider
         return $prefix;
     }
 
-    public function languageMetaField(): string|null
+    public function languageMetaField(): ?string
     {
         $languages = Language::getActiveLanguage([
             'lang_code',
@@ -262,7 +262,7 @@ class HookServiceProvider extends ServiceProvider
         )->render();
     }
 
-    public function checkCurrentLanguage(array|EloquentCollection $languages, string|null $value): ?LanguageModel
+    public function checkCurrentLanguage(array|EloquentCollection $languages, ?string $value): ?LanguageModel
     {
         $refLang = Language::getRefLang();
 
@@ -329,7 +329,7 @@ class HookServiceProvider extends ServiceProvider
         echo null;
     }
 
-    public function getCurrentAdminLanguage(Request $request, ?Model $data = null): string|null
+    public function getCurrentAdminLanguage(Request $request, ?Model $data = null): ?string
     {
         $code = null;
         if ($refLang = Language::getRefLang()) {
@@ -438,7 +438,7 @@ class HookServiceProvider extends ServiceProvider
         return $this->getDataByCurrentLanguageCode($data, Language::getCurrentLocaleCode());
     }
 
-    protected function getDataByCurrentLanguageCode(Builder|Model $data, string|null $languageCode): Builder|Model
+    protected function getDataByCurrentLanguageCode(Builder|Model $data, ?string $languageCode): Builder|Model
     {
         $model = $data->getModel();
 
@@ -616,7 +616,7 @@ class HookServiceProvider extends ServiceProvider
         return $form;
     }
 
-    public function updateMenuNodeUrl(string|null $value): string
+    public function updateMenuNodeUrl(?string $value): string
     {
         if (is_in_admin() || in_array($value, ['#', 'javascript:void(0)'])) {
             return $value;

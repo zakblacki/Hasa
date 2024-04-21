@@ -106,6 +106,8 @@ class CaptchaSettingForm extends SettingForm
                                     ),
                                 ],
                             ]);
+
+                        $form->addSelectFormFields('enable_recaptcha');
                     })
                     ->isOpened((bool) old('enable_captcha', Captcha::reCaptchaEnabled()))
             )
@@ -118,7 +120,24 @@ class CaptchaSettingForm extends SettingForm
                             ->label(trans('plugins/captcha::captcha.settings.enable_math_captcha'))
                             ->value(Captcha::mathCaptchaEnabled())
                     )
+                    ->fieldset(function (CaptchaSettingForm $form) {
+                        $form->addSelectFormFields('enable_math_captcha');
+                    })
                     ->isOpened((bool) old('enable_math_captcha', Captcha::mathCaptchaEnabled()))
             );
+    }
+
+    public function addSelectFormFields(string $key): void
+    {
+        foreach (Captcha::getFormsSupport() as $form => $title) {
+            $this->add(
+                Captcha::formSettingKey($form, $key),
+                OnOffCheckboxField::class,
+                CheckboxFieldOption::make()
+                ->label(trans('plugins/captcha::captcha.settings.enable_for_form', ['form' => $title]))
+                    ->value(Captcha::formSetting($form, $key))
+                    ->toArray()
+            );
+        }
     }
 }

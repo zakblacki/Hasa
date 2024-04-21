@@ -559,7 +559,7 @@ class Botble {
                 Botble.select(element, options)
                 const selected = $element.data('selected')
 
-                if (Object.keys(selected).length > 0) {
+                if (typeof selected !== 'undefined' && Object.keys(selected).length > 0) {
                     Object.keys(selected).forEach((key) => {
                         const option = new Option(selected[key], key, true, true)
                         $element.append(option).trigger('change')
@@ -1335,7 +1335,12 @@ class Botble {
                 }
             } else {
                 $parent.prop('indeterminate', false)
-                $parent.prop('checked', false)
+
+                if ($parent.prop('checked') || $topParent.find('ul input[type=checkbox]:checked').length > 0) {
+                    $parent.prop('checked', true)
+                } else {
+                    $parent.prop('checked', false)
+                }
             }
 
             if ($parent.length > 0) {
@@ -1697,7 +1702,11 @@ class Botble {
                     $textElement.text(values.join(', '))
                 }
             } else {
-                $textElement.text($wrapper.data('placeholder') || ' ')
+                if ($wrapper.length) {
+                    $.map($wrapper, function (item) {
+                        $(item).find('> span').text($(item).data('placeholder') || ' ')
+                    })
+                }
             }
         }
 

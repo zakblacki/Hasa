@@ -16,7 +16,7 @@ class PostRequest extends Request
             'name' => ['required', 'string', 'max:250'],
             'description' => ['nullable', 'string', 'max:400'],
             'content' => ['nullable', 'string', 'max:300000'],
-            'tag' => ['nullable', 'string', 'max:255'],
+            'tag' => ['nullable', 'string', 'max:400'],
             'categories' => ['sometimes', 'array'],
             'categories.*' => ['sometimes', 'exists:categories,id'],
             'status' => Rule::in(BaseStatusEnum::values()),

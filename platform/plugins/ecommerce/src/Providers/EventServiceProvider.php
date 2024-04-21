@@ -32,6 +32,7 @@ use Botble\Ecommerce\Listeners\SendMailsAfterCustomerRegistered;
 use Botble\Ecommerce\Listeners\SendProductReviewsMailAfterOrderCompleted;
 use Botble\Ecommerce\Listeners\SendShippingStatusChangedNotification;
 use Botble\Ecommerce\Listeners\SendWebhookWhenOrderPlaced;
+use Botble\Ecommerce\Listeners\UpdateInvoiceAndShippingWhenOrderCancelled;
 use Botble\Ecommerce\Listeners\UpdateProductStockStatus;
 use Botble\Ecommerce\Listeners\UpdateProductView;
 use Botble\Ecommerce\Services\HandleApplyCouponService;
@@ -96,6 +97,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         OrderCancelledEvent::class => [
             OrderCancelledNotification::class,
+            UpdateInvoiceAndShippingWhenOrderCancelled::class,
         ],
         OrderReturnedEvent::class => [
             OrderReturnedNotification::class,

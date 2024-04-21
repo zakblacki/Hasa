@@ -35,6 +35,9 @@ class UpdateDefaultProductService
             'wide',
             'height',
             'weight',
+            'quantity',
+            'allow_checkout_when_out_of_stock',
+            'with_storehouse_management',
         ];
 
         foreach ($data as $item) {

@@ -16,7 +16,7 @@ class IdColumn extends FormattedColumn implements FormattedColumnContract
             ->columnVisibility();
     }
 
-    public function formattedValue($value): string|null
+    public function formattedValue($value): ?string
     {
         return $this
             ->when(BaseModel::getTypeOfId() !== 'BIGINT', function (IdColumn $column) {

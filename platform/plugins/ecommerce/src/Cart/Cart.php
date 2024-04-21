@@ -47,7 +47,7 @@ class Cart
         return $this;
     }
 
-    public function getLastUpdatedAt(): CarbonInterface|null
+    public function getLastUpdatedAt(): ?CarbonInterface
     {
         return $this->session->get($this->instance . '_updated_at');
     }
@@ -232,7 +232,7 @@ class Cart
 
             if ($content->has($cartItem->rowId)) {
                 $existingCartItem = $this->get($cartItem->rowId);
-                $cartItem->setQuantity((int)$existingCartItem->qty + (int)$cartItem->qty);
+                $cartItem->setQuantity((int) $existingCartItem->qty + (int) $cartItem->qty);
             }
         }
 

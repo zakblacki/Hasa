@@ -18,7 +18,7 @@
             <small>{{ $product->variation_attributes }}</small>
         </p>
 
-        @include('plugins/ecommerce::themes.includes.cart-item-options-extras', [
+        @include(EcommerceHelper::viewPath('includes.cart-item-options-extras'), [
             'options' => $cartItem->options,
         ])
 

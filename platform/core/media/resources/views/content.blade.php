@@ -389,31 +389,27 @@
             </footer>
         </div>
         <div class="rv-upload-progress hide-the-pane position-fixed bottom-0 end-0 ">
-            <div class="panel panel-default">
-                <x-core::card>
-                    <x-core::card.header class="position-relative">
-                        <h3 class="panel-title mb-0">{{ trans('core/media::media.upload_progress') }}</h3>
-                        <x-core::button
-                            class="close-pane position-absolute top-50 bg-primary text-white text-center p-0"
-                        >
-                            <x-core::icon
-                                class="m-0"
-                                name="ti ti-x"
-                            />
-                        </x-core::button>
-                    </x-core::card.header>
-                    <div
-                        class="table-responsive overflow-auto"
-                        style="max-height: 180px"
+            <x-core::card>
+                <x-core::card.header class="position-relative">
+                    <h3 class="panel-title mb-0">{{ trans('core/media::media.upload_progress') }}</h3>
+                    <x-core::button
+                        class="close-pane position-absolute top-50 bg-primary text-white text-center p-0"
                     >
-                        <x-core::table>
-                            <x-core::table.body class="rv-upload-progress-table">
-
-                            </x-core::table.body>
-                        </x-core::table>
-                    </div>
-                </x-core::card>
-            </div>
+                        <x-core::icon
+                            class="m-0"
+                            name="ti ti-x"
+                        />
+                    </x-core::button>
+                </x-core::card.header>
+                <div
+                    class="table-responsive overflow-auto"
+                    style="max-height: 180px"
+                >
+                    <x-core::table>
+                        <x-core::table.body class="rv-upload-progress-table"></x-core::table.body>
+                    </x-core::table>
+                </div>
+            </x-core::card>
         </div>
     </x-core::card>
 </div>
@@ -791,7 +787,7 @@
             <span class="file-size">__fileSize__</span>
         </x-core::table.body.cell>
         <x-core::table.body.cell>
-            <span class="label label-__status__">__message__</span>
+            <span class="file-status text-__status__">__message__</span>
         </x-core::table.body.cell>
     </x-core::table.body.row>
 </x-core::custom-template>

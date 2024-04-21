@@ -17,7 +17,7 @@ class MarketplaceService
 {
     protected string $url;
 
-    protected string|null $token;
+    protected ?string $token;
 
     protected string $publishedPath;
 

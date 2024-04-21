@@ -4,7 +4,7 @@
             @foreach ($products as $product)
                 <a class="bb-quick-search-item" href="{{ $product->url }}">
                     <div class="bb-quick-search-item-image">
-                        {{ RvMedia::image($product->image, $product->name, 'thumb', useDefaultImage: true) }}
+                        {{ RvMedia::image($product->image, $product->name, 'thumb', useDefaultImage: true, attributes: ['loading' => false]) }}
                     </div>
                     <div class="bb-quick-search-item-info">
                         <div class="bb-quick-search-item-name">

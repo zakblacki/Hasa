@@ -37,6 +37,7 @@ use Botble\Base\Traits\Forms\HasMetadata;
 use Botble\JsValidation\Facades\JsValidator;
 use Botble\JsValidation\Javascript\JavascriptValidator;
 use Closure;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
@@ -88,7 +89,7 @@ abstract class FormAbstract extends Form implements ExtensibleContract
     {
     }
 
-    public function buildForm()
+    public function buildForm(): void
     {
         $this->withCustomFields();
 
@@ -279,7 +280,7 @@ abstract class FormAbstract extends Form implements ExtensibleContract
         return apply_filters('form_custom_fields', $this, $this->getFormHelper());
     }
 
-    public function addCustomField($name, $class): static
+    public function addCustomField(string $name, string $class): static
     {
         if ($this->rebuilding && $this->formHelper->hasCustomField($name)) {
             return $this;
@@ -328,7 +329,7 @@ abstract class FormAbstract extends Form implements ExtensibleContract
         return $this;
     }
 
-    protected function addField(FormField $field, $modify = false): static
+    protected function addField(FormField $field, bool $modify = false): static
     {
         if (! $modify && ! $this->rebuilding) {
             $this->preventDuplicate($field->getRealName());
@@ -343,7 +344,7 @@ abstract class FormAbstract extends Form implements ExtensibleContract
         return $this;
     }
 
-    public function renderForm(array $options = [], $showStart = true, $showFields = true, $showEnd = true): string
+    public function renderForm(array $options = [], bool $showStart = true, bool $showFields = true, bool $showEnd = true): string
     {
         Assets::addScripts(['form-validation', 'are-you-sure']);
 
@@ -382,14 +383,19 @@ abstract class FormAbstract extends Form implements ExtensibleContract
 
     public function renderValidatorJs(): string|JavascriptValidator
     {
+        return JsValidator::formRequest($this->getValidatorClass(), $this->getDomSelector());
+    }
+
+    public function getDomSelector(): ?string
+    {
         $element = null;
-        if ($this->getFormOption('id')) {
-            $element = '#' . $this->getFormOption('id');
-        } elseif ($this->getFormOption('class')) {
-            $element = '.' . $this->getFormOption('class');
+        if ($formId = $this->getFormOption('id')) {
+            $element = '#' . $formId;
+        } elseif ($formClass = $this->getFormOption('class')) {
+            $element = '.' . $formClass;
         }
 
-        return JsValidator::formRequest($this->getValidatorClass(), $element);
+        return $element;
     }
 
     public function getValidatorClass(): string
@@ -436,10 +442,14 @@ abstract class FormAbstract extends Form implements ExtensibleContract
         return $this;
     }
 
-    public function add($name, $type = 'text', array $options = [], $modify = false): static
+    public function add(string $name, string $type = 'text', array|Arrayable $options = [], bool $modify = false): static
     {
         if (Assets::hasVueJs()) {
             $options['attr']['v-pre'] = 1;
+        }
+
+        if ($options instanceof Arrayable) {
+            $options = $options->toArray();
         }
 
         parent::add($name, $type, $options, $modify);
@@ -489,23 +499,23 @@ abstract class FormAbstract extends Form implements ExtensibleContract
     public static function beforeSaving(callable|Closure $callback, int $priority = 100): void
     {
         if (static::class === FormAbstract::class) {
-            add_filter(BASE_FILTER_BEFORE_SAVE_FORM, $callback, $priority, 2);
+            add_action(BASE_FILTER_BEFORE_SAVE_FORM, $callback, $priority, 2);
 
             return;
         }
 
-        add_filter(static::getFilterPrefix() . '_before_saving', $callback, $priority, 2);
+        add_action(static::getFilterPrefix() . '_before_saving', $callback, $priority, 2);
     }
 
     public static function afterSaving(callable|Closure $callback, int $priority = 100): void
     {
         if (static::class === FormAbstract::class) {
-            add_filter(BASE_FILTER_AFTER_SAVE_FORM, $callback, $priority, 2);
+            add_action(BASE_FILTER_AFTER_SAVE_FORM, $callback, $priority, 2);
 
             return;
         }
 
-        add_filter(static::getFilterPrefix() . '_after_saving', $callback, $priority, 2);
+        add_action(static::getFilterPrefix() . '_after_saving', $callback, $priority, 2);
     }
 
     public function save(): void
@@ -551,7 +561,7 @@ abstract class FormAbstract extends Form implements ExtensibleContract
         }
     }
 
-    public function fireModelEvents(Model $model)
+    public function fireModelEvents(Model $model): void
     {
         if ($model->wasRecentlyCreated) {
             CreatedContentEvent::dispatch('form', $this->request, $model);
@@ -562,14 +572,14 @@ abstract class FormAbstract extends Form implements ExtensibleContract
 
     protected function dispatchBeforeSaving(): void
     {
-        apply_filters(BASE_FILTER_BEFORE_SAVE_FORM, $this);
-        apply_filters(static::getFilterPrefix() . '_before_saving', $this);
+        do_action(BASE_FILTER_BEFORE_SAVE_FORM, $this);
+        do_action(static::getFilterPrefix() . '_before_saving', $this);
     }
 
     protected function dispatchAfterSaving(): void
     {
-        apply_filters(BASE_FILTER_AFTER_SAVE_FORM, $this);
-        apply_filters(static::getFilterPrefix() . '_after_saving', $this);
+        do_action(BASE_FILTER_AFTER_SAVE_FORM, $this);
+        do_action(static::getFilterPrefix() . '_after_saving', $this);
     }
 
     public static function getFilterPrefix(): string
@@ -625,9 +635,9 @@ abstract class FormAbstract extends Form implements ExtensibleContract
         return static::create([...$options, 'model' => $model], $data);
     }
 
-    public function hasFiles(): static
+    public function hasFiles(bool $hasFiles = true): static
     {
-        $this->setFormOption('files', true);
+        $this->setFormOption('files', $hasFiles);
 
         return $this;
     }

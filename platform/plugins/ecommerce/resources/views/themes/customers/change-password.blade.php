@@ -1,6 +1,6 @@
-@extends(EcommerceHelper::viewPath('customers.master'))
+@extends(EcommerceHelper::viewPath('customers.layouts.account-settings'))
 
-@section('content')
+@section('account-content')
     <h2 class="customer-page-title mb-4">{{ __('Change password') }}</h2>
 
     {!! Form::open(['route' => 'customer.post.change-password', 'method' => 'POST']) !!}

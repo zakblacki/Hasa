@@ -502,7 +502,7 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
                     ->where(function (EloquentBuilder $query) use ($keyword, $searchProductsBy, $isPartial) {
                         $hasWhere = false;
 
-                        if (in_array('name', $searchProductsBy) || in_array('sku', $searchProductsBy) || in_array('description', $searchProductsBy)) {
+                        if (in_array('name', $searchProductsBy) || in_array('sku', $searchProductsBy) || in_array('description', $searchProductsBy) || in_array('type_de_taille', $searchProductsBy) || in_array('type_de_tissu', $searchProductsBy) || in_array('coupe_pantalon', $searchProductsBy) || in_array('longueur', $searchProductsBy) || in_array('coupe_silhouette', $searchProductsBy) || in_array('motif', $searchProductsBy) || in_array('couleur', $searchProductsBy) || in_array('poche', $searchProductsBy) || in_array('type_de_produit', $searchProductsBy) || in_array('taille', $searchProductsBy) || in_array('grandes_occasions', $searchProductsBy) || in_array('personnage', $searchProductsBy) || in_array('matiere', $searchProductsBy) || in_array('duree_de_livraison', $searchProductsBy)) {
                             $query
                                 ->where(function (BaseQueryBuilder $subQuery) use ($keyword, $searchProductsBy, $isPartial) {
                                     if (in_array('name', $searchProductsBy)) {
@@ -515,6 +515,62 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
 
                                     if (in_array('description', $searchProductsBy)) {
                                         $subQuery->addSearch('ec_products.description', $keyword, false);
+                                    }
+
+                                    if (in_array('type_de_taille', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.type_de_taille', $keyword, false);
+                                    }
+
+                                    if (in_array('type_de_tissu', $searchProductsBy)) {
+                                        $subQuery->addSearch('type_de_tissu', $keyword, false);
+                                    }
+
+                                    if (in_array('coupe_pantalon', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.coupe_pantalon', $keyword, false);
+                                    }
+
+                                    if (in_array('longueur', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.longueur', $keyword, false);
+                                    }
+
+                                    if (in_array('coupe_silhouette', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.coupe_silhouette', $keyword, false);
+                                    }
+
+                                    if (in_array('motif', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.motif', $keyword, false);
+                                    }
+
+                                    if (in_array('couleur', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.couleur', $keyword, false);
+                                    }
+
+                                    if (in_array('poche', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.poche', $keyword, false);
+                                    }
+
+                                    if (in_array('type_de_produit', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.type_de_produit', $keyword, false);
+                                    }
+
+                                    if (in_array('taille', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.taille', $keyword, false);
+                                    }
+
+                                    if (in_array('grandes_occasions', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.grandes_occasions', $keyword, false);
+                                    }
+
+                                    if (in_array('personnage', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.personnage', $keyword, false);
+                                    }
+
+                                    if (in_array('matiere', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.matiere', $keyword, false);
+                                    }
+
+                                    if (in_array('duree_de_livraison', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.duree_de_livraison', $keyword, false);
                                     }
                                 });
 

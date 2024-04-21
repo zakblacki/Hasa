@@ -36,48 +36,52 @@ class PluginManagementController extends BaseController
 
         RenderingPluginListingPage::dispatch();
 
-        $plugins = [];
-
         if (File::exists(plugin_path('.DS_Store'))) {
             File::delete(plugin_path('.DS_Store'));
         }
 
-        $paths = BaseHelper::scanFolder(plugin_path());
+        $plugins = collect();
 
-        if (! empty($paths)) {
+        if (! empty($pluginsPath = BaseHelper::scanFolder(plugin_path()))) {
             $installed = get_active_plugins();
-            foreach ($paths as $path) {
+
+            foreach ($pluginsPath as $path) {
                 $pluginPath = plugin_path($path);
 
-                if (File::exists($pluginPath . '/.DS_Store')) {
-                    File::delete($pluginPath . '/.DS_Store');
+                if (File::exists($dsStore = "$pluginPath/.DS_Store")) {
+                    File::delete($dsStore);
                 }
 
-                if (! File::isDirectory($pluginPath) || ! File::exists($pluginPath . '/plugin.json')) {
+                if (
+                    ! File::isDirectory($pluginPath)
+                    || ! File::exists($pluginJson = "$pluginPath/plugin.json")
+                ) {
                     continue;
                 }
 
-                $content = BaseHelper::getFileData($pluginPath . '/plugin.json');
+                $manifest = BaseHelper::getFileData($pluginJson);
 
-                if (! empty($content)) {
-                    $content = [
-                        ...$content,
+                if (! empty($manifest)) {
+                    $manifest = [
+                        ...$manifest,
                         'status' => in_array($path, $installed),
                         'path' => $path,
                         'image' => null,
                     ];
 
-                    $screenshot = 'vendor/core/plugins/' . $path . '/screenshot.png';
+                    $screenshot = "vendor/core/plugins/$path/screenshot.png";
 
                     if (File::exists(public_path($screenshot))) {
-                        $content['image'] = asset($screenshot);
+                        $manifest['image'] = asset($screenshot);
                     } elseif (File::exists($pluginPath . '/screenshot.png')) {
-                        $content['image'] = 'data:image/png;base64,' . base64_encode(File::get($pluginPath . '/screenshot.png'));
+                        $manifest['image'] = 'data:image/png;base64,' . base64_encode(File::get($pluginPath . '/screenshot.png'));
                     }
 
-                    $plugins[] = (object) $content;
+                    $plugins->push((object) $manifest);
                 }
             }
+
+            $plugins = collect($plugins)->sortByDesc('status');
         }
 
         return view('packages/plugin-management::index', compact('plugins'));

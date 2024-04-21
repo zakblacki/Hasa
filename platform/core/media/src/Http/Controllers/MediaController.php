@@ -252,7 +252,7 @@ class MediaController extends BaseController
         ]);
     }
 
-    protected function transformOrderBy(string|null $orderBy): array
+    protected function transformOrderBy(?string $orderBy): array
     {
         $result = explode('-', $orderBy);
         if (! count($result) == 2) {
@@ -544,8 +544,8 @@ class MediaController extends BaseController
 
                 $thumbnailService
                     ->setImage(RvMedia::getRealPath($fileUrl))
-                    ->setSize((int)$cropData['width'], (int)$cropData['height'])
-                    ->setCoordinates((int)$cropData['x'], (int)$cropData['y'])
+                    ->setSize((int) $cropData['width'], (int) $cropData['height'])
+                    ->setCoordinates((int) $cropData['x'], (int) $cropData['y'])
                     ->setDestinationPath(File::dirname($fileUrl))
                     ->setFileName(File::name($fileUrl) . '.' . File::extension($fileUrl))
                     ->save('crop');

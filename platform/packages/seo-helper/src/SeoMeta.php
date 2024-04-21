@@ -43,10 +43,12 @@ class SeoMeta implements SeoMetaContract
      * The Analytics instance.
      *
      * @var AnalyticsContract
+     *
+     * @deprecated since 7.3.0 use ThemeSupport::renderGoogleTagManagerScript() instead.
      */
     protected $analytics;
 
-    protected string|null $currentUrl = null;
+    protected ?string $currentUrl = null;
 
     /**
      * Make SeoMeta instance.
@@ -58,7 +60,6 @@ class SeoMeta implements SeoMetaContract
         $this->misc(new Entities\MiscTags());
         $this->webmasters(new Entities\Webmasters());
         $this->analytics(new Entities\Analytics());
-        $this->setGoogle(setting('google_analytics'));
     }
 
     /**
@@ -123,6 +124,8 @@ class SeoMeta implements SeoMetaContract
      * @param AnalyticsContract $analytics
      *
      * @return $this
+     *
+     * @deprecated since 7.3.0 use ThemeSupport::renderGoogleTagManagerScript() instead.
      */
     protected function analytics(AnalyticsContract $analytics)
     {

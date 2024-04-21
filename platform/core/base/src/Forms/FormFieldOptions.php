@@ -75,7 +75,7 @@ class FormFieldOptions implements Arrayable
         return $this->wrapperAttributes;
     }
 
-    public function helperText(string|null $helperText, array $attributes = []): static
+    public function helperText(?string $helperText, array $attributes = []): static
     {
         if (! $helperText) {
             return $this;

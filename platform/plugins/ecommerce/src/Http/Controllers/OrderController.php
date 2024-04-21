@@ -9,6 +9,7 @@ use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\EmailHandler;
 use Botble\Base\Supports\Breadcrumb;
 use Botble\Ecommerce\Cart\CartItem;
+use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ShippingCodStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
@@ -136,13 +137,13 @@ class OrderController extends BaseController
 
         if ($order) {
             OrderHistory::query()->create([
-                'action' => 'create_order_from_admin_page',
+                'action' => OrderHistoryActionEnum::CREATE_ORDER_FROM_ADMIN_PAGE,
                 'description' => trans('plugins/ecommerce::order.create_order_from_admin_page'),
                 'order_id' => $order->getKey(),
             ]);
 
             OrderHistory::query()->create([
-                'action' => 'create_order',
+                'action' => OrderHistoryActionEnum::CREATE_ORDER,
                 'description' => trans(
                     'plugins/ecommerce::order.new_order',
                     ['order_id' => $order->code]
@@ -151,7 +152,7 @@ class OrderController extends BaseController
             ]);
 
             OrderHistory::query()->create([
-                'action' => 'confirm_order',
+                'action' => OrderHistoryActionEnum::CONFIRM_ORDER,
                 'description' => trans('plugins/ecommerce::order.order_was_verified_by'),
                 'order_id' => $order->getKey(),
                 'user_id' => $userId,
@@ -178,7 +179,7 @@ class OrderController extends BaseController
                     event(new OrderPaymentConfirmedEvent($order, Auth::user()));
 
                     OrderHistory::query()->create([
-                        'action' => 'confirm_payment',
+                        'action' => OrderHistoryActionEnum::CONFIRM_PAYMENT,
                         'description' => trans('plugins/ecommerce::order.payment_was_confirmed_by', [
                             'money' => format_price($order->amount),
                         ]),
@@ -370,7 +371,7 @@ class OrderController extends BaseController
         $order->save();
 
         OrderHistory::query()->create([
-            'action' => 'confirm_order',
+            'action' => OrderHistoryActionEnum::CONFIRM_ORDER,
             'description' => trans('plugins/ecommerce::order.order_was_verified_by'),
             'order_id' => $order->getKey(),
             'user_id' => Auth::id(),
@@ -495,14 +496,14 @@ class OrderController extends BaseController
             $shipment = Shipment::query()->create($shipment);
 
             OrderHistory::query()->create([
-                'action' => 'create_shipment',
+                'action' => OrderHistoryActionEnum::CREATE_SHIPMENT,
                 'description' => $result->getMessage() . ' ' . trans('plugins/ecommerce::order.by_username'),
                 'order_id' => $order->getKey(),
                 'user_id' => Auth::id(),
             ]);
 
             ShipmentHistory::query()->create([
-                'action' => 'create_from_order',
+                'action' => OrderHistoryActionEnum::CREATE_FROM_ORDER,
                 'description' => trans('plugins/ecommerce::order.shipping_was_created_from'),
                 'shipment_id' => $shipment->id,
                 'order_id' => $order->getKey(),
@@ -518,7 +519,7 @@ class OrderController extends BaseController
         $shipment->update(['status' => ShippingStatusEnum::CANCELED]);
 
         OrderHistory::query()->create([
-            'action' => 'cancel_shipment',
+            'action' => OrderHistoryActionEnum::CANCEL_SHIPMENT,
             'description' => trans('plugins/ecommerce::order.shipping_was_canceled_by'),
             'order_id' => $shipment->order_id,
             'user_id' => Auth::id(),
@@ -583,7 +584,7 @@ class OrderController extends BaseController
         OrderHelper::cancelOrder($order);
 
         OrderHistory::query()->create([
-            'action' => 'cancel_order',
+            'action' => OrderHistoryActionEnum::CANCEL_ORDER,
             'description' => trans('plugins/ecommerce::order.order_was_canceled_by'),
             'order_id' => $order->id,
             'user_id' => Auth::id(),
@@ -649,7 +650,7 @@ class OrderController extends BaseController
         $response = apply_filters(ACTION_BEFORE_POST_ORDER_REFUND_ECOMMERCE, $this->httpResponse(), $order, $request);
 
         if ($response->isError()) {
-            return $this->httpResponse();
+            return $response;
         }
 
         $payment = $order->payment;
@@ -690,7 +691,7 @@ class OrderController extends BaseController
                     ->setMessage(Arr::get($paymentResponse, 'message', ''));
             }
 
-            $refundData = (array)Arr::get($paymentResponse, 'data', []);
+            $refundData = (array) Arr::get($paymentResponse, 'data', []);
 
             $response->setData($refundData);
 
@@ -737,7 +738,7 @@ class OrderController extends BaseController
 
         if ($refundAmount > 0) {
             OrderHistory::query()->create([
-                'action' => 'refund',
+                'action' => OrderHistoryActionEnum::REFUND,
                 'description' => trans('plugins/ecommerce::order.refund_success_with_price', [
                     'price' => format_price($refundAmount),
                 ]),
@@ -873,7 +874,7 @@ class OrderController extends BaseController
         $customerOrderNumbers = 0;
         if ($order->user_id) {
             $customer = Customer::query()->findOrFail($order->user_id);
-            $customer->avatar = (string)$customer->avatar_url;
+            $customer->avatar = (string) $customer->avatar_url;
 
             if ($customer) {
                 $customerOrderNumbers = $customer->orders()->count();
@@ -937,7 +938,7 @@ class OrderController extends BaseController
             $order->histories()->create([
                 'order_id' => $order->getKey(),
                 'user_id' => Auth::user()->getKey(),
-                'action' => 'mark_order_as_completed',
+                'action' => OrderHistoryActionEnum::MARK_ORDER_AS_COMPLETED,
                 'description' => trans('plugins/ecommerce::order.mark_as_completed.history', [
                     'admin' => Auth::user()->name,
                     'time' => Carbon::now(),
@@ -1063,7 +1064,7 @@ class OrderController extends BaseController
             }
 
             $originalQuantity = $product->quantity;
-            $product->quantity = (int)$product->quantity - $qtySelected - $inputQty + 1;
+            $product->quantity = (int) $product->quantity - $qtySelected - $inputQty + 1;
 
             if ($product->quantity < 0) {
                 $product->quantity = 0;
@@ -1128,7 +1129,7 @@ class OrderController extends BaseController
                 'weight' => $product->original_product->weight,
                 'original_price' => $product->front_sale_price,
                 'product_link' => route('products.edit', $product->original_product->id),
-                'product_type' => (string)$product->product_type,
+                'product_type' => (string) $product->product_type,
             ];
 
             $price = $product->front_sale_price;
@@ -1292,7 +1293,7 @@ class OrderController extends BaseController
             }
         } else {
             $couponData = [];
-            if ($discountCustomValue = max((float)$request->input('discount_custom_value'), 0)) {
+            if ($discountCustomValue = max((float) $request->input('discount_custom_value'), 0)) {
                 if ($request->input('discount_type') === 'percentage') {
                     $discountAmount = $rawTotal * min($discountCustomValue, 100) / 100;
                 } else {

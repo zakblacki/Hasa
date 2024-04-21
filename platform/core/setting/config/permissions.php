@@ -22,11 +22,6 @@ return [
         'parent_flag' => 'settings.options',
     ],
     [
-        'name' => 'Cronjob',
-        'flag' => 'settings.cronjob',
-        'parent_flag' => 'settings.options',
-    ],
-    [
         'name' => 'Admin Appearance Settings',
         'flag' => 'settings.admin-appearance',
         'parent_flag' => 'settings.options',
@@ -44,6 +39,11 @@ return [
     [
         'name' => 'Email Rules',
         'flag' => 'settings.email.rules',
+        'parent_flag' => 'settings.options',
+    ],
+    [
+        'name' => 'Website Tracking Settings',
+        'flag' => 'settings.website-tracking',
         'parent_flag' => 'settings.options',
     ],
 ];

@@ -50,7 +50,7 @@ class GeneralSettingForm extends SettingForm
                     ->searchable()
                     ->toArray()
             )
-            ->when(count($locales) > 1, function (FormAbstract $form) use ($locales, $availableLocales) {
+            ->when(! empty($locales), function (FormAbstract $form) use ($locales, $availableLocales) {
                 $defaultLocale = setting('locale', App::getLocale());
 
                 if (

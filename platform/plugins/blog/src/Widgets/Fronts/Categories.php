@@ -24,14 +24,10 @@ class Categories extends AbstractWidget
 
     protected function data(): array|Collection
     {
-        if (! is_plugin_active('blog')) {
-            return [];
-        }
-
         $categories = Category::query()
             ->wherePublished()
             ->with('slugable')
-            ->take((int)$this->getConfig('number_display') ?: 10)
+            ->take((int) $this->getConfig('number_display') ?: 10)
             ->get();
 
         return [
@@ -41,10 +37,6 @@ class Categories extends AbstractWidget
 
     protected function settingForm(): WidgetForm|string|null
     {
-        if (! is_plugin_active('blog')) {
-            return null;
-        }
-
         return WidgetForm::createFromArray($this->getConfig())
             ->add('name', TextField::class, NameFieldOption::make()->toArray())
             ->add(
@@ -54,5 +46,10 @@ class Categories extends AbstractWidget
                     ->label(__('Number categories to display'))
                     ->toArray()
             );
+    }
+
+    protected function requiredPlugins(): array
+    {
+        return ['blog'];
     }
 }

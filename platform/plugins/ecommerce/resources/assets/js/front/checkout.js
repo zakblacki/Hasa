@@ -75,10 +75,6 @@ class MainCheckout {
     }
 
     static handleValidationError(errors, $container) {
-        if (!errors.length) {
-            return
-        }
-
         $.each(errors, (index, item) => {
             let inputName = MainCheckout.dotArrayToJs(index)
             let $input = $('*[name="' + inputName + '"]')
@@ -102,7 +98,9 @@ class MainCheckout {
             }
         })
 
-        MainCheckout.showError(errors[0])
+        if (errors[0]) {
+            MainCheckout.showError(errors[0])
+        }
     }
 
     static showError(message, messageHeader = '') {

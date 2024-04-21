@@ -3,7 +3,7 @@
         <div class="card-body">
             <div class="customer-order-detail">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div @class(['col-12' => ! $order->address->name, 'col-md-6' => $order->address->name])>
                         <p>
                             <span class="d-inline-block me-1">{{ __('Order number') }}: </span>
                             <strong>{{ $order->code }}</strong>
@@ -16,6 +16,12 @@
                             <span class="d-inline-block me-1">{{ __('Order status') }}: </span>
                             <strong class="text-info">{{ $order->status->label() }}</strong>
                         </p>
+                        @if($order->cancellation_reason)
+                            <p>
+                                <span class="d-inline-block me-1">{{ __('Cancellation Reason') }}: </span>
+                                <strong class="text-warning">{{ $order->cancellation_reason_message }}</strong>
+                            </p>
+                        @endif
                         @if (is_plugin_active('payment') && $order->payment->id)
                             <p>
                                 <span class="d-inline-block me-1">{{ __('Payment method') }}: </span>
@@ -112,7 +118,7 @@
                                             @endif
 
                                             @include(
-                                                'plugins/ecommerce::themes.includes.cart-item-options-extras',
+                                                EcommerceHelper::viewPath('includes.cart-item-options-extras'),
                                                 ['options' => $orderProduct->options]
                                             )
 

@@ -26,11 +26,11 @@ use Throwable;
 
 class Shippo
 {
-    protected string|null $liveApiToken;
+    protected ?string $liveApiToken;
 
-    protected string|null $testApiToken;
+    protected ?string $testApiToken;
 
-    protected string|null $labelFileType;
+    protected ?string $labelFileType;
 
     protected Cache $cache;
 
@@ -42,7 +42,7 @@ class Shippo
 
     public const MAX_DESCRIPTION_LENGTH = 45;
 
-    protected string|null $currency;
+    protected ?string $currency;
 
     protected array $statuses;
 

@@ -10,36 +10,36 @@ use Illuminate\Support\HtmlString;
 class SocialLink
 {
     public function __construct(
-        protected string|null $name,
-        protected string|null $url,
-        protected string|null $icon,
-        protected string|null $image,
-        protected string|null $color,
-        protected string|null $backgroundColor,
+        protected ?string $name,
+        protected ?string $url,
+        protected ?string $icon,
+        protected ?string $image,
+        protected ?string $color,
+        protected ?string $backgroundColor,
     ) {
     }
 
-    public function getName(): string|null
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function getIcon(): string|null
+    public function getIcon(): ?string
     {
         return $this->icon;
     }
 
-    public function getUrl(): string|null
+    public function getUrl(): ?string
     {
         return $this->url;
     }
 
-    public function getImage(): string|null
+    public function getImage(): ?string
     {
         return $this->image;
     }
 
-    public function getColor(): string|null
+    public function getColor(): ?string
     {
         if ($this->color === 'transparent') {
             return null;
@@ -48,7 +48,7 @@ class SocialLink
         return $this->color;
     }
 
-    public function getBackgroundColor(): string|null
+    public function getBackgroundColor(): ?string
     {
         if ($this->backgroundColor === 'transparent') {
             return null;
@@ -80,7 +80,7 @@ class SocialLink
         return new HtmlString(Html::attributes($attributes));
     }
 
-    public function getIconHtml(array $attributes = []): HtmlString|null
+    public function getIconHtml(array $attributes = []): ?HtmlString
     {
         if ($this->image) {
             return RvMedia::image($this->image, $this->name, attributes: $attributes);

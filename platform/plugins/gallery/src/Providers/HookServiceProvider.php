@@ -39,6 +39,7 @@ class HookServiceProvider extends ServiceProvider
 
             shortcode()->setAdminConfig('gallery', function (array $attributes) {
                 return ShortcodeForm::createFromArray($attributes)
+                    ->withLazyLoading()
                     ->add('title', TextField::class, [
                         'label' => __('Title'),
                     ])
@@ -99,7 +100,7 @@ class HookServiceProvider extends ServiceProvider
 
     public function render(Shortcode $shortcode): string
     {
-        $limit = (int)$shortcode->limit;
+        $limit = (int) $shortcode->limit;
 
         $galleries = GalleryModel::query()
             ->with(['slugable', 'user'])
@@ -119,7 +120,7 @@ class HookServiceProvider extends ServiceProvider
         return (new GalleryService())->handleFrontRoutes($slug);
     }
 
-    public function renderGalleriesPage(string|null $content, Page $page): string|null
+    public function renderGalleriesPage(?string $content, Page $page): ?string
     {
         if ($page->getKey() == theme_option('galleries_page_id')) {
             $view = 'plugins/gallery::themes.galleries';
@@ -134,7 +135,7 @@ class HookServiceProvider extends ServiceProvider
         return $content;
     }
 
-    public function addAdditionNameToPageName(string|null $name, Page $page): string|null
+    public function addAdditionNameToPageName(?string $name, Page $page): ?string
     {
         if ($page->getKey() == theme_option('galleries_page_id')) {
             $subTitle = Html::tag(

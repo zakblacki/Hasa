@@ -47,7 +47,7 @@
                             {!! render_product_options_html($orderProduct->product_options, $orderProduct->price) !!}
                         @endif
 
-                        @include('plugins/ecommerce::themes.includes.cart-item-options-extras', [
+                        @include(EcommerceHelper::viewPath('includes.cart-item-options-extras'), [
                             'options' => $orderProduct->options,
                         ])
                     </div>

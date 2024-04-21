@@ -4,16 +4,17 @@ namespace Botble\Ecommerce\Http\Controllers\Settings;
 
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
-use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\Http\Requests\Settings\InvoiceTemplateSettingRequest;
 use Botble\Ecommerce\Supports\InvoiceHelper;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\File;
 
-class InvoiceTemplateSettingController extends BaseController
+class InvoiceTemplateSettingController extends SettingController
 {
     public function edit(InvoiceHelper $invoiceHelper): View
     {
+        $this->pageTitle(trans('plugins/ecommerce::setting.invoice_templates'));
+
         Assets::addScriptsDirectly('vendor/core/core/setting/js/email-template.js');
 
         $content = $invoiceHelper->getInvoiceTemplate();

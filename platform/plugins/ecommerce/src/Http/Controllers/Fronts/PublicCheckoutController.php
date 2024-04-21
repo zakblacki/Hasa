@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Http\Controllers\Fronts;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\Enums\DiscountTypeEnum;
+use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ShippingCodStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
@@ -13,6 +14,7 @@ use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\Discount;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
+use Botble\Ecommerce\GoogleAnalytics\GoogleTagManager;
 use Botble\Ecommerce\Http\Requests\ApplyCouponRequest;
 use Botble\Ecommerce\Http\Requests\CheckoutRequest;
 use Botble\Ecommerce\Http\Requests\SaveCheckoutInformationRequest;
@@ -41,12 +43,15 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class PublicCheckoutController extends BaseController
 {
     public function __construct()
     {
-        OptimizerHelper::disable();
+        if (class_exists(OptimizerHelper::class)) {
+            OptimizerHelper::disable();
+        }
     }
 
     public function getCheckout(
@@ -303,7 +308,17 @@ class PublicCheckoutController extends BaseController
 
         $discounts = apply_filters('ecommerce_checkout_discounts_query', $discountsQuery, $products)->get();
 
-        $data = [...$data, 'discounts' => $discounts];
+        $rawTotal = Cart::instance('cart')->rawTotal();
+        $orderAmount = max($rawTotal - $promotionDiscountAmount - $couponDiscountAmount, 0);
+        $orderAmount += (float) $shippingAmount;
+
+        $data = [...$data, 'discounts' => $discounts, 'rawTotal' => $rawTotal, 'orderAmount' => $orderAmount];
+
+        app(GoogleTagManager::class)->beginCheckout(
+            $products->all(),
+            $orderAmount,
+            isset($discount) ? $discount->code : null
+        );
 
         $checkoutView = Theme::getThemeNamespace('views.ecommerce.orders.checkout');
 
@@ -337,33 +352,41 @@ class PublicCheckoutController extends BaseController
         if ($request->input('address', [])) {
             if (! isset($sessionData['created_account']) && $request->input('create_account') == 1) {
                 $validator = Validator::make($request->input(), [
-                    'password' => 'required|min:6',
-                    'password_confirmation' => 'required|same:password',
-                    'address.email' => 'required|max:60|min:6|email|unique:ec_customers,email',
-                    'address.name' => 'required|min:3|max:120',
+                    'password' => ['required', 'min:6'],
+                    'password_confirmation' => ['required', 'same:password'],
+                    'address.email' => ['required', 'max:60', 'min:6', 'email', 'unique:ec_customers,email'],
+                    'address.name' => ['required', 'min:3', 'max:120'],
                 ]);
 
-                if (! $validator->fails()) {
-                    $customer = Customer::query()->create([
-                        'name' => BaseHelper::clean($request->input('address.name')),
-                        'email' => BaseHelper::clean($request->input('address.email')),
-                        'phone' => BaseHelper::clean($request->input('address.phone')),
-                        'password' => Hash::make($request->input('password')),
-                    ]);
+                if ($validator->passes()) {
+                    $customerId = null;
 
-                    auth('customer')->attempt([
-                        'email' => $request->input('address.email'),
-                        'password' => $request->input('password'),
-                    ], true);
+                    try {
+                        /**
+                         * @var Customer $customer
+                         */
+                        $customer = Customer::query()->create([
+                            'name' => $request->input('address.name'),
+                            'email' => $request->input('address.email'),
+                            'phone' => $request->input('address.phone'),
+                            'password' => Hash::make($request->input('password')),
+                        ]);
 
-                    event(new Registered($customer));
+                        auth('customer')->loginUsingId($customer->getKey(), true);
 
-                    $sessionData['created_account'] = true;
+                        event(new Registered($customer));
+
+                        $sessionData['created_account'] = true;
+
+                        $customerId = $customer->getKey();
+                    } catch (Throwable $exception) {
+                        BaseHelper::logError($exception);
+                    }
 
                     $address = Address::query()
                         ->create(
                             array_merge($request->input('address'), [
-                                'customer_id' => $customer->id,
+                                'customer_id' => $customerId,
                                 'is_default' => true,
                             ])
                         );
@@ -429,7 +452,7 @@ class PublicCheckoutController extends BaseController
                 'zip_code' => $address->zip_code,
                 'address_id' => $address->id,
             ];
-        } elseif ($addressFromInput = (array)$request->input('address', [])) {
+        } elseif ($addressFromInput = (array) $request->input('address', [])) {
             $addressData = $addressFromInput;
         }
 
@@ -486,10 +509,10 @@ class PublicCheckoutController extends BaseController
 
         if (! empty($address)) {
             $addressData['order_id'] = $sessionData['created_order_id'];
-        } elseif ((array)$request->input('address', [])) {
+        } elseif ((array) $request->input('address', [])) {
             $addressData = array_merge(
                 ['order_id' => $sessionData['created_order_id']],
-                (array)$request->input('address', [])
+                (array) $request->input('address', [])
             );
         }
 
@@ -734,7 +757,7 @@ class PublicCheckoutController extends BaseController
             $currentUserId = auth('customer')->id();
         }
 
-        $orderAmount += (float)$shippingAmount;
+        $orderAmount += (float) $shippingAmount;
 
         $request->merge([
             'amount' => $orderAmount ?: 0,
@@ -742,7 +765,7 @@ class PublicCheckoutController extends BaseController
             'user_id' => $currentUserId,
             'shipping_method' => $isAvailableShipping ? $shippingMethodInput : '',
             'shipping_option' => $isAvailableShipping ? $request->input('shipping_option') : null,
-            'shipping_amount' => (float)$shippingAmount,
+            'shipping_amount' => (float) $shippingAmount,
             'tax_amount' => Cart::instance('cart')->rawTax(),
             'sub_total' => Cart::instance('cart')->rawSubTotal(),
             'coupon_code' => session('applied_coupon_code'),
@@ -756,7 +779,7 @@ class PublicCheckoutController extends BaseController
         $order = $this->createOrderFromData($request->input(), $order);
 
         OrderHistory::query()->create([
-            'action' => 'create_order_from_payment_page',
+            'action' => OrderHistoryActionEnum::CREATE_ORDER_FROM_PAYMENT_PAGE,
             'description' => __('Order was created from checkout page'),
             'order_id' => $order->getKey(),
         ]);
@@ -834,7 +857,7 @@ class PublicCheckoutController extends BaseController
         $paymentData = [
             'error' => false,
             'message' => false,
-            'amount' => (float)format_price($order->amount, null, true),
+            'amount' => (float) format_price($order->amount, null, true),
             'currency' => strtoupper(get_application_currency()->title),
             'type' => $request->input('payment_method'),
             'charge_id' => null,
@@ -883,7 +906,7 @@ class PublicCheckoutController extends BaseController
             abort(404);
         }
 
-        if (is_plugin_active('payment') && (float)$order->amount && ! $order->payment_id) {
+        if (is_plugin_active('payment') && (float) $order->amount && ! $order->payment_id) {
             return $this
                 ->httpResponse()
                 ->setError()
@@ -891,40 +914,17 @@ class PublicCheckoutController extends BaseController
                 ->setMessage(__('Payment failed!'));
         }
 
+        if (session('tracked_start_checkout')) {
+            app(GoogleTagManager::class)->purchase($order);
+        }
+
         if (is_plugin_active('marketplace')) {
             return apply_filters(PROCESS_GET_CHECKOUT_SUCCESS_IN_ORDER, $token, $this->httpResponse());
         }
 
+        $products = $order->getOrderProducts();
+
         OrderHelper::clearSessions($token);
-
-        $products = collect();
-
-        $productsIds = $order->products->pluck('product_id')->all();
-
-        if (! empty($productsIds)) {
-            $products = get_products([
-                'condition' => [
-                    ['ec_products.id', 'IN', $productsIds],
-                ],
-                'select' => [
-                    'ec_products.id',
-                    'ec_products.images',
-                    'ec_products.name',
-                    'ec_products.price',
-                    'ec_products.sale_price',
-                    'ec_products.sale_type',
-                    'ec_products.start_date',
-                    'ec_products.end_date',
-                    'ec_products.sku',
-                    'ec_products.order',
-                    'ec_products.created_at',
-                    'ec_products.is_variation',
-                ],
-                'with' => [
-                    'variationProductAttributes',
-                ],
-            ]);
-        }
 
         return view('plugins/ecommerce::orders.thank-you', compact('order', 'products'));
     }

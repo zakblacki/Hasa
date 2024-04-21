@@ -166,7 +166,7 @@ class CategoryController extends BaseController
             ->withUpdatedSuccessMessage();
     }
 
-    protected function getForm(Category|null $model = null): string
+    protected function getForm(?Category $model = null): string
     {
         $options = ['template' => 'core/base::forms.form-no-wrap'];
 

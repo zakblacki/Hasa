@@ -6,10 +6,12 @@ use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\EmailHandler;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Contact\Events\SentContactEvent;
+use Botble\Contact\Forms\Fronts\ContactForm;
 use Botble\Contact\Http\Requests\ContactRequest;
 use Botble\Contact\Models\Contact;
 use Exception;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class PublicController extends BaseController
 {
@@ -53,34 +55,58 @@ class PublicController extends BaseController
             }
         }
 
+        $receiverEmails = null;
+
+        if ($receiverEmailsSetting = setting('receiver_emails', '')) {
+            $receiverEmails = trim($receiverEmailsSetting);
+        }
+
+        if ($receiverEmails) {
+            $receiverEmails = collect(json_decode($receiverEmails, true))
+                ->pluck('value')
+                ->all();
+        }
+
         try {
-            /**
-             * @var Contact $contact
-             */
-            $contact = Contact::query()->create($request->input());
+            $form = ContactForm::create();
 
-            event(new SentContactEvent($contact));
+            $form->saving(function (ContactForm $form) use ($receiverEmails) {
+                $form
+                    ->getModel()
+                    ->fill($form->getRequestData())
+                    ->save();
 
-            $args = [];
+                /**
+                 * @var Contact $contact
+                 */
+                $contact = $form
+                    ->getModel();
 
-            if ($contact->name && $contact->email) {
-                $args = ['replyTo' => [$contact->name => $contact->email]];
-            }
+                event(new SentContactEvent($contact));
 
-            EmailHandler::setModule(CONTACT_MODULE_SCREEN_NAME)
-                ->setVariableValues([
-                    'contact_name' => $contact->name ?? 'N/A',
-                    'contact_subject' => $contact->subject ?? 'N/A',
-                    'contact_email' => $contact->email ?? 'N/A',
-                    'contact_phone' => $contact->phone ?? 'N/A',
-                    'contact_address' => $contact->address ?? 'N/A',
-                    'contact_content' => $contact->content ?? 'N/A',
-                ])
-                ->sendUsingTemplate('notice', null, $args);
+                $args = [];
+
+                if ($contact->name && $contact->email) {
+                    $args = ['replyTo' => [$contact->name => $contact->email]];
+                }
+
+                EmailHandler::setModule(CONTACT_MODULE_SCREEN_NAME)
+                    ->setVariableValues([
+                        'contact_name' => $contact->name ?? 'N/A',
+                        'contact_subject' => $contact->subject ?? 'N/A',
+                        'contact_email' => $contact->email ?? 'N/A',
+                        'contact_phone' => $contact->phone ?? 'N/A',
+                        'contact_address' => $contact->address ?? 'N/A',
+                        'contact_content' => $contact->content ?? 'N/A',
+                    ])
+                    ->sendUsingTemplate('notice', $receiverEmails ?: null, $args);
+            });
 
             return $this
                 ->httpResponse()
                 ->setMessage(__('Send message successfully!'));
+        } catch (ValidationException $exception) {
+            throw $exception;
         } catch (Exception $exception) {
             BaseHelper::logError($exception);
 

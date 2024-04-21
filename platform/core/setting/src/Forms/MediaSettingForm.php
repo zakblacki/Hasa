@@ -7,6 +7,7 @@ use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Forms\FieldOptions\AlertFieldOption;
 use Botble\Base\Forms\FieldOptions\CheckboxFieldOption;
 use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
+use Botble\Base\Forms\FieldOptions\MediaImageFieldOption;
 use Botble\Base\Forms\Fields\AlertField;
 use Botble\Base\Forms\Fields\HtmlField;
 use Botble\Base\Forms\Fields\MediaImageField;
@@ -99,69 +100,97 @@ class MediaSettingForm extends SettingForm
                                 compact('folders', 'folderIds')
                             )->render(),
                         ])
-                        ->add('row_1', 'html', [
-                            'html' => '<div class="row">',
-                        ])
-                        ->add('media_watermark_source', MediaImageField::class, [
-                            'label' => trans('core/setting::setting.media.watermark_source'),
-                            'value' => setting('media_watermark_source'),
-                            'colspan' => 6,
-                        ])
-                        ->add('media_watermark_size', 'number', [
-                            'label' => trans('core/setting::setting.media.watermark_size'),
-                            'value' => setting('media_watermark_size', RvMedia::getConfig('watermark.size')),
-                            'attr' => [
-                                'placeholder' => trans('core/setting::setting.media.watermark_size_placeholder'),
-                            ],
-                            'colspan' => 3,
-                        ])
-                        ->add('watermark_opacity', 'number', [
-                            'label' => trans('core/setting::setting.media.watermark_opacity'),
-                            'value' => setting('watermark_opacity', RvMedia::getConfig('watermark.opacity')),
-                            'attr' => [
-                                'placeholder' => trans('core/setting::setting.media.watermark_opacity_placeholder'),
-                            ],
-                            'colspan' => 3,
-                        ])
-                        ->add('media_watermark_position', SelectField::class, [
-                            'label' => trans('core/setting::setting.media.watermark_position'),
-                            'selected' => setting('media_watermark_position', RvMedia::getConfig('watermark.position')),
-                            'choices' => [
-                                'top-left' => trans('core/setting::setting.media.watermark_position_top_left'),
-                                'top-right' => trans('core/setting::setting.media.watermark_position_top_right'),
-                                'bottom-left' => trans('core/setting::setting.media.watermark_position_bottom_left'),
-                                'bottom-right' => trans('core/setting::setting.media.watermark_position_bottom_right'),
-                                'center' => trans('core/setting::setting.media.watermark_position_center'),
-                            ],
-                            'colspan' => 2,
-                        ])
-                        ->add('watermark_position_x', 'number', [
-                            'label' => trans('core/setting::setting.media.watermark_position_x'),
-                            'value' => setting('watermark_position_x', RvMedia::getConfig('watermark.x')),
-                            'attr' => [
-                                'placeholder' => trans('core/setting::setting.media.watermark_position_x'),
-                            ],
-                            'colspan' => 2,
-                        ])
-                        ->add('watermark_position_y', 'number', [
-                            'label' => trans('core/setting::setting.media.watermark_position_y'),
-                            'value' => setting('watermark_position_y', RvMedia::getConfig('watermark.y')),
-                            'attr' => [
-                                'placeholder' => trans('core/setting::setting.media.watermark_position_y'),
-                            ],
-                            'colspan' => 2,
-                        ])
-                        ->add('row_1_close', 'html', [
-                            'html' => '</div>',
-                        ]);
+                            ->add('row_1', 'html', [
+                                'html' => '<div class="row">',
+                            ])
+                            ->add(
+                                'media_watermark_source',
+                                MediaImageField::class,
+                                MediaImageFieldOption::make()
+                                    ->label(trans('core/setting::setting.media.watermark_source'))
+                                    ->value(setting('media_watermark_source'))
+                                    ->colspan(6)
+                                    ->toArray()
+                            )
+                            ->add('media_watermark_size', 'number', [
+                                'label' => trans('core/setting::setting.media.watermark_size'),
+                                'value' => setting('media_watermark_size', RvMedia::getConfig('watermark.size')),
+                                'attr' => [
+                                    'placeholder' => trans('core/setting::setting.media.watermark_size_placeholder'),
+                                ],
+                                'colspan' => 3,
+                            ])
+                            ->add('media_watermark_opacity', 'number', [
+                                'label' => trans('core/setting::setting.media.watermark_opacity'),
+                                'value' => setting(
+                                    'media_watermark_opacity',
+                                    setting('watermark_opacity') ?: RvMedia::getConfig('watermark.opacity')
+                                ),
+                                'attr' => [
+                                    'placeholder' => trans('core/setting::setting.media.watermark_opacity_placeholder'),
+                                ],
+                                'colspan' => 3,
+                            ])
+                            ->add('media_watermark_position', SelectField::class, [
+                                'label' => trans('core/setting::setting.media.watermark_position'),
+                                'selected' => setting(
+                                    'media_watermark_position',
+                                    RvMedia::getConfig('watermark.position')
+                                ),
+                                'choices' => [
+                                    'top-left' => trans('core/setting::setting.media.watermark_position_top_left'),
+                                    'top-right' => trans('core/setting::setting.media.watermark_position_top_right'),
+                                    'bottom-left' => trans(
+                                        'core/setting::setting.media.watermark_position_bottom_left'
+                                    ),
+                                    'bottom-right' => trans(
+                                        'core/setting::setting.media.watermark_position_bottom_right'
+                                    ),
+                                    'center' => trans('core/setting::setting.media.watermark_position_center'),
+                                ],
+                                'colspan' => 2,
+                            ])
+                            ->add('media_watermark_position_x', 'number', [
+                                'label' => trans('core/setting::setting.media.watermark_position_x'),
+                                'value' => setting(
+                                    'media_watermark_position_x',
+                                    setting('watermark_position_x') ?: RvMedia::getConfig('watermark.x')
+                                ),
+                                'attr' => [
+                                    'placeholder' => trans('core/setting::setting.media.watermark_position_x'),
+                                ],
+                                'colspan' => 2,
+                            ])
+                            ->add('media_watermark_position_y', 'number', [
+                                'label' => trans('core/setting::setting.media.watermark_position_y'),
+                                'value' => setting(
+                                    'media_watermark_position_y',
+                                    setting('watermark_position_y') ?: RvMedia::getConfig('watermark.y')
+                                ),
+                                'attr' => [
+                                    'placeholder' => trans('core/setting::setting.media.watermark_position_y'),
+                                ],
+                                'colspan' => 2,
+                            ])
+                            ->add('row_1_close', 'html', [
+                                'html' => '</div>',
+                            ]);
                     })
                     ->beforeRegisterField(function (MediaSettingForm $form) {
-                        $form->add('open_html', HtmlField::class, HtmlFieldOption::make()->content('<div class="col-lg-12">')->toArray());
+                        $form->add(
+                            'open_html',
+                            HtmlField::class,
+                            HtmlFieldOption::make()->content('<div class="col-lg-12">')->toArray()
+                        );
                     })
                     ->afterRegisterField(function (MediaSettingForm $form) {
-                        $form->add('close_html', HtmlField::class, HtmlFieldOption::make()->content('</div>')->toArray());
+                        $form->add(
+                            'close_html',
+                            HtmlField::class,
+                            HtmlFieldOption::make()->content('</div>')->toArray()
+                        );
                     })
-                ->isOpened((bool) old('media_watermark_enabled', setting('media_watermark_enabled')))
+                    ->isOpened((bool) old('media_watermark_enabled', setting('media_watermark_enabled')))
             )
             ->add('media_image_processing_library', 'customRadio', [
                 'label' => trans('core/setting::setting.media.image_processing_library'),

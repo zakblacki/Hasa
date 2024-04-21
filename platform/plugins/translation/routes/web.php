@@ -42,11 +42,6 @@ Route::group(['namespace' => 'Botble\Translation\Http\Controllers'], function ()
                     'uses' => 'TranslationController@update',
                     'middleware' => 'preventDemo',
                 ]);
-
-                Route::post('import', [
-                    'as' => 'translations.import',
-                    'uses' => 'TranslationController@import',
-                ]);
             });
 
             Route::group(['prefix' => 'theme', 'permission' => 'translations.theme-translations'], function () {
@@ -58,6 +53,12 @@ Route::group(['namespace' => 'Botble\Translation\Http\Controllers'], function ()
                 Route::post('post', [
                     'as' => 'translations.theme-translations.post',
                     'uses' => 'ThemeTranslationController@update',
+                    'middleware' => 'preventDemo',
+                ]);
+
+                Route::post('re-import', [
+                    'as' => 'translations.theme-translations.re-import',
+                    'uses' => 'ReImportThemeTranslationController@__invoke',
                     'middleware' => 'preventDemo',
                 ]);
             });

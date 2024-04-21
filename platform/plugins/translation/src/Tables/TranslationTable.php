@@ -3,7 +3,6 @@
 namespace Botble\Translation\Tables;
 
 use Botble\Base\Facades\Assets;
-use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\Html;
 use Botble\Base\Supports\Language;
 use Botble\Table\Abstracts\TableAbstract;
@@ -14,7 +13,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Str;
-use Throwable;
 
 class TranslationTable extends TableAbstract
 {
@@ -140,7 +138,6 @@ class TranslationTable extends TableAbstract
             FormattedColumn::make('group')
                 ->title(trans('plugins/translation::translation.group'))
                 ->alignStart()
-                ->nowrap()
                 ->searchable(false)
                 ->getValueUsing(function (FormattedColumn $column) {
                     $item = $column->getItem();
@@ -216,7 +213,7 @@ class TranslationTable extends TableAbstract
         return $this;
     }
 
-    protected function formatKeyAndValue(string|null $value): string|null
+    protected function formatKeyAndValue(?string $value): ?string
     {
         return htmlentities($value, ENT_QUOTES, 'UTF-8', false);
     }
@@ -225,51 +222,34 @@ class TranslationTable extends TableAbstract
     {
         $groups = [];
 
-        $langPaths = File::glob(lang_path(BaseHelper::joinPaths(['vendor', '*', '*', 'en'])));
-        $langPaths[] = lang_path('en');
+        if (File::isDirectory(lang_path('en'))) {
+            foreach (File::allFiles(lang_path('en')) as $directory) {
+                $group = File::name($directory);
 
-        foreach ($langPaths as $langPath) {
-            if (! File::isWritable($langPath)) {
-                continue;
-            }
-
-            try {
-                foreach (File::allFiles($langPath) as $file) {
-                    $group = str_replace(lang_path(), '', dirname($file));
-
-                    if ($group) {
-                        $group = str_replace('vendor' . DIRECTORY_SEPARATOR, '', $group);
-                    }
-
-                    $group = str_replace(DIRECTORY_SEPARATOR . 'en', '', $group);
-
-                    if (! $group) {
-                        $group = null;
-                    } else {
-                        $group = ltrim($group, DIRECTORY_SEPARATOR);
-                    }
-
-                    $fileName = File::name($file);
-
-                    if ($group) {
-                        $group .= DIRECTORY_SEPARATOR . $fileName;
-                    } else {
-                        $group = $fileName;
-                    }
-
-                    $groups[$group] = $group;
-                }
-            } catch (Throwable $exception) {
-                BaseHelper::logError($exception);
-
-                continue;
+                $groups[$group] = $group;
             }
         }
+
+        foreach (Lang::getLoader()->namespaces() as $namespace => $langPath) {
+            $defaultLanguage = $langPath . DIRECTORY_SEPARATOR . 'en';
+
+            if (! File::isDirectory($defaultLanguage)) {
+                continue;
+            }
+
+            foreach (File::allFiles($defaultLanguage) as $directory) {
+                $group =  $namespace . DIRECTORY_SEPARATOR . File::name($directory);
+
+                $groups[$group] = $group;
+            }
+        }
+
+        ksort($groups);
 
         return $groups;
     }
 
-    public function htmlDrawCallbackFunction(): string|null
+    public function htmlDrawCallbackFunction(): ?string
     {
         return parent::htmlDrawCallbackFunction() . 'Botble.initEditable()';
     }

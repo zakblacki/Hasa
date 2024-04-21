@@ -29,6 +29,7 @@ const scripts = [
     'edit-product-collection.js',
     'global-option.js',
     'product-option.js',
+    'product-bulk-editable-table.js',
     'ecommerce-product-attributes.js',
     'change-product-swatches.js',
     'change-product-options.js',

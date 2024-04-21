@@ -403,7 +403,7 @@ class TemplateProductExport implements
             'plugins/ecommerce::bulk-import.export.template.prompt_whole_number',
             compact('min')
         ));
-        $validation->setFormula1((string)$min);
+        $validation->setFormula1((string) $min);
         $validation->setOperator(DataValidation::OPERATOR_GREATERTHANOREQUAL);
 
         return $validation;
@@ -423,7 +423,7 @@ class TemplateProductExport implements
         $validation->setError(trans('plugins/ecommerce::bulk-import.export.template.number_not_allowed'));
         $validation->setPromptTitle(trans('plugins/ecommerce::bulk-import.export.template.allowed_input'));
         $validation->setPrompt(trans('plugins/ecommerce::bulk-import.export.template.prompt_decimal', compact('min')));
-        $validation->setFormula1((string)$min);
+        $validation->setFormula1((string) $min);
         $validation->setOperator(DataValidation::OPERATOR_GREATERTHANOREQUAL);
 
         return $validation;

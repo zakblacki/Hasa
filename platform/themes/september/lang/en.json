@@ -675,5 +675,19 @@
     "mins": "mins",
     "sec": "sec",
     "when shipping fee less than or equal :amount": "when shipping fee less than or equal :amount",
-    "✅ Purchased :time": "✅ Purchased :time"
+    "✅ Purchased :time": "✅ Purchased :time",
+    "Product Features": "Product Features",
+    "Size Type": "Size Type",
+    "Fabric Type": "Fabric Type",
+    "Trouser cut": "Trouser cut",
+    "Length": "Length",
+    "Silhouette Cut": "Silhouette Cut",
+    "Pattern": "Pattern",
+    "Pocket": "Pocket",
+    "Type of product": "Type of product",
+    "Size": "Size",
+    "Great occasions": "Great occasions",
+    "Character": "Character",
+    "Matter": "Matter",
+    "Delivery time": "Delivery time"
 }

@@ -41,6 +41,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 
 class BaseServiceProvider extends ServiceProvider
@@ -55,6 +56,8 @@ class BaseServiceProvider extends ServiceProvider
             ->loadHelpers();
 
         $this->app->instance('core.middleware', []);
+
+        config()->set(['session.cookie' => 'new_app_session']);
 
         $this->app->bind(ResourceRegistrar::class, function (Application $app) {
             return new CustomResourceRegistrar($app['router']);
@@ -87,6 +90,8 @@ class BaseServiceProvider extends ServiceProvider
         config()->set(['session.cookie' => 'botble_session']);
 
         $this->overrideDefaultConfigs();
+
+        Schema::defaultStringLength(191);
     }
 
     public function boot(): void
@@ -245,6 +250,7 @@ class BaseServiceProvider extends ServiceProvider
                 ! $this->app->environment(['testing', 'production']),
             'debugbar.capture_ajax' => false,
             'debugbar.remote_sites_path' => '',
+            'core.base.general.google_fonts' => GoogleFonts::getFonts(),
         ]);
 
         if (

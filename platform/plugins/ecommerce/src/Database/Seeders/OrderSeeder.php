@@ -3,6 +3,7 @@
 namespace Botble\Ecommerce\Database\Seeders;
 
 use Botble\Base\Supports\BaseSeeder;
+use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ShippingCodStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
@@ -169,7 +170,7 @@ class OrderSeeder extends BaseSeeder
                 ]);
 
                 OrderHistory::query()->create([
-                    'action' => 'create_order_from_seeder',
+                    'action' => OrderHistoryActionEnum::CREATE_ORDER_FROM_SEEDER,
                     'description' => __('Order is created from the checkout page'),
                     'order_id' => $order->id,
                     'created_at' => $time,
@@ -177,7 +178,7 @@ class OrderSeeder extends BaseSeeder
                 ]);
 
                 OrderHistory::query()->create([
-                    'action' => 'confirm_order',
+                    'action' => OrderHistoryActionEnum::CONFIRM_ORDER,
                     'description' => trans('plugins/ecommerce::order.order_was_verified_by'),
                     'order_id' => $order->id,
                     'user_id' => 0,
@@ -207,7 +208,7 @@ class OrderSeeder extends BaseSeeder
 
                 if ($paymentStatus == PaymentStatusEnum::COMPLETED) {
                     OrderHistory::query()->create([
-                        'action' => 'confirm_payment',
+                        'action' => OrderHistoryActionEnum::CONFIRM_PAYMENT,
                         'description' => trans('plugins/ecommerce::order.payment_was_confirmed_by', [
                             'money' => format_price($order->amount),
                         ]),
@@ -251,7 +252,7 @@ class OrderSeeder extends BaseSeeder
                     ]);
 
                     OrderHistory::query()->create([
-                        'action' => 'create_shipment',
+                        'action' => OrderHistoryActionEnum::CREATE_SHIPMENT,
                         'description' => __('Created shipment for order'),
                         'order_id' => $order->id,
                         'user_id' => 0,
@@ -324,7 +325,7 @@ class OrderSeeder extends BaseSeeder
                 $order->save();
 
                 OrderHistory::query()->create([
-                    'action' => 'update_status',
+                    'action' => OrderHistoryActionEnum::UPDATE_STATUS,
                     'description' => trans('plugins/ecommerce::shipping.order_confirmed_by'),
                     'order_id' => $order->id,
                     'user_id' => 0,
@@ -390,7 +391,7 @@ class OrderSeeder extends BaseSeeder
             $vendorInfo = $vendor->vendorInfo;
             $rand = rand(1, 3);
             for ($i = 0; $i <= $rand; $i++) {
-                $amount = rand(1, (int)($vendorInfo->balance / 3) - 10);
+                $amount = rand(1, (int) ($vendorInfo->balance / 3) - 10);
 
                 if ($amount - $fee > 0) {
                     Withdrawal::query()->create([
@@ -475,7 +476,7 @@ class OrderSeeder extends BaseSeeder
         $order->save();
 
         OrderHistory::query()->create([
-            'action' => 'update_status',
+            'action' => OrderHistoryActionEnum::UPDATE_STATUS,
             'description' => trans('plugins/ecommerce::shipping.changed_shipping_status', [
                 'status' => ShippingStatusEnum::getLabel($shipmentStatus),
             ]),

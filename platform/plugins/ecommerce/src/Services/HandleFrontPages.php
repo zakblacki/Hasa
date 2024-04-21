@@ -7,6 +7,7 @@ use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Base\Supports\Helper;
 use Botble\Ecommerce\Events\ProductViewed;
 use Botble\Ecommerce\Facades\EcommerceHelper;
+use Botble\Ecommerce\GoogleAnalytics\GoogleTagManager;
 use Botble\Ecommerce\Models\Brand;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\ProductCategory;
@@ -151,6 +152,9 @@ class HandleFrontPages
 
                 do_action(BASE_ACTION_PUBLIC_RENDER_SINGLE, PRODUCT_MODULE_SCREEN_NAME, $product);
 
+                app(GoogleTagManager::class)
+                    ->viewItem($product);
+
                 [$productImages, $productVariation, $selectedAttrs] = EcommerceHelper::getProductVariationInfo(
                     $product,
                     $request->input()
@@ -271,7 +275,7 @@ class HandleFrontPages
                     $request = request();
                 }
 
-                $request->merge(['brands' => array_merge((array)request()->input('brands', []), [$brand->getKey()])]);
+                $request->merge(['brands' => array_merge((array) request()->input('brands', []), [$brand->getKey()])]);
 
                 $products = app(GetProductService::class)->getProduct(
                     $request,
@@ -399,13 +403,7 @@ class HandleFrontPages
             compact('total')
         );
 
-        $productsView = Theme::getThemeNamespace('views.ecommerce.includes.product-items');
-
-        if (! view()->exists($productsView)) {
-            $productsView = 'plugins/ecommerce::themes.includes.product-items';
-        }
-
-        $data = view($productsView, compact('products'))->render();
+        $data = view(EcommerceHelper::viewPath('includes.product-items'), compact('products'))->render();
 
         $breadcrumbView = Theme::getThemeNamespace('partials.breadcrumbs');
 

@@ -38,10 +38,14 @@ class SatimPaymentService extends SatimPaymentAbstract
                 ]),
             ]);
             Log::debug('-----Satim register.do url: ' . $response->transferStats->getEffectiveUri()->__toString());
-
+            Log::debug('-----Satim register.do Response Start--------');
+            Log::debug($response->json());
+            Log::debug('-----Satim register.do Response End----------');
+            
             if ($response->successful()) {
                try{
                 $jsonBody = $response->json();
+
                 $url = isset($jsonBody['formUrl']) ? $jsonBody['formUrl'] : null;
                 
                 if($jsonBody && isset($jsonBody['errorCode']) && $jsonBody['errorCode'] == 1){

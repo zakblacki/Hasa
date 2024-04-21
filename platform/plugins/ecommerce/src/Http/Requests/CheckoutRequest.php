@@ -18,6 +18,10 @@ class CheckoutRequest extends Request
             'amount' => 'required|min:0',
         ];
 
+        if (theme_option('ecommerce_term_and_privacy_policy_url')) {
+            $rules['agree_terms_and_policy'] = 'sometimes|accepted:1';
+        }
+
         if (is_plugin_active('payment') && Cart::instance('cart')->rawTotal()) {
             $paymentMethods = Arr::where(PaymentMethodEnum::values(), function ($value) {
                 return get_payment_setting('status', $value) == 1;

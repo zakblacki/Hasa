@@ -132,6 +132,16 @@ class InvoiceHelper
 
             $content = $twigCompiler->compile($content, $this->getDataForInvoiceTemplate($invoice));
 
+            $currencies = [
+                '₼' => 'azeri-manat',
+                '₹' => 'indian-rupee',
+                '৳' => 'bangladeshi-taka',
+            ];
+
+            foreach ($currencies as $currency => $icon) {
+                $content = str_replace($currency, '<img src="' . asset('vendor/core/plugins/ecommerce/images/currencies/' . $icon . '.svg') . '" width="10" style="margin-right: 2px;" alt="currency" />', $content);
+            }
+
             if ($this->getLanguageSupport() === 'arabic') {
                 $arabic = new Arabic();
                 $p = $arabic->arIdentify($content);
@@ -197,7 +207,7 @@ class InvoiceHelper
             $templateHtml = File::exists($defaultPath) ? BaseHelper::getFileData($defaultPath, false) : '';
         }
 
-        return (string)$templateHtml;
+        return (string) $templateHtml;
     }
 
     protected function getDataForInvoiceTemplate(Invoice $invoice): array
@@ -264,9 +274,9 @@ class InvoiceHelper
             'payment_description' => $paymentDescription,
             'is_tax_enabled' => EcommerceHelperFacade::isTaxEnabled(),
             'settings' => [
-                'using_custom_font_for_invoice' => (bool)get_ecommerce_setting('using_custom_font_for_invoice'),
+                'using_custom_font_for_invoice' => (bool) get_ecommerce_setting('using_custom_font_for_invoice'),
                 'custom_font_family' => get_ecommerce_setting('invoice_font_family', 'DejaVu Sans'),
-                'font_family' => (int)get_ecommerce_setting('using_custom_font_for_invoice', 0) == 1
+                'font_family' => (int) get_ecommerce_setting('using_custom_font_for_invoice', 0) == 1
                     ? get_ecommerce_setting('invoice_font_family', 'DejaVu Sans')
                     : 'DejaVu Sans',
                 'enable_invoice_stamp' => get_ecommerce_setting('enable_invoice_stamp'),
@@ -394,22 +404,22 @@ class InvoiceHelper
         ];
     }
 
-    public function getCompanyCountry(): string|null
+    public function getCompanyCountry(): ?string
     {
         return get_ecommerce_setting('company_country_for_invoicing', get_ecommerce_setting('store_country'));
     }
 
-    public function getCompanyState(): string|null
+    public function getCompanyState(): ?string
     {
         return get_ecommerce_setting('company_state_for_invoicing', get_ecommerce_setting('store_state'));
     }
 
-    public function getCompanyCity(): string|null
+    public function getCompanyCity(): ?string
     {
         return get_ecommerce_setting('company_city_for_invoicing', get_ecommerce_setting('store_city'));
     }
 
-    public function getCompanyZipCode(): string|null
+    public function getCompanyZipCode(): ?string
     {
         return get_ecommerce_setting('company_zipcode_for_invoicing', get_ecommerce_setting('store_zip_code'));
     }

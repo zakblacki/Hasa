@@ -7,6 +7,7 @@ use Botble\Ecommerce\Enums\DiscountTypeEnum;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Facades\OrderHelper;
+use Botble\Ecommerce\GoogleAnalytics\GoogleTagManager;
 use Botble\Ecommerce\Http\Requests\CartRequest;
 use Botble\Ecommerce\Http\Requests\UpdateCartRequest;
 use Botble\Ecommerce\Models\Discount;
@@ -39,13 +40,15 @@ class PublicCartController extends BaseController
 
             $crossSellProducts = get_cart_cross_sale_products(
                 $products->pluck('original_product.id')->all(),
-                (int)theme_option('number_of_cross_sale_product', 4)
+                (int) theme_option('number_of_cross_sale_product', 4)
             ) ?: collect();
         }
 
         SeoHelper::setTitle(__('Shopping Cart'));
 
         Theme::breadcrumb()->add(__('Shopping Cart'), route('public.cart'));
+
+        app(GoogleTagManager::class)->viewCart();
 
         return Theme::scope(
             'ecommerce.cart',
@@ -70,13 +73,15 @@ class PublicCartController extends BaseController
             $product = $product->defaultVariation->product;
         }
 
+        $originalProduct = $product->original_product;
+
         if ($product->isOutOfStock()) {
             return $response
                 ->setError()
                 ->setMessage(
                     __(
                         'Product :product is out of stock!',
-                        ['product' => $product->original_product->name ?: $product->name]
+                        ['product' => $originalProduct->name ?: $product->name]
                     )
                 );
         }
@@ -95,7 +100,7 @@ class PublicCartController extends BaseController
         foreach (Cart::instance('cart')->content() as $item) {
             if ($item->id == $product->id) {
                 $originalQuantity = $product->quantity;
-                $product->quantity = (int)$product->quantity - $item->qty;
+                $product->quantity = (int) $product->quantity - $item->qty;
 
                 if ($product->quantity < 0) {
                     $product->quantity = 0;
@@ -113,16 +118,16 @@ class PublicCartController extends BaseController
 
         if (
             EcommerceHelper::isEnabledProductOptions() &&
-            $product->original_product->options()->where('required', true)->exists()
+            $originalProduct->options()->where('required', true)->exists()
         ) {
             if (! $request->input('options')) {
                 return $response
                     ->setError()
-                    ->setData(['next_url' => $product->original_product->url])
+                    ->setData(['next_url' => $originalProduct->url])
                     ->setMessage(__('Please select product options!'));
             }
 
-            $requiredOptions = $product->original_product->options()->where('required', true)->get();
+            $requiredOptions = $originalProduct->options()->where('required', true)->get();
 
             $message = null;
 
@@ -145,26 +150,33 @@ class PublicCartController extends BaseController
         if ($outOfQuantity) {
             return $response
                 ->setError()
-                ->setMessage(
-                    __(
-                        'Product :product is out of stock!',
-                        ['product' => $product->original_product->name ?: $product->name]
-                    )
-                );
+                ->setMessage(__(
+                    'Product :product is out of stock!',
+                    ['product' => $originalProduct->name ?: $product->name]
+                ));
         }
 
         $cartItems = OrderHelper::handleAddCart($product, $request);
 
-        $response
-            ->setMessage(
-                __(
-                    'Added product :product to cart successfully!',
-                    ['product' => $product->original_product->name ?: $product->name]
-                )
-            );
+        $cartItem = Arr::first(array_filter($cartItems, fn ($item) => $item['id'] == $product->id));
+
+        $response->setMessage(__(
+            'Added product :product to cart successfully!',
+            ['product' => $originalProduct->name ?: $product->name]
+        ));
+
+        $responseData = [
+            'status' => true,
+            'content' => $cartItems,
+        ];
+
+        app(GoogleTagManager::class)->addToCart(
+            $originalProduct,
+            $cartItem['qty'],
+            $cartItem['subtotal'],
+        );
 
         $token = OrderHelper::getOrderSessionToken();
-
         $nextUrl = route('public.checkout.information', $token);
 
         if (EcommerceHelper::getQuickBuyButtonTarget() == 'cart') {
@@ -172,20 +184,21 @@ class PublicCartController extends BaseController
         }
 
         if ($request->input('checkout')) {
-            $response->setData(['next_url' => $nextUrl]);
+            $responseData['next_url'] = $nextUrl;
 
             if ($request->ajax() && $request->wantsJson()) {
-                return $response;
+                return $response->setData($responseData);
             }
 
-            return $response->setNextUrl($nextUrl);
+            return $response
+                ->setData($responseData)
+                ->setNextUrl($nextUrl);
         }
 
         return $response
             ->setData([
                 ...$this->getDataForResponse(),
-                'status' => true,
-                'content' => $cartItems,
+                ...$responseData,
             ]);
     }
 
@@ -213,7 +226,7 @@ class PublicCartController extends BaseController
 
             if ($product) {
                 $originalQuantity = $product->quantity;
-                $product->quantity = (int)$product->quantity - (int)Arr::get($item, 'values.qty', 0) + 1;
+                $product->quantity = (int) $product->quantity - (int) Arr::get($item, 'values.qty', 0) + 1;
 
                 if ($product->quantity < 0) {
                     $product->quantity = 0;
@@ -246,18 +259,25 @@ class PublicCartController extends BaseController
     public function destroy(string $id)
     {
         try {
+            $cartItem = Cart::instance('cart')->get($id);
+            app(GoogleTagManager::class)->removeFromCart($cartItem);
+
             Cart::instance('cart')->remove($id);
+
+            $responseData = [
+                ...$this->getDataForResponse(),
+            ];
+
+            return $this
+                ->httpResponse()
+                ->setData($responseData)
+                ->setMessage(__('Removed item from cart successfully!'));
         } catch (Throwable) {
             return $this
                 ->httpResponse()
                 ->setError()
                 ->setMessage(__('Cart item is not existed!'));
         }
-
-        return $this
-            ->httpResponse()
-            ->setData($this->getDataForResponse())
-            ->setMessage(__('Removed item from cart successfully!'));
     }
 
     public function empty()

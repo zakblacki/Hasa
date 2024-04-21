@@ -151,7 +151,7 @@ abstract class PayPalPaymentAbstract
         }
 
         // issue https://developer.paypal.com/docs/api/orders/v2/#error-DECIMAL_PRECISION
-        $this->totalAmount = round((float)$this->totalAmount, $this->isSupportedDecimals() ? 2 : 0);
+        $this->totalAmount = round((float) $this->totalAmount, $this->isSupportedDecimals() ? 2 : 0);
 
         return $this;
     }
@@ -189,7 +189,7 @@ abstract class PayPalPaymentAbstract
                     'custom_id' => $this->customer,
                     'amount' => [
                         'currency_code' => $this->paymentCurrency,
-                        'value' => (string)$this->totalAmount,
+                        'value' => (string) $this->totalAmount,
                     ],
                 ],
             ],

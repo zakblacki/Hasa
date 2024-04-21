@@ -163,7 +163,7 @@ class ProductTable extends TableAbstract
         return $this->applyScopes($query);
     }
 
-    public function htmlDrawCallbackFunction(): string|null
+    public function htmlDrawCallbackFunction(): ?string
     {
         return parent::htmlDrawCallbackFunction() . 'Botble.initEditable()';
     }
@@ -355,7 +355,7 @@ class ProductTable extends TableAbstract
         EloquentBuilder|QueryBuilder|EloquentRelation $query,
         string $key,
         string $operator,
-        string|null $value
+        ?string $value
     ): EloquentRelation|EloquentBuilder|QueryBuilder {
         switch ($key) {
             case 'created_at':
@@ -449,7 +449,7 @@ class ProductTable extends TableAbstract
         return parent::applyFilterCondition($query, $key, $operator, $value);
     }
 
-    public function saveBulkChangeItem(Model|Product $item, string $inputKey, string|null $inputValue): Model|bool
+    public function saveBulkChangeItem(Model|Product $item, string $inputKey, ?string $inputValue): Model|bool
     {
         if ($inputKey === 'category') {
             /**

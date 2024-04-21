@@ -9,6 +9,10 @@ $(() => {
     }
 
     const getReviewList = (url, successCallback) => {
+        if (! url) {
+            return
+        }
+
         $.ajax({
             url: url,
             method: 'GET',
@@ -79,8 +83,10 @@ $(() => {
         loadPreviewImage(input)
     }
 
-    initLightGallery($('.review-images'))
-    getReviewList($reviewListContainer.data('ajax-url'))
+    if ($reviewListContainer.length) {
+        initLightGallery($('.review-images'))
+        getReviewList($reviewListContainer.data('ajax-url'))
+    }
 
     $reviewListContainer.on('click', '.pagination a', (e) => {
         e.preventDefault()

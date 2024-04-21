@@ -13,7 +13,7 @@
         id="accordion-tab-shortcode mt-2"
         style="--bs-accordion-btn-padding-y: .7rem;"
     >
-        @for ($i = 1; $i <= $max; $i++)
+        @for ($i = $min; $i <= $max; $i++)
             <div
                 class="accordion-item @if ($i > $current) d-none @endif"
                 data-tab-id="{{ $i }}"

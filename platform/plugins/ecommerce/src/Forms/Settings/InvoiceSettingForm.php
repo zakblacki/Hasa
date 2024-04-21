@@ -6,6 +6,7 @@ use Botble\Base\Forms\FieldOptions\RadioFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\GoogleFontsField;
+use Botble\Base\Forms\Fields\MediaImageField;
 use Botble\Base\Forms\Fields\RadioField;
 use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextField;
@@ -103,7 +104,7 @@ class InvoiceSettingForm extends SettingForm
                 'value' => get_ecommerce_setting('company_tax_id_for_invoicing') ?: get_ecommerce_setting('store_vat_number'),
                 'colspan' => 6,
             ])
-            ->add('company_logo_for_invoicing', 'mediaImage', [
+            ->add('company_logo_for_invoicing', MediaImageField::class, [
                 'value' => get_ecommerce_setting('company_logo_for_invoicing') ?: (theme_option('logo_in_invoices') ?: theme_option('logo')),
                 'allow_thumb' => false,
                 'colspan' => 6,
@@ -137,10 +138,12 @@ class InvoiceSettingForm extends SettingForm
                 RadioFieldOption::make()
                     ->label(trans('plugins/ecommerce::setting.invoice.form.add_language_support'))
                     ->choices([
+                        'default' => trans('plugins/ecommerce::setting.invoice.form.only_latin_languages'),
                         'arabic' => 'Arabic',
                         'bangladesh' => 'Bangladesh',
                         'chinese' => 'Chinese',
                     ])
+                    ->defaultValue('default')
                     ->when(InvoiceHelper::getLanguageSupport(), function (RadioFieldOption $option, string $language) {
                         $option->selected($language);
                     })

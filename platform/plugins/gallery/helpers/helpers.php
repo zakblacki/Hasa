@@ -24,7 +24,7 @@ if (! function_exists('gallery_meta_data')) {
                 $images = json_decode($images, true);
             }
 
-            return $images ? (array)$images : [];
+            return $images ? (array) $images : [];
         }
 
         return [];
@@ -76,7 +76,7 @@ if (! function_exists('get_list_galleries')) {
 }
 
 if (! function_exists('render_object_gallery')) {
-    function render_object_gallery(array $galleries, string|null $category = null): string
+    function render_object_gallery(array $galleries, ?string $category = null): string
     {
         Theme::asset()
             ->container('footer')

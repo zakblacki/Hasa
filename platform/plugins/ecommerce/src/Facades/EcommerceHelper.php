@@ -54,7 +54,6 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getProductsSearchBy()
  * @method static int|float validateOrderWeight(int|float $weight)
  * @method static bool isFacebookPixelEnabled()
- * @method static bool isGoogleTagManagerEnabled()
  * @method static int getReturnableDays()
  * @method static bool canCustomReturnProductQty()
  * @method static bool isOrderReturnEnabled()
@@ -89,7 +88,13 @@ use Illuminate\Support\Facades\Facade;
  * @method static array dataPriceRanges(int $stepPrice = 1000, int $stepCount = 10)
  * @method static bool useCityFieldAsTextField()
  * @method static bool isLoginUsingPhone()
+ * @method static string getLoginOption()
  * @method static void registerThemeAssets()
+ * @method static array|string|null getDefaultPageSlug(string|null $key = null)
+ * @method static string|null getPageSlug(string $key)
+ * @method static string getAdminPrefix()
+ * @method static \Illuminate\Routing\RouteRegistrar registerRoutes(\Closure|callable $closure, array $middleware = [])
+ * @method static \Illuminate\Routing\RouteRegistrar registerFallbackRoutes(string $prefix)
  *
  * @see \Botble\Ecommerce\Supports\EcommerceHelper
  */

@@ -45,6 +45,10 @@ class AnalyticsServiceProvider extends ServiceProvider
             ->publishAssets();
 
         PanelSectionManager::default()->beforeRendering(function () {
+            if (! config('plugins.analytics.general.enabled_dashboard_widgets', true)) {
+                return;
+            }
+
             PanelSectionManager::registerItem(
                 SettingOthersPanelSection::class,
                 fn () => PanelSectionItem::make('analytics')

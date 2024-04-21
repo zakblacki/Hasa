@@ -141,7 +141,7 @@
             name="media_do_spaces_endpoint"
             :label="trans('core/setting::setting.media.do_spaces_endpoint')"
             :value="config('filesystems.disks.do_spaces.endpoint')"
-            placeholder="Ex: https://sfo2.digitaloceanspaces.com"
+            placeholder="Ex: https://botble.sfo2.digitaloceanspaces.com"
         />
 
         <x-core::form.on-off.checkbox

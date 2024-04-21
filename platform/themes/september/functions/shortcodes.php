@@ -43,7 +43,7 @@ app()->booted(function () {
             function (Shortcode $shortcode) {
                 $products = get_featured_products(
                     [
-                        'take' => (int)$shortcode->limit ?: 8,
+                        'take' => (int) $shortcode->limit ?: 8,
                         'with' => EcommerceHelper::withProductEagerLoadingRelations(),
                     ] + EcommerceHelper::withReviewsParams()
                 );
@@ -118,7 +118,7 @@ app()->booted(function () {
             function (Shortcode $shortcode) {
                 $products = get_trending_products(
                     [
-                        'take' => (int)$shortcode->limit ?: 4,
+                        'take' => (int) $shortcode->limit ?: 4,
                         'with' => EcommerceHelper::withProductEagerLoadingRelations(),
                     ] + EcommerceHelper::withReviewsParams()
                 );
@@ -159,8 +159,8 @@ app()->booted(function () {
                     ],
                     'with' => ['slugable'],
                     'paginate' => [
-                        'per_page' => (int)($shortcode->per_page ?: 12),
-                        'current_paged' => (int)request()->input('page') ?: 1,
+                        'per_page' => (int) ($shortcode->per_page ?: 12),
+                        'current_paged' => (int) request()->input('page') ?: 1,
                     ],
                 ] + EcommerceHelper::withReviewsParams()
             );
@@ -208,7 +208,7 @@ app()->booted(function () {
                     'products' => function ($query) use ($shortcode) {
                         return $query
                             ->where('status', BaseStatusEnum::PUBLISHED)
-                            ->limit((int)$shortcode->limit ?: 2)
+                            ->limit((int) $shortcode->limit ?: 2)
                             ->withCount(EcommerceHelper::withReviewsParams()['withCount'])
                             ->with(EcommerceHelper::withProductEagerLoadingRelations());
                     },
@@ -235,7 +235,7 @@ app()->booted(function () {
 
     if (is_plugin_active('blog')) {
         add_shortcode('news', __('News'), __('News'), function (Shortcode $shortcode) {
-            $posts = app(PostInterface::class)->getFeatured((int)$shortcode->limit ?: 3, ['slugable']);
+            $posts = app(PostInterface::class)->getFeatured((int) $shortcode->limit ?: 3, ['slugable']);
 
             return Theme::partial('short-codes.news', [
                 'title' => $shortcode->title,
@@ -295,7 +295,7 @@ app()->booted(function () {
                     'title' => $shortcode->title,
                     'description' => $shortcode->description,
                     'subtitle' => $shortcode->subtitle,
-                    'limit' => (int)$shortcode->limit ?: 8,
+                    'limit' => (int) $shortcode->limit ?: 8,
                 ]);
             }
         );

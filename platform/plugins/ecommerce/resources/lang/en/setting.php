@@ -166,6 +166,7 @@ return [
             'invoice_font_family' => 'Invoice font family (Only work for Latin language)',
             'enable_invoice_stamp' => 'Enable invoice stamp',
             'add_language_support' => 'Add language support',
+            'only_latin_languages' => 'Only Latin languages',
             'disable_order_invoice_until_order_confirmed' => 'Disable order invoice until order confirmed',
         ],
     ],
@@ -192,10 +193,11 @@ return [
         'customer_setting_description' => 'Configure customer settings',
         'form' => [
             'verify_customer_email' => 'Verify customer’s email',
-            'enable_recaptcha_in_register_page' => 'Enable Recaptcha in the registration page',
-            'enable_math_captcha_in_register_page' => 'Enable Math captcha in the customer registration page',
-            'enable_recaptcha_in_register_page_description' => 'Need to setup Captcha in Admin -> Settings -> General first.',
             'login_using_phone' => 'Sign in with phone number instead of email',
+            'login_option' => 'Login option',
+            'login_with_email' => 'Login with email',
+            'login_with_phone' => 'Login with phone',
+            'login_with_email_or_phone' => 'Login with email or phone',
         ],
     ],
     'shipping' => [
@@ -243,9 +245,8 @@ return [
             'enable_facebook_pixel' => 'Enable Facebook Pixel (Meta Pixel)',
             'facebook_pixel_helper' => 'Go to https://developers.facebook.com/docs/meta-pixel to create Facebook Pixel.',
             'facebook_pixel_id' => 'Facebook Pixel ID',
-            'enable_google_tag_manager' => 'Enable Google Tag Manager',
-            'google_tag_manager_helper' => 'Go to https://ads.google.com/aw/conversions to create Google Ads Conversions.',
-            'google_tag_manager_code' => 'Google Tag Manager code',
+            'enable_google_tag_manager_tracking_events' => 'Enable Google Tag Manager Tracking Events',
+            'google_tag_manager_tracking_info' => 'You need to add Google Tag Manager to tracking your website, please go to Admin → Settings → :website_tracking.',
         ],
     ],
     'marketplace' => [
@@ -286,4 +287,5 @@ return [
     ],
     'payment_method_cod_minimum_amount' => 'Minimum order amount - :currency (Optional)',
     'display_bank_info_at_the_checkout_success_page' => 'Display bank info at the checkout success page?',
+    'invoice_templates' => 'Invoice templates',
 ];

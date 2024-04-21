@@ -40,4 +40,9 @@ return [
         'flag' => 'theme.custom-html',
         'parent_flag' => 'core.appearance',
     ],
+    [
+        'name' => 'Robots.txt Editor',
+        'flag' => 'theme.robots-txt',
+        'parent_flag' => 'core.appearance',
+    ],
 ];

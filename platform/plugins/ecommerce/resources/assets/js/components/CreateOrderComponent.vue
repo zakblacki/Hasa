@@ -1405,9 +1405,9 @@ export default {
                     email: context.child_customer_address.email,
                     phone: context.child_customer_address.phone,
                     address: context.child_customer_address.address,
-                    country: context.child_customer_address.country,
-                    state: context.child_customer_address.state,
-                    city: context.child_customer_address.city,
+                    country: context.child_customer_address.country.toString(),
+                    state: context.child_customer_address.state.toString(),
+                    city: context.child_customer_address.city.toString(),
                     zip_code: context.child_customer_address.zip_code,
                 })
                 .then((res) => {

@@ -15,4 +15,9 @@ return [
         'flag' => 'extensions.index',
         'parent_flag' => 'core.system',
     ],
+    [
+        'name' => 'Cronjob',
+        'flag' => 'systems.cronjob',
+        'parent_flag' => 'core.system',
+    ],
 ];

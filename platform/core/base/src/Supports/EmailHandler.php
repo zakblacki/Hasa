@@ -19,9 +19,9 @@ class EmailHandler
 {
     protected string $type = 'plugins';
 
-    protected string|null $module = null;
+    protected ?string $module = null;
 
-    protected string|null $template = null;
+    protected ?string $template = null;
 
     protected array $templates = [];
 
@@ -58,12 +58,12 @@ class EmailHandler
         return $this;
     }
 
-    public function getTemplate(): string|null
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
 
-    public function setTemplate(string|null $template): self
+    public function setTemplate(?string $template): self
     {
         $this->template = $template;
 
@@ -109,7 +109,7 @@ class EmailHandler
         return $this;
     }
 
-    public function getVariableValues(string|null $module = null): array
+    public function getVariableValues(?string $module = null): array
     {
         $values = apply_filters('cms_email_variable_values', $this->variableValues, $this->template);
 
@@ -120,7 +120,7 @@ class EmailHandler
         return $values;
     }
 
-    public function setVariableValues(array $data, string|null $module = null): self
+    public function setVariableValues(array $data, ?string $module = null): self
     {
         foreach ($data as $name => $value) {
             $this->variableValues[$module ?: $this->module][$name] = $value;
@@ -129,7 +129,7 @@ class EmailHandler
         return $this;
     }
 
-    public function addTemplateSettings(string $module, array|null $data, string $type = 'plugins'): self
+    public function addTemplateSettings(string $module, ?array $data, string $type = 'plugins'): self
     {
         if (empty($data)) {
             return $this;
@@ -200,7 +200,7 @@ class EmailHandler
 
     public function templateEnabled(string $template, string $type = 'plugins'): bool
     {
-        return (bool)get_setting_email_status($type, $this->module, $template);
+        return (bool) get_setting_email_status($type, $this->module, $template);
     }
 
     public function send(
@@ -383,7 +383,7 @@ class EmailHandler
         return $throwable->getAsString();
     }
 
-    public function getTemplateContent(string $template, string $type = 'plugins'): string|null
+    public function getTemplateContent(string $template, string $type = 'plugins'): ?string
     {
         $this->template = $template;
         $this->type = $type;
@@ -393,7 +393,7 @@ class EmailHandler
 
     public function getTemplateSubject(string $template, string $type = 'plugins'): string
     {
-        return (string)setting(
+        return (string) setting(
             get_setting_email_subject_key($type, $this->module, $template),
             trans(
                 config(

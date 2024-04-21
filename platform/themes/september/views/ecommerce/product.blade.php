@@ -39,10 +39,11 @@
                     </div>
                     <div>
                         <div>
+                            <!--
                             @if ($product->sku)
                                 <span class="d-inline-block">{{ __('SKU') }}:</span> <span id="product-sku" class="sku d-inline-block" itemprop="sku">{{ $product->sku }}</span>
                             @endif
-
+                            -->
                             @if (EcommerceHelper::isReviewEnabled())
                                 @if ($product->reviews_count > 0)
                                     @if ($product->sku) - @endif
@@ -150,6 +151,108 @@
                     </figure>
                 </div>
             </div>
+            <hr style="margin-top: 2%">
+
+            @if (!empty($product->type_de_taille) || !empty($product->type_de_tissu) || !empty($product->coupe_pantalon) || !empty($product->longueur) || !empty($product->coupe_silhouette) || !empty($product->motif) || !empty($product->couleur) || !empty($product->poche) || !empty($product->type_de_produit) || !empty($product->taille) || !empty($product->grandes_occasions) || !empty($product->personnage) || !empty($product->matiere) || !empty($product->duree_de_livraison))
+            <div style="margin-top: 4%; margin-bottom: 3%">
+                <h4>{{trans('Product Features')}}</h4>
+                <div class="row" style="margin-top: 2%">
+                    <div class="col-6">
+                        <table class="table">
+                            @if (!empty($product->type_de_taille))
+                            <tr>
+                                <th>{{trans('Size Type')}}</th>
+                                <td><b>{{$product->type_de_taille}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->type_de_tissu))
+                            <tr>
+                                <th>{{trans('Fabric Type')}}</th>
+                                <td><b>{{$product->type_de_tissu}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->coupe_pantalon))
+                            <tr>
+                                <th>{{trans('Trouser cut')}}</th>
+                                <td><b>{{$product->coupe_pantalon}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->longueur))
+                            <tr>
+                                <th>{{trans('Length')}}</th>
+                                <td><b>{{$product->longueur}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->coupe_silhouette))
+                            <tr>
+                                <th>{{trans('Silhouette Cut')}}</th>
+                                <td><b>{{$product->coupe_silhouette}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->motif))
+                            <tr>
+                                <th>{{trans('Pattern')}}</th>
+                                <td><b>{{$product->motif}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->couleur))
+                            <tr>
+                                <th>{{trans('Color')}}</th>
+                                <td><b>{{$product->couleur}}</b></td>
+                            </tr>
+                            @endif
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <table class="table">
+                            @if (!empty($product->poche))
+                            <tr>
+                                <th>{{trans('Pocket')}}</th>
+                                <td><b>{{$product->poche}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->type_de_produit))
+                            <tr>
+                                <th>{{trans('Type of product')}}</th>
+                                <td><b>{{$product->type_de_produit}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->taille))
+                            <tr>
+                                <th>{{trans('Size')}}</th>
+                                <td><b>{{$product->taille}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->grandes_occasions))
+                            <tr>
+                                <th>{{trans('Great occasions')}}</th>
+                                <td><b>{{$product->grandes_occasions}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->personnage))
+                            <tr>
+                                <th>{{trans('Character')}}</th>
+                                <td><b>{{$product->personnage}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->matiere))
+                            <tr>
+                                <th>{{trans('Matter')}}</th>
+                                <td><b>{{$product->matiere}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->duree_de_livraison))
+                            <tr>
+                                <th>{{trans('Delivery time')}}</th>
+                                <td><b>{{$product->duree_de_livraison}}</b></td>
+                            </tr>
+                            @endif
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <div class="product__content tab-root">
                 <ul class="tab-list">
                     <li class="active"><a href="#tab-description">{{ __('Description') }}</a></li>

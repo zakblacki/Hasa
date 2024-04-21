@@ -24,16 +24,6 @@ class NewsletterRequest extends Request
             'status' => Rule::in(NewsletterStatusEnum::values()),
         ];
 
-        if (is_plugin_active('captcha')) {
-            if (Captcha::reCaptchaEnabled()) {
-                $rules += Captcha::rules();
-            }
-
-            if (setting('enable_math_captcha_for_newsletter_form', 0)) {
-                $rules += Captcha::mathCaptchaRules();
-            }
-        }
-
         return $rules;
     }
 

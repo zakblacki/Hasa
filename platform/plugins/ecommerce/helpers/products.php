@@ -198,7 +198,7 @@ if (! function_exists('get_products_by_collections')) {
 }
 
 if (! function_exists('get_default_product_variation')) {
-    function get_default_product_variation(int|string $configurableId): Product|null
+    function get_default_product_variation(int|string $configurableId): ?Product
     {
         return app(ProductInterface::class)
             ->getProductVariations($configurableId, [
@@ -360,9 +360,9 @@ if (! function_exists('handle_next_attributes_in_product')) {
         Collection $productVariationsInfo,
         int|string|null $setId,
         array $selectedAttributes,
-        string|null $key,
+        ?string $key,
         array $variationNextIds,
-        Collection|null $variationInfo = null,
+        ?Collection $variationInfo = null,
         array $unavailableAttributeIds = []
     ): array {
         foreach ($productAttributes as $attribute) {

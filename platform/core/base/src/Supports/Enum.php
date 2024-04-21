@@ -126,7 +126,7 @@ abstract class Enum implements CastsAttributes, JsonSerializable
         return $result;
     }
 
-    public static function getLabel(string|null $value): string|null
+    public static function getLabel(?string $value): ?string
     {
         $key = sprintf(
             '%s.%s',
@@ -163,7 +163,7 @@ abstract class Enum implements CastsAttributes, JsonSerializable
 
     public function __toString()
     {
-        return (string)$this->value;
+        return (string) $this->value;
     }
 
     /**
@@ -192,7 +192,7 @@ abstract class Enum implements CastsAttributes, JsonSerializable
         ];
     }
 
-    public function label(): string|null
+    public function label(): ?string
     {
         return self::getLabel($this->getValue());
     }

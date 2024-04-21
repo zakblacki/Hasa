@@ -53,6 +53,9 @@ abstract class SatimPaymentAbstract
                 'language' => in_array(strtoupper(app()->getLocale()), ['EN','FR','AR'])?strtoupper(app()->getLocale()):'EN',
             ]);
             Log::debug('-----Satim confirmOrder.do (admin transaction page) url: ' . $reqresponse->transferStats->getEffectiveUri()->__toString());
+            Log::debug('-----Satim confirmOrder.do (admin transaction page) Start--------');
+            Log::debug($reqresponse->json());
+            Log::debug('-----Satim confirmOrder.do (admin transaction page) End----------');
             return $reqresponse->json();
         }catch (Exception $exception){
             return [
@@ -85,6 +88,9 @@ abstract class SatimPaymentAbstract
                 'password' => setting('payment_satim_secret'),
             ]);
             Log::debug('-----Satim refund.do (admin order page) url: ' . $response->transferStats->getEffectiveUri()->__toString());
+            Log::debug('-----Satim refund.do (admin order page) Start--------');
+            Log::debug($response->json());
+            Log::debug('-----Satim refund.do (admin order page) End----------');
             if ($response->successful()) {
                 $response = $response->json();
                 if ($response['errorCode'] == 0) {

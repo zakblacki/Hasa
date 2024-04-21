@@ -84,12 +84,12 @@ class ShippingRuleItemForm extends FormAbstract
             ]);
 
         if (EcommerceHelper::loadCountriesStatesCitiesFromPluginLocation()) {
-            $states = ['' => trans('plugins/location::city.select_state')];
+            $states = ['' => trans('plugins/ecommerce::ecommerce.select_state')];
             if ($country) {
                 $states += EcommerceHelper::getAvailableStatesByCountry($country);
             }
 
-            $cities = ['' => trans('plugins/location::city.select_city')];
+            $cities = ['' => trans('plugins/ecommerce::ecommerce.select_city')];
 
             $cities += EcommerceHelper::getAvailableCitiesByState(old('state', $this->getModel()->state));
 

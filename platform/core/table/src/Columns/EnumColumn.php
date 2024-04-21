@@ -3,7 +3,6 @@
 namespace Botble\Table\Columns;
 
 use BackedEnum;
-use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Supports\Enum;
 use Botble\Table\Contracts\FormattedColumn as FormattedColumnContract;
 
@@ -19,7 +18,7 @@ class EnumColumn extends FormattedColumn implements FormattedColumnContract
             });
     }
 
-    public function formattedValue($value): string
+    public function formattedValue($value): ?string
     {
         if (! $value instanceof Enum && ! $value instanceof BackedEnum) {
             return '';
@@ -35,8 +34,6 @@ class EnumColumn extends FormattedColumn implements FormattedColumnContract
             return $value->getValue();
         }
 
-        $value = $value->toHtml() ?: $value->getValue();
-
-        return BaseHelper::clean($value);
+        return $value->toHtml() ?: $value->getValue();
     }
 }

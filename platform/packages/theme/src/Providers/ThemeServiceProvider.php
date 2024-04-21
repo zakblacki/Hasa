@@ -108,6 +108,20 @@ class ThemeServiceProvider extends ServiceProvider
                             'permissions' => ['theme.custom-html'],
                         ]);
                     }
+                )
+                ->when(
+                    $config->get('packages.theme.general.enable_robots_txt_editor'),
+                    function (DashboardMenuSupport $menu) {
+                        $menu->registerItem([
+                            'id' => 'cms-core-appearance-robots-txt',
+                            'priority' => 6,
+                            'parent_id' => 'cms-core-appearance',
+                            'name' => 'packages/theme::theme.robots_txt_editor',
+                            'icon' => null,
+                            'url' => fn () => route('theme.robots-txt'),
+                            'permissions' => ['theme.robots-text'],
+                        ]);
+                    }
                 );
         });
 

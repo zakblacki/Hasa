@@ -183,7 +183,6 @@ return [
         'email_template_status' => 'Email template status',
         'email_template_status_description' => 'Turn on/off email template',
     ],
-
     'media' => [
         'title' => 'Media',
         'driver' => 'Driver',
@@ -333,4 +332,13 @@ return [
     ],
     'saving' => 'Saving...',
     'generating_media_thumbnails' => 'Generating media thumbnails...',
+    'website_tracking' => [
+        'title' => 'Website Tracking',
+        'description' => 'Configure website tracking',
+        'google_tag_manager_id' => 'Google Tag Manager ID',
+        'google_tag_manager_id_placeholder' => 'Example: G-123ABC4567',
+        'google_tag_manager_code' => 'Google Tag Manager Code',
+        'google_tag_manager_code_helper' => 'Go to https://tagmanager.google.com to configure your tags.',
+        'google_tag_manager_info' => 'Only setup one of Google Tag Manager ID or Google Tag Manager Code',
+    ],
 ];

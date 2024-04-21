@@ -4,6 +4,7 @@ namespace Botble\SeoHelper;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\MetaBox;
+use Botble\Media\Facades\RvMedia;
 use Botble\SeoHelper\Contracts\SeoHelperContract;
 use Botble\SeoHelper\Contracts\SeoMetaContract;
 use Botble\SeoHelper\Contracts\SeoOpenGraphContract;
@@ -12,6 +13,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class SeoHelper implements SeoHelperContract
 {
@@ -49,7 +51,7 @@ class SeoHelper implements SeoHelperContract
         return $this->seoOpenGraph;
     }
 
-    public function setTitle(string|null $title, string|null $siteName = null, string|null $separator = null): self
+    public function setTitle(?string $title, ?string $siteName = null, ?string $separator = null): self
     {
         $this->meta()->setTitle($title, $siteName, $separator);
         $this->openGraph()->setTitle($title);
@@ -57,6 +59,13 @@ class SeoHelper implements SeoHelperContract
             $this->openGraph()->setSiteName($siteName);
         }
         $this->twitter()->setTitle($title);
+
+        return $this;
+    }
+
+    public function setImage(?string $image): SeoHelperContract
+    {
+        $this->openGraph()->setImage($image);
 
         return $this;
     }
@@ -71,12 +80,12 @@ class SeoHelper implements SeoHelperContract
         return $this->seoTwitter;
     }
 
-    public function getTitle(): string|null
+    public function getTitle(): ?string
     {
         return $this->meta()->getTitle();
     }
 
-    public function getDescription(): string|null
+    public function getDescription(): ?string
     {
         return $this->meta()->getDescription();
     }
@@ -124,12 +133,31 @@ class SeoHelper implements SeoHelperContract
 
                 $seoMeta = $request->input('seo_meta', []);
 
+                if ($request->hasFile('seo_meta_image_input')) {
+                    $uploadFolder = $object->upload_folder ?: Str::plural(Str::slug(class_basename($this)));
+
+                    $result = RvMedia::handleUpload($request->file('seo_meta_image_input'), 0, $uploadFolder);
+
+                    if (! $result['error']) {
+                        $request->merge(['seo_meta_image' => $result['data']->url]);
+                    }
+                }
+
+                $seoMeta['seo_image'] = $request->input('seo_meta_image');
+
+                Arr::forget($seoMeta, 'seo_meta_image');
+                Arr::forget($seoMeta, 'seo_meta_image_input');
+
                 if (! Arr::get($seoMeta, 'seo_title')) {
                     Arr::forget($seoMeta, 'seo_title');
                 }
 
                 if (! Arr::get($seoMeta, 'seo_description')) {
                     Arr::forget($seoMeta, 'seo_description');
+                }
+
+                if (! Arr::get($seoMeta, 'seo_image')) {
+                    Arr::forget($seoMeta, 'seo_image');
                 }
 
                 if (! empty($seoMeta)) {

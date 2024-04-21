@@ -113,7 +113,7 @@ class ProductController extends BaseController
             $variation['sku'] = $product->sku;
             $variation['auto_generate_sku'] = true;
 
-            $variation['images'] = array_filter((array)$request->input('images', []));
+            $variation['images'] = array_filter((array) $request->input('images', []));
 
             $this->postSaveAllVersions(
                 [$variation['id'] => $variation],

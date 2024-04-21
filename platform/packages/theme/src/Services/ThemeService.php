@@ -146,12 +146,12 @@ class ThemeService
         ];
     }
 
-    protected function getPath(string $theme, string|null $path = null): string
+    protected function getPath(string $theme, ?string $path = null): string
     {
         return rtrim(theme_path(), '/') . '/' . rtrim(ltrim(strtolower($theme), '/'), '/') . '/' . $path;
     }
 
-    public function publishAssets(string|null $theme = null): array
+    public function publishAssets(?string $theme = null): array
     {
         if ($theme) {
             $themes = [$theme];

@@ -73,7 +73,7 @@ class DashboardController extends BaseController
                 'user_id' => $request->user()->getKey(),
             ]);
 
-            $widgetSetting->settings = array_merge((array)$widgetSetting->settings, [
+            $widgetSetting->settings = array_merge((array) $widgetSetting->settings, [
                 $request->input('setting_name') => $request->input('setting_value'),
             ]);
 

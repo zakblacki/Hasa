@@ -11,10 +11,6 @@ use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Base\Forms\Fields\PasswordField;
 use Botble\Base\Forms\Fields\PhoneNumberField;
 use Botble\Base\Forms\Fields\TextField;
-use Botble\Base\Forms\FormAbstract;
-use Botble\Captcha\Facades\Captcha;
-use Botble\Captcha\Forms\Fields\MathCaptchaField;
-use Botble\Captcha\Forms\Fields\ReCaptchaField;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Forms\Fronts\Auth\FieldOptions\EmailFieldOption;
 use Botble\Ecommerce\Forms\Fronts\Auth\FieldOptions\TextFieldOption;
@@ -23,6 +19,11 @@ use Botble\Ecommerce\Models\Customer;
 
 class RegisterForm extends AuthForm
 {
+    public static function formTitle(): string
+    {
+        return __('Customer register form');
+    }
+
     public function setup(): void
     {
         parent::setup();
@@ -90,15 +91,6 @@ class RegisterForm extends AuthForm
                     ->icon('ti ti-lock')
                     ->toArray()
             )
-            ->when(is_plugin_active('captcha'), function (FormAbstract $form) {
-                $form
-                    ->when(Captcha::isEnabled() && get_ecommerce_setting('enable_recaptcha_in_register_page', false), function (FormAbstract $form) {
-                        $form->add('recaptcha', ReCaptchaField::class);
-                    })
-                    ->when(Captcha::mathCaptchaEnabled() && get_ecommerce_setting('enable_math_captcha_in_register_page', false), function (FormAbstract $form) {
-                        $form->add('math_captcha', MathCaptchaField::class);
-                    });
-            })
             ->add(
                 'agree_terms_and_policy',
                 OnOffCheckboxField::class,

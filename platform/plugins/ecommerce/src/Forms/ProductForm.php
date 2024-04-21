@@ -13,6 +13,7 @@ use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\StatusFieldOption;
 use Botble\Base\Forms\Fields\EditorField;
 use Botble\Base\Forms\Fields\MediaImageField;
+use Botble\Base\Forms\Fields\MediaImagesField;
 use Botble\Base\Forms\Fields\MultiCheckListField;
 use Botble\Base\Forms\Fields\OnOffField;
 use Botble\Base\Forms\Fields\SelectField;
@@ -67,9 +68,15 @@ class ProductForm extends FormAbstract
             ->setValidatorClass(ProductRequest::class)
             ->setFormOption('files', true)
             ->add('name', TextField::class, NameFieldOption::make()->required()->toArray())
-            ->add('description', EditorField::class, EditorFieldOption::make()->placeholder(trans('core/base::forms.description_placeholder'))->toArray())
+            ->add(
+                'description',
+                EditorField::class,
+                EditorFieldOption::make()
+                    ->label(trans('core/base::forms.description'))
+                    ->placeholder(trans('core/base::forms.description_placeholder'))->toArray()
+            )
             ->add('content', EditorField::class, ContentFieldOption::make()->allowedShortcodes()->toArray())
-            ->add('images[]', 'mediaImages', [
+            ->add('images[]', MediaImagesField::class, [
                 'label' => trans('plugins/ecommerce::products.form.image'),
                 'values' => $productId ? $this->getModel()->images : [],
             ])

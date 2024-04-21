@@ -63,7 +63,7 @@ abstract class MolliePaymentAbstract implements ProduceServiceInterface
         return $this;
     }
 
-    public function getCurrency(): string|null
+    public function getCurrency(): ?string
     {
         return $this->paymentCurrency;
     }

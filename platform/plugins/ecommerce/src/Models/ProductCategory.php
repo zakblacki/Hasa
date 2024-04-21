@@ -129,7 +129,7 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
 
     protected function iconHtml(): Attribute
     {
-        return Attribute::get(function (): HtmlString|null {
+        return Attribute::get(function (): ?HtmlString {
             if ($this->icon_image) {
                 return RvMedia::image($this->icon_image, attributes: ['alt' => $this->name]);
             }

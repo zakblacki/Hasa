@@ -60,7 +60,7 @@ class GallerySupport
                 ])
                 ->first();
 
-            $gallery = (string)$request->input('gallery');
+            $gallery = (string) $request->input('gallery');
 
             if (
                 defined('LANGUAGE_MODULE_SCREEN_NAME') &&
@@ -144,7 +144,7 @@ class GallerySupport
         return $this;
     }
 
-    public function getGalleriesPageUrl(): string|null
+    public function getGalleriesPageUrl(): ?string
     {
         $pageId = theme_option('galleries_page_id');
 

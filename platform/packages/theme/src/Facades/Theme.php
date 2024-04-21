@@ -68,10 +68,19 @@ use Illuminate\Support\Facades\Facade;
  * @method static string|null getBodyAttribute(string $attribute)
  * @method static array getBodyAttributes()
  * @method static string bodyAttributes()
+ * @method static static addHtmlAttributes(array $htmlAttributes)
+ * @method static string|null getHtmlAttribute(string $attribute)
+ * @method static array getHtmlAttributes()
+ * @method static string htmlAttributes()
  * @method static void registerPreloader()
  * @method static array getPreloaderVersions()
  * @method static void registerToastNotification()
  * @method static string|null getSiteCopyright()
+ * @method static string|null getLogo(string $logoKey = 'logo')
+ * @method static string|null getSiteTitle()
+ * @method static \Illuminate\Support\HtmlString|null getLogoImage(array $attributes = [], string $logoKey = 'logo')
+ * @method static string|null formatDate(\Carbon\CarbonInterface|string|int|null $date, string|null $format = null)
+ * @method static \Botble\Theme\Typograhpy\Typography typography()
  *
  * @see \Botble\Theme\Theme
  */

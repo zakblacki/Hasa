@@ -13,7 +13,7 @@
     @endphp
 
     <div class="d-flex flex-column gap-5 product-review-container">
-        <div class="row">
+        <div class="row g-3">
             @if ($showAvgRating)
                 <div class="col-12 col-md-4">
                     <div class="product-review-number">
@@ -69,7 +69,7 @@
                 </div>
             @endif
 
-            @include($reviewFormView ?? 'plugins/ecommerce::themes.includes.review-form')
+            @include($reviewFormView ?? EcommerceHelper::viewPath('includes.review-form'))
         </div>
 
         @if (($reviewImagesCount = count($product->review_images)) > 0)

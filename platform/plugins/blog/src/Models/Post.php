@@ -80,7 +80,7 @@ class Post extends BaseModel
     protected function timeReading(): Attribute
     {
         return Attribute::make(
-            get: function (): string|null {
+            get: function (): ?string {
                 if (! $this->content) {
                     return null;
                 }
@@ -90,7 +90,7 @@ class Post extends BaseModel
                 $timeToRead = $this->getMetaData('time_to_read', true);
 
                 if ($timeToRead != null) {
-                    return number_format((float)$timeToRead);
+                    return number_format((float) $timeToRead);
                 }
 
                 return number_format(ceil(str_word_count(strip_tags($this->content)) / 200));

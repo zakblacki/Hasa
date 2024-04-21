@@ -3,6 +3,13 @@
 @section('content')
     <x-core::alert type="warning">
         {{ trans('plugins/translation::translation.theme_translations_instruction') }}
+
+        <p class="mt-3 mb-0">
+            {!! trans(
+                'plugins/translation::translation.re_import_alert',
+                ['here' => Html::link('#', trans('plugins/translation::translation.here'), ['data-bs-toggle' => 'modal', 'data-bs-target' => '#confirm-re-import-modal'])]
+            ) !!}
+        </p>
     </x-core::alert>
 
     <x-core::card class="theme-translation">
@@ -40,3 +47,14 @@
         @endif
     </x-core::card>
 @endsection
+
+@push('footer')
+    <x-core::modal.action
+        id="confirm-re-import-modal"
+        :title="trans('plugins/translation::translation.import_translations')"
+        :description="trans('plugins/translation::translation.import_translations_description')"
+        type="warning"
+        :submit-button-attrs="['class' => 'button-re-import', 'data-url' => route('translations.theme-translations.re-import')]"
+        :submit-button-label="trans('core/base::base.yes')"
+    />
+@endpush

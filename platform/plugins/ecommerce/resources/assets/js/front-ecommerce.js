@@ -25,7 +25,8 @@ class Ecommerce {
                 const currentTarget = $(e.currentTarget)
 
                 const formData = this.#transformFormData(currentTarget.serializeArray())
-                let nextUrl = `${window.location.origin}${window.location.pathname}`
+                const url = currentTarget.prop('action')
+                let nextUrl = url
                 let params = []
 
                 formData.map((item) => {
@@ -42,51 +43,7 @@ class Ecommerce {
                     return
                 }
 
-                $.ajax({
-                    url: currentTarget.prop('action'),
-                    type: 'GET',
-                    data: formData,
-                    beforeSend: () => {
-                        document.dispatchEvent(
-                            new CustomEvent('ecommerce.product-filter.before', {
-                                detail: {
-                                    data: formData,
-                                    element: currentTarget,
-                                },
-                            })
-                        )
-                    },
-                    success: (data) => {
-                        const { message, error } = data
-
-                        if (error) {
-                            Theme.showError(message)
-
-                            return
-                        }
-
-                        window.history.pushState(formData, null, nextUrl)
-
-                        document.dispatchEvent(
-                            new CustomEvent('ecommerce.product-filter.success', {
-                                detail: {
-                                    data,
-                                    element: currentTarget,
-                                },
-                            })
-                        )
-                    },
-                    error: (error) => Theme.handleError(error),
-                    complete: () => {
-                        document.dispatchEvent(
-                            new CustomEvent('ecommerce.product-filter.completed', {
-                                detail: {
-                                    element: currentTarget,
-                                },
-                            })
-                        )
-                    },
-                })
+                this.#ajaxFilterForm(url, formData, nextUrl)
             })
             .on('change', 'form.bb-product-form-filter input, form.bb-product-form-filter select', (e) => {
                 $(e.currentTarget).closest('form').trigger('submit')
@@ -142,10 +99,78 @@ class Ecommerce {
                     },
                 })
             })
+            .on('click', '.bb-product-filter-link', (e) => {
+                e.preventDefault()
+
+                const currentTarget = $(e.currentTarget)
+                const form = currentTarget.closest('form')
+                const parent = currentTarget.closest('.bb-product-filter')
+                const input = form.find('input[name="categories[]"]')
+
+                parent.find('.bb-product-filter-link').removeClass('active')
+                currentTarget.addClass('active')
+
+                if (input.length) {
+                    input.val(currentTarget.data('id')).trigger('change')
+                } else {
+                    form.prop('action', currentTarget.prop('href')).trigger('submit')
+                }
+            })
+            .on('click', '.bb-product-filter-clear', (e) => {
+                e.preventDefault()
+
+                const currentTarget = $(e.currentTarget)
+
+                this.#ajaxFilterForm(currentTarget.prop('href'))
+            })
+            .on('click', '.bb-product-filter-clear-all', (e) => {
+                e.preventDefault()
+
+                const form = $('.bb-product-form-filter')
+
+                form.find(
+                    'input[type="text"], input[type="hidden"], input[type="checkbox"], input[type="radio"], select'
+                ).val(null)
+
+                form.trigger('submit')
+            })
+            .on('submit', 'form#cancel-order-form', (e) => {
+                e.preventDefault()
+
+                const currentTarget = $(e.currentTarget)
+                const modal = currentTarget.closest('.modal')
+                const button = modal.find('button[type="submit"]')
+
+                $.ajax({
+                    url: currentTarget.prop('action'),
+                    type: 'POST',
+                    data: currentTarget.serialize(),
+                    beforeSend: () => {
+                        button.addClass('btn-loading')
+                    },
+                    success: ({ error, message }) => {
+                        if (error) {
+                            Theme.showError(message)
+
+                            return
+                        }
+
+                        Theme.showSuccess(message)
+
+                        modal.modal('hide')
+
+                        setTimeout(() => window.location.reload(), 1000)
+                    },
+                    error: (error) => Theme.handleError(error),
+                    complete: () => button.removeClass('btn-loading'),
+                })
+            })
 
         if ($('.bb-product-price-filter').length) {
             this.initPriceFilter()
         }
+
+        this.#initCategoriesDropdown()
     }
 
     /**
@@ -225,18 +250,15 @@ class Ecommerce {
                                 vertical: false,
                             },
                         },
-                        {
-                            breakpoint: 768,
-                            settings: {
-                                slidesToShow: 3,
-                                vertical: false,
-                            },
-                        },
                     ],
                 })
             }
 
             this.initLightGallery($gallery)
+
+            if (typeof Theme.lazyLoadInstance !== 'undefined') {
+                Theme.lazyLoadInstance.update()
+            }
         }
 
         const $quickViewGallery = $('.bb-quick-view-gallery-images')
@@ -304,7 +326,7 @@ class Ecommerce {
         let priceUnit = ''
 
         if (currencies.show_symbol_or_title) {
-            priceUnit = currencies.symbol || currencies.title
+            priceUnit = currencies.symbol || currencies.title || ''
         }
 
         if (currencies.display_big_money) {
@@ -389,6 +411,109 @@ class Ecommerce {
             },
             complete: () => button.removeClass('btn-loading'),
         })
+    }
+
+    #ajaxFilterForm = (url, data, nextUrl) => {
+        const form = $('.bb-product-form-filter')
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: data,
+            beforeSend: () => {
+                document.dispatchEvent(
+                    new CustomEvent('ecommerce.product-filter.before', {
+                        detail: {
+                            data: data,
+                            element: form,
+                        },
+                    })
+                )
+            },
+            success: (data) => {
+                const { message, error } = data
+
+                if (error) {
+                    Theme.showError(message)
+
+                    return
+                }
+
+                window.history.pushState(data, null, nextUrl || url)
+
+                document.dispatchEvent(
+                    new CustomEvent('ecommerce.product-filter.success', {
+                        detail: {
+                            data,
+                            element: form,
+                        },
+                    })
+                )
+            },
+            error: (error) => Theme.handleError(error),
+            complete: () => {
+                if (typeof Theme.lazyLoadInstance !== 'undefined') {
+                    Theme.lazyLoadInstance.update()
+                }
+
+                document.dispatchEvent(
+                    new CustomEvent('ecommerce.product-filter.completed', {
+                        detail: {
+                            element: form,
+                        },
+                    })
+                )
+            },
+        })
+    }
+
+    #initCategoriesDropdown = async () => {
+        const makeRequest = (url, beforeCallback, successCallback) => {
+            $.ajax({
+                url,
+                method: 'GET',
+                beforeSend: () => beforeCallback(),
+                success: ({ error, data }) => {
+                    if (error) {
+                        return
+                    }
+
+                    successCallback(data)
+
+                    document.dispatchEvent(
+                        new CustomEvent('ecommerce.categories-dropdown.success', {
+                            detail: {
+                                data,
+                            },
+                        })
+                    )
+                },
+                error: (error) => Theme.handleError(error),
+            })
+        }
+
+        const initCategoriesDropdown = $(document).find('[data-bb-toggle="init-categories-dropdown"]')
+
+        if (initCategoriesDropdown.length) {
+            const url = initCategoriesDropdown.first().data('url')
+
+            makeRequest(
+                url,
+                () => {},
+                (data) => {
+                    initCategoriesDropdown.each((index, element) => {
+                        const currentTarget = $(element)
+                        const target = $(currentTarget.data('bb-target'))
+
+                        if (target.length) {
+                            target.html(data.dropdown)
+                        } else {
+                            currentTarget.append(data.select)
+                        }
+                    })
+                }
+            )
+        }
     }
 }
 

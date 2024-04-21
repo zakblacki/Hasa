@@ -4,7 +4,6 @@ $(() => {
     </div></div>`
     const table = 'ecommerce-tax-rule-table'
     const _table = '#' + table
-    const wrapper = _table + '_wrapper'
     const $modal = $('.create-tax-rule-form-modal')
     const $modalBody = $modal.find('.modal-body')
     const $modalTitle = $modal.find('.modal-title strong')
@@ -23,7 +22,7 @@ $(() => {
         resetModal()
     })
 
-    $(document).on('click', wrapper + ' .create-tax-rule-item', function (e) {
+    $(document).off('click', '.create-tax-rule-item').on('click', '.create-tax-rule-item', function (e) {
         e.preventDefault()
         const $this = $(e.currentTarget)
         $modal.modal('show')

@@ -120,9 +120,9 @@ return [
     'add_note' => 'Add note...',
     'view_order' => 'View Order :order_id',
     'rule' => [
-        'types' => [
-            'based_on_weight' => 'Based on product\'s weight (:unit)',
-            'based_on_price' => 'Based on product\'s price',
+        'enum_types' => [
+            'based_on_weight' => 'Based on order\'s total weight (:unit)',
+            'based_on_price' => 'Based on order\'s total amount',
             'based_on_zipcode' => 'Based on zipcode',
             'based_on_location' => 'Based on location',
             'unavailable' => 'Unavailable',

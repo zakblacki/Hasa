@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class ShortcodeField
 {
-    public function tabs(array $fields, array $attributes = [], int $max = 20): string
+    public function tabs(array $fields, array $attributes = [], int $max = 20, int $min = 1): string
     {
         if (! $fields) {
             return '';
@@ -18,10 +18,10 @@ class ShortcodeField
 
         $selector = 'quantity_' . Str::random(20);
 
-        $choices = range(1, $max);
+        $choices = range($min, $max);
         $choices = array_combine($choices, $choices);
 
-        return view('packages/shortcode::fields.tabs', compact('fields', 'attributes', 'current', 'selector', 'choices', 'max'))->render();
+        return view('packages/shortcode::fields.tabs', compact('fields', 'attributes', 'current', 'selector', 'choices', 'max', 'min'))->render();
     }
 
     public function getTabsData(array $fields, ShortcodeCompiler $shortcode): array
@@ -73,7 +73,7 @@ class ShortcodeField
         return static::parseIds($value);
     }
 
-    public static function parseIds(string|null $value): array
+    public static function parseIds(?string $value): array
     {
         if (empty($value)) {
             return [];

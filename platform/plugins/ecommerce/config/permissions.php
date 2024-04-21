@@ -46,6 +46,36 @@ return [
         'flag' => 'products.duplicate',
         'parent_flag' => 'products.index',
     ],
+
+    /**
+     * Product Prices
+     */
+    [
+        'name' => 'Product Prices',
+        'flag' => 'ecommerce.product-prices.index',
+        'parent_flag' => 'plugins.ecommerce',
+    ],
+    [
+        'name' => 'Update',
+        'flag' => 'ecommerce.product-prices.edit',
+        'parent_flag' => 'plugins.ecommerce',
+    ],
+
+    /**
+     * Product Inventory
+     */
+
+    [
+        'name' => 'Product Inventory',
+        'flag' => 'ecommerce.product-inventory.index',
+        'parent_flag' => 'plugins.ecommerce',
+    ],
+    [
+        'name' => 'Update',
+        'flag' => 'ecommerce.product-inventory.edit',
+        'parent_flag' => 'plugins.ecommerce',
+    ],
+
     /**
      * Categories
      */

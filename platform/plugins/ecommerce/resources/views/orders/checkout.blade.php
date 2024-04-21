@@ -4,12 +4,6 @@
 
 @section('content')
     @if (Cart::instance('cart')->isNotEmpty())
-        @php
-            $rawTotal = Cart::instance('cart')->rawTotal();
-            $orderAmount = max($rawTotal - $promotionDiscountAmount - $couponDiscountAmount, 0);
-            $orderAmount += (float) $shippingAmount;
-        @endphp
-
         @if (is_plugin_active('payment') && $orderAmount)
             @include('plugins/payment::partials.header')
         @endif
@@ -120,7 +114,7 @@
                         <hr>
 
                         <div class="mt-3 mb-5">
-                            @include('plugins/ecommerce::themes.discounts.partials.form', compact('discounts'))
+                            @include(EcommerceHelper::viewPath('discounts.partials.form'), compact('discounts'))
                         </div>
                     </div>
 
@@ -289,6 +283,24 @@
                                 )
 
                                 {!! apply_filters('ecommerce_checkout_form_after_tax_information_form', null, $products) !!}
+                            @endif
+
+                            @if($privacyPolicyUrl = theme_option('ecommerce_term_and_privacy_policy_url'))
+                                <div class="form-check ps-0 mb-3">
+                                    <input
+                                        id="agree_terms_and_policy"
+                                        name="agree_terms_and_policy"
+                                        type="checkbox"
+                                        value="1"
+                                        @checked (old('agree_terms_and_policy', true))
+                                    >
+                                    <label class="form-check-label" for="agree_terms_and_policy">
+                                        {!! BaseHelper::clean(__(
+                                            'I agree to the :link',
+                                            ['link' => Html::link($privacyPolicyUrl, __('Terms and Privacy Policy'), attributes: ['class' => 'text-decoration-underline', 'target' => '_blank'])]
+                                        )) !!}
+                                    </label>
+                                </div>
                             @endif
 
                             {!! apply_filters('ecommerce_checkout_form_after', null, $products) !!}

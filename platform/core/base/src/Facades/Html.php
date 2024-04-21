@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool hasComponent($name)
  * @method static \Illuminate\Contracts\View\View|mixed componentCall(string $method, array $parameters)
  *
- * @see \Botble\Base\Supports\HtmlBuilder
+ * @see \Kris\LaravelFormBuilder\Supports\HtmlBuilder
  */
 class Html extends Facade
 {

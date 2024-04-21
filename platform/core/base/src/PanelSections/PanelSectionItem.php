@@ -21,7 +21,7 @@ class PanelSectionItem implements PanelSectionItemContract
 
     protected int $priority = 0;
 
-    protected array|null $permissions = null;
+    protected ?array $permissions = null;
 
     protected string $view = 'core/base::sections.item';
 

@@ -80,7 +80,7 @@ class AdminAppearanceSettingForm extends SettingForm
                 'label' => trans('core/setting::setting.admin_appearance.form.link_hover_color'),
                 'value' => setting('admin_link_hover_color', '#1a569d'),
             ])
-            ->when(count($locales) > 1, function (FormAbstract $form) use ($locales) {
+            ->when(! empty($locales), function (FormAbstract $form) use ($locales) {
                 $form->add(
                     AdminAppearance::getSettingKey('locale'),
                     SelectField::class,

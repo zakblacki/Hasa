@@ -31,7 +31,7 @@ class QuickShopController extends BaseController
             ],
         ]);
 
-        abort_unless($product->exists, 404);
+        abort_unless($product && $product->exists, 404);
 
         $referenceProduct = null;
 

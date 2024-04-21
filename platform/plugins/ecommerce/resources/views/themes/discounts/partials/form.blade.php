@@ -1,7 +1,7 @@
 @if ($discounts->isNotEmpty())
     <div class="checkout__coupon-section">
         <div class="checkout__coupon-heading">
-            <img alt="MÃ GIẢM GIÁ" width="32" height="32" src="{{ asset('vendor/core/plugins/ecommerce/images/code_dis.gif') }}">
+            <img width="32" height="32" src="{{ asset('vendor/core/plugins/ecommerce/images/coupon-code.gif') }}" alt="coupon code icon">
             {{ __('Coupon codes (:count)', ['count' => $discounts->count()]) }}
         </div>
 
@@ -13,7 +13,10 @@
                     <div class="checkout__coupon-item-icon"></div>
                     <div class="checkout__coupon-item-content">
                         <div class="checkout__coupon-item-title">
-                            <h4>{{ $discount->type_option === 'percentage' ? $discount->value . '%' : format_price($discount->value) }}</h4>
+                            @if ($discount->type_option !== 'shipping')
+                                <h4>{{ $discount->type_option === 'percentage' ? $discount->value . '%' : format_price($discount->value) }}</h4>
+                            @endif
+
                             @if($discount->quantity > 0)
                                 <span class="checkout__coupon-item-count">
                                     ({{ __('Left :left', ['left' => $discount->left_quantity]) }})
@@ -55,9 +58,9 @@
     @if (!session()->has('applied_coupon_code')) style="display: none;" @endif
 >
     @if (!session()->has('applied_coupon_code'))
-        @include('plugins/ecommerce::themes.discounts.partials.apply-coupon')
+        @include(EcommerceHelper::viewPath('discounts.partials.apply-coupon'))
     @else
-        @include('plugins/ecommerce::themes.discounts.partials.remove-coupon')
+        @include(EcommerceHelper::viewPath('discounts.partials.remove-coupon'))
     @endif
 </div>
 <div class="clearfix"></div>

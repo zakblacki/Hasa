@@ -24,17 +24,17 @@ class PaymentMethods
         return $this->methods;
     }
 
-    public function getDefaultMethod(): string|null
+    public function getDefaultMethod(): ?string
     {
         return setting('default_payment_method', PaymentMethodEnum::COD);
     }
 
-    public function getSelectedMethod(): string|null
+    public function getSelectedMethod(): ?string
     {
         return session('selected_payment_method');
     }
 
-    public function getSelectingMethod(): string|null
+    public function getSelectingMethod(): ?string
     {
         return $this->getSelectedMethod() ?: $this->getDefaultMethod();
     }

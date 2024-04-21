@@ -29,24 +29,26 @@
         <p>{{trans("plugins/satim::satim.please_try_again_later")}}</p>
     @endif
 
-    @if(isset($satimError))
-        <h1>{{trans("plugins/satim::satim.satim_error")}}</h1>
-        <p>{{trans("plugins/satim::satim.an_error_occurred_while_processing_your_payment")}}</p>
-        @if(isset($error))
-            <p>{{trans("plugins/satim::satim.error_description")}}: {{ $error }}</p>
-        @endif
-        @if(isset($satimError) && isset($satimError['ErrorCode']) && $satimError['ErrorCode']=="0" && isset($satimError['params']['respCode']) && $satimError['params']['respCode'] == "00" && isset($satimError['OrderStatus']) && $satimError['OrderStatus']==3)
-            <p>Your transaction was rejected/ تم رفض معاملتك</p>
-            <p><span class="d-inline-block" style="color:green">{{trans("plugins/satim::satim.in_case_of_payment_problem_please_contact_the_toll_free_number_of")}}<br></span> <img class="filter-black" src="{{url('vendor/core/plugins/satim/images/3020.png')}}" alt="satim"></p>
-        @else
-            @if(!empty($satimError['respCode_desc']))
-                <p>{{trans("plugins/satim::satim.error_description")}}: {{ $satimError['respCode_desc'] }}</p>
-            @elseif(empty($satimError['respCode_desc']))
-            <p>{{trans("plugins/satim::satim.error_description")}}: {{ $satimError['actionCodeDescription'] }}</p>
-            @endif
-            <p><span class="d-inline-block" style="color:green">{{trans("plugins/satim::satim.in_case_of_payment_problem_please_contact_the_toll_free_number_of")}}<br></span> <img class="filter-black" src="{{url('vendor/core/plugins/satim/images/3020.png')}}" alt="satim"></p>
-        @endif
+@if(isset($satimError))
+    <h1>{{trans("plugins/satim::satim.satim_error")}}</h1>
+    <p>{{trans("plugins/satim::satim.an_error_occurred_while_processing_your_payment")}}</p>
+
+    @if(isset($error))
+        <p>{{trans("plugins/satim::satim.error_description")}}: {{ $error }}</p>
     @endif
+
+    @if(isset($satimError) && isset($satimError['ErrorCode']) && $satimError['ErrorCode']=="0" && isset($satimError['params']['respCode']) && $satimError['params']['respCode'] == "00" && isset($satimError['OrderStatus']) && $satimError['OrderStatus']==3)
+        <p>Your transaction was rejected/ تم رفض معاملتك</p>
+        <p><span class="d-inline-block" style="color:green">{{trans("plugins/satim::satim.in_case_of_payment_problem_please_contact_the_toll_free_number_of")}}<br></span> <img class="filter-black" src="{{url('vendor/core/plugins/satim/images/3020.png')}}" alt="satim"></p>
+    @else
+        @if(!empty($satimError['params']['respCode_desc']))
+            <p>{{trans("plugins/satim::satim.error_description")}}: {{ $satimError['params']['respCode_desc'] }}</p>
+        @elseif(isset($satimError['actionCodeDescription']))
+            <p>{{trans("plugins/satim::satim.error_description")}}: {{ $satimError['actionCodeDescription'] }}</p>
+        @endif
+        <p><span class="d-inline-block" style="color:green">{{trans("plugins/satim::satim.in_case_of_payment_problem_please_contact_the_toll_free_number_of")}}<br></span> <img class="filter-black" src="{{url('vendor/core/plugins/satim/images/3020.png')}}" alt="satim"></p>
+    @endif
+@endif
 
     <a href="{{url('/')}}" class="btn btn-primary mt-3">{{trans("plugins/satim::satim.back_to_home")}}</a>
 </body>

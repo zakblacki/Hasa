@@ -76,7 +76,7 @@
                                 @endif
 
                                 @include(
-                                    'plugins/ecommerce::themes.includes.cart-item-options-extras',
+                                    EcommerceHelper::viewPath('includes.cart-item-options-extras'),
                                     ['options' => $orderProduct->options]
                                 )
 

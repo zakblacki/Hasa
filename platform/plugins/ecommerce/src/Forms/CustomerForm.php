@@ -104,7 +104,7 @@ class CustomerForm extends FormAbstract
             ->add('status', SelectField::class, StatusFieldOption::make()->choices(CustomerStatusEnum::labels())->toArray())
             ->add('avatar', MediaImageField::class)
             ->setBreakFieldPoint('status')
-            ->when($this->getModel()->id, function () {
+            ->when($this->getModel()->getKey(), function () {
                 $this
                     ->addMetaBoxes([
                     'addresses' => [

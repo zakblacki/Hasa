@@ -96,7 +96,7 @@ class Helper
         return true;
     }
 
-    public static function getCountryNameByCode(string|null $countryCode): string|null
+    public static function getCountryNameByCode(?string $countryCode): ?string
     {
         if (empty($countryCode)) {
             return null;
@@ -105,7 +105,7 @@ class Helper
         return Arr::get(self::countries(), $countryCode, $countryCode);
     }
 
-    public static function getCountryCodeByName(string|null $countryName): string|null
+    public static function getCountryCodeByName(?string $countryName): ?string
     {
         if (empty($countryName)) {
             return null;
@@ -172,7 +172,7 @@ class Helper
     public static function convertHrToBytes(string|float|int|null $value): float|int
     {
         $value = strtolower(trim($value));
-        $bytes = (int)$value;
+        $bytes = (int) $value;
 
         if (str_contains($value, 'g')) {
             $bytes *= 1024 * 1024 * 1024;

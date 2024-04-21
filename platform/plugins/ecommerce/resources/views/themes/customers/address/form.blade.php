@@ -52,6 +52,7 @@
                 name="country"
                 :options="EcommerceHelper::getAvailableCountries()"
                 :value="old('country', $address->country)"
+                :class="$selectClass ?? ''"
                 data-type="country"
             />
         @else
@@ -71,6 +72,7 @@
                 name="state"
                 :options="EcommerceHelper::getAvailableStatesByCountry(old('country', $address->country))"
                 :value="old('state', $address->state)"
+                :class="$selectClass ?? ''"
                 data-type="state"
                 data-url="{{ route('ajax.states-by-country') }}"
             />
@@ -95,6 +97,7 @@
                 name="city"
                 :options="EcommerceHelper::getAvailableCitiesByState(old('state', $address->state))"
                 :value="old('city', $address->city)"
+                :class="$selectClass ?? ''"
                 data-type="city"
                 data-url="{{ route('ajax.cities-by-state') }}"
             />

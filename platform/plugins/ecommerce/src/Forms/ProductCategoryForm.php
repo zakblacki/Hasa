@@ -7,6 +7,7 @@ use Botble\Base\Forms\FieldOptions\NameFieldOption;
 use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
 use Botble\Base\Forms\FieldOptions\StatusFieldOption;
 use Botble\Base\Forms\Fields\EditorField;
+use Botble\Base\Forms\Fields\MediaImageField;
 use Botble\Base\Forms\Fields\OnOffField;
 use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextField;
@@ -28,7 +29,7 @@ class ProductCategoryForm extends FormAbstract
                 ContentFieldOption::make()->label(trans('core/base::forms.description'))->toArray()
             )
             ->add('status', SelectField::class, StatusFieldOption::make()->toArray())
-            ->add('image', 'mediaImage')
+            ->add('image', MediaImageField::class)
             ->add(
                 'icon',
                 $this->getFormHelper()->hasCustomField('themeIcon') ? 'themeIcon' : 'text',
@@ -40,7 +41,7 @@ class ProductCategoryForm extends FormAbstract
                     'empty_value' => __('-- None --'),
                 ]
             )
-            ->add('icon_image', 'mediaImage', [
+            ->add('icon_image', MediaImageField::class, [
                 'label' => __('Icon image'),
                 'help_block' => [
                     'text' => __('It will replace Icon Font if it is present.'),

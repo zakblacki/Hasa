@@ -31,7 +31,7 @@ class SelectFieldOption extends FormFieldOptions
         return $this->choices;
     }
 
-    public function selected(array|string|bool|null $selected): static
+    public function selected(array|string|bool|float|null $selected): static
     {
         $this->selected = $selected;
 

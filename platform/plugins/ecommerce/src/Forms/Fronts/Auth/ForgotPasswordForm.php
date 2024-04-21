@@ -9,6 +9,11 @@ use Botble\Ecommerce\Http\Requests\Fronts\Auth\ForgotPasswordRequest;
 
 class ForgotPasswordForm extends AuthForm
 {
+    public static function formTitle(): string
+    {
+        return __('Customer forgot password form');
+    }
+
     public function setup(): void
     {
         parent::setup();

@@ -217,7 +217,7 @@ class TemplateLocationExport implements
             ->setError(trans('plugins/location::bulk-import.export.template.text_not_allowed'))
             ->setPromptTitle(trans('plugins/location::bulk-import.export.template.max_text_length'))
             ->setPrompt(trans('plugins/location::bulk-import.export.template.prompt_max_text_length', compact('max')))
-            ->setFormula1((string)$max)
+            ->setFormula1((string) $max)
             ->setOperator(DataValidation::OPERATOR_LESSTHANOREQUAL);
 
         return $validation;

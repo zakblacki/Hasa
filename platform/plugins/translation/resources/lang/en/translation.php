@@ -58,4 +58,7 @@ return [
             'description' => 'Manage the other translations (admin, plugins, packages...)',
         ],
     ],
+    'please_select_locale' => 'Please select a language to start translating. If your language is not listed, you can go to Settings -> Locales to add it.',
+    'import_translations' => 'Import translations',
+    'import_translations_description' => 'It will find all translation texts for front theme and add them to translation',
 ];

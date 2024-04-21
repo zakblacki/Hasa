@@ -31,10 +31,7 @@ class TaxRuleForm extends FormAbstract
                     $taxId = request()->input('tax_id'),
                     fn (FormAbstract $form) => $form->add('tax_id', 'hidden', [
                         'value' => $taxId,
-                    ])
-                )
-                ->when(
-                    ! $taxId,
+                    ]),
                     function (FormAbstract $form) {
                         $taxes = Tax::query()->pluck('title', 'id')->toArray();
                         $form
@@ -88,10 +85,12 @@ class TaxRuleForm extends FormAbstract
                 ]);
         }
 
-        $this->addSubmitButton(trans('core/base::forms.save'), 'ti ti-device-floppy', [
-            'wrapper' => [
-                'class' => 'd-grid gap-2',
-            ],
-        ]);
+        if ($this->request->ajax()) {
+            $this->addSubmitButton(trans('core/base::forms.save'), 'ti ti-device-floppy', [
+                'wrapper' => [
+                    'class' => 'd-grid gap-2',
+                ],
+            ]);
+        }
     }
 }

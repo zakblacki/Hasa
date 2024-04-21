@@ -39,6 +39,10 @@ class SatimController extends Controller
                 'language' => in_array(strtoupper(app()->getLocale()), ['EN','FR','AR'])?strtoupper(app()->getLocale()):'EN',
             ]);
             Log::debug('-----Satim confirmOrder.do url: ' . $reqresponse->transferStats->getEffectiveUri()->__toString());
+            Log::debug('-----Satim confirmOrder.do Response Start--------');
+            Log::debug($reqresponse->json());
+            Log::debug('-----Satim confirmOrder.do Response End----------');
+            
             $reqresponse = $reqresponse->json();
             
             if ($reqresponse && isset($reqresponse['params']['respCode']) && $reqresponse['params']['respCode'] == "00" && isset($reqresponse['ErrorCode']) && $reqresponse['ErrorCode'] == 0 && isset($reqresponse['OrderStatus']) && $reqresponse['OrderStatus'] == 2 ) {

@@ -2,6 +2,8 @@
 
 namespace Botble\Ecommerce\Forms\Settings;
 
+use Botble\Base\Forms\FieldOptions\RadioFieldOption;
+use Botble\Base\Forms\Fields\RadioField;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\Settings\CustomerSettingRequest;
 use Botble\Setting\Forms\SettingForm;
@@ -23,9 +25,19 @@ class CustomerSettingForm extends SettingForm
             ->add('login_using_phone', 'onOffCheckbox', [
                 'label' => trans('plugins/ecommerce::setting.customer.form.login_using_phone'),
                 'value' => EcommerceHelper::isLoginUsingPhone(),
-                'wrapper' => [
-                    'class' => 'mb-0',
-                ],
-            ]);
+            ])
+            ->add(
+                'login_option',
+                RadioField::class,
+                RadioFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.customer.form.login_option'))
+                    ->selected(EcommerceHelper::getLoginOption())
+                    ->choices([
+                        'email' => trans('plugins/ecommerce::setting.customer.form.login_with_email'),
+                        'phone' => trans('plugins/ecommerce::setting.customer.form.login_with_phone'),
+                        'email_or_phone' => trans('plugins/ecommerce::setting.customer.form.login_with_email_or_phone'),
+                    ])
+                    ->toArray(),
+            );
     }
 }

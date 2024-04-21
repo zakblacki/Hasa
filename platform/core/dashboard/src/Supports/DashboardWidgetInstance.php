@@ -26,7 +26,7 @@ class DashboardWidgetInstance
 
     protected bool $isEqualHeight = true;
 
-    protected string|null $column = null;
+    protected ?string $column = null;
 
     protected string $permission;
 
@@ -308,7 +308,7 @@ class DashboardWidgetInstance
         ];
     }
 
-    public function getFilterRange(string|null $filterRangeInput)
+    public function getFilterRange(?string $filterRangeInput)
     {
         $predefinedRanges = $this->getPredefinedRanges();
         $predefinedRanges = collect($predefinedRanges);
@@ -339,7 +339,7 @@ class DashboardWidgetInstance
             'user_id' => Auth::guard()->id(),
         ]);
 
-        $widgetSetting->settings = array_merge((array)$widgetSetting->settings, $settings);
+        $widgetSetting->settings = array_merge((array) $widgetSetting->settings, $settings);
 
         $widgetSetting->save();
 

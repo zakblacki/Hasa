@@ -190,10 +190,18 @@ Route::group(['namespace' => 'Botble\Setting\Http\Controllers'], function () {
                 ]);
             });
 
-            Route::get('cronjob', [
-                'as' => 'cronjob',
-                'uses' => 'CronjobSettingController@index',
-            ]);
+            Route::prefix('website-tracking')->group(function () {
+                Route::get('/', [
+                    'as' => 'website-tracking',
+                    'uses' => 'WebsiteTrackingSettingController@edit',
+                ]);
+
+                Route::put('/', [
+                    'as' => 'website-tracking.update',
+                    'uses' => 'WebsiteTrackingSettingController@update',
+                    'permission' => 'settings.website-tracking',
+                ]);
+            });
         });
     });
 });

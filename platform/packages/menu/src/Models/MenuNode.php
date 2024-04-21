@@ -70,7 +70,7 @@ class MenuNode extends BaseModel
                 return '/';
             }
 
-            return (string)$this->reference->url;
+            return (string) $this->reference->url;
         });
     }
 

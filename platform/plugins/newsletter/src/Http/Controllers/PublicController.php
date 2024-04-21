@@ -7,6 +7,7 @@ use Botble\Base\Http\Controllers\BaseController;
 use Botble\Newsletter\Enums\NewsletterStatusEnum;
 use Botble\Newsletter\Events\SubscribeNewsletterEvent;
 use Botble\Newsletter\Events\UnsubscribeNewsletterEvent;
+use Botble\Newsletter\Forms\Fronts\NewsletterForm;
 use Botble\Newsletter\Http\Requests\NewsletterRequest;
 use Botble\Newsletter\Models\Newsletter;
 use Illuminate\Http\Request;
@@ -16,15 +17,24 @@ class PublicController extends BaseController
 {
     public function postSubscribe(NewsletterRequest $request)
     {
-        /**
-         * @var Newsletter $newsletter
-         */
-        $newsletter = Newsletter::query()->firstOrNew(['email' => $request->input('email')], $request->validated());
+        $newsletterForm = NewsletterForm::create();
+        $newsletterForm->setRequest($request);
 
-        $newsletter->status = NewsletterStatusEnum::SUBSCRIBED;
-        $newsletter->save();
+        $newsletterForm->onlyValidatedData()->saving(function (NewsletterForm $form) {
+            /** @var NewsletterRequest $request */
+            $request = $form->getRequest();
 
-        event(new SubscribeNewsletterEvent($newsletter));
+            $newsletter = $form->getModel()->firstOrNew([
+                'email' => $request->input('email'),
+            ], [
+                ...$form->getRequestData(),
+                'status' => NewsletterStatusEnum::SUBSCRIBED,
+            ]);
+
+            $newsletter->save();
+
+            event(new SubscribeNewsletterEvent($newsletter));
+        });
 
         return $this
             ->httpResponse()

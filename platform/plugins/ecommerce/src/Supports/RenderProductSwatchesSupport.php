@@ -2,6 +2,7 @@
 
 namespace Botble\Ecommerce\Supports;
 
+use Botble\Ecommerce\Facades\EcommerceHelper as EcommerceHelperFacade;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\ProductVariation;
 use Botble\Ecommerce\Models\ProductVariationItem;
@@ -27,7 +28,7 @@ class RenderProductSwatchesSupport
     {
         $params = array_merge([
             'selected' => [],
-            'view' => 'plugins/ecommerce::themes.attributes.swatches-renderer',
+            'view' => EcommerceHelperFacade::viewPath('attributes.swatches-renderer'),
         ], $params);
 
         $product = $this->product;

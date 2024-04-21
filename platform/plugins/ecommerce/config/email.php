@@ -57,6 +57,7 @@ return [
             'variables' => [
                 'customer_name' => 'plugins/ecommerce::ecommerce.customer_name',
                 'order_id' => 'plugins/ecommerce::ecommerce.order_id',
+                'cancellation_reason' => 'plugins/ecommerce::order.order_cancellation_reason',
             ],
         ],
         'customer_delivery_order' => [
@@ -199,6 +200,38 @@ return [
                 'order_note' => 'plugins/ecommerce::ecommerce.order_note',
                 'order_id' => 'plugins/ecommerce::ecommerce.order_id',
                 'digital_product_list' => 'Digital product list',
+            ],
+        ],
+        'customer-deletion-request-confirmation' => [
+            'title' => 'Account deletion confirmation',
+            'description' => 'Send confirmation email to user when they request to delete their account',
+            'subject' => 'Confirm your account deletion request',
+            'can_off' => false,
+            'variables' => [
+                'customer_name' => 'plugins/ecommerce::ecommerce.customer_name',
+                'customer_email' => 'plugins/ecommerce::ecommerce.customer_email',
+                'confirm_url' => 'plugins/ecommerce::account-deletion.confirm_url',
+            ],
+        ],
+        'customer-deletion-request-completed' => [
+            'title' => 'Account deletion completed',
+            'description' => 'Send email to user when their account is deleted',
+            'subject' => 'Account deletion completed',
+            'can_off' => false,
+            'variables' => [
+                'customer_name' => 'plugins/ecommerce::ecommerce.customer_name',
+            ],
+        ],
+        'order-return-status-updated' => [
+            'title' => 'Order return request status updated',
+            'description' => 'Notify the customer when their order return request status is updated',
+            'subject' => 'Your order return request {{ order_id }} has been {{ status }}',
+            'can_off' => true,
+            'variables' => [
+                'customer_name' => 'plugins/ecommerce::ecommerce.customer_name',
+                'order_id' => 'plugins/ecommerce::ecommerce.order_id',
+                'description' => 'core/base::forms.description',
+                'status' => 'core/base::forms.status',
             ],
         ],
     ],

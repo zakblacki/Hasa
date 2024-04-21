@@ -4,7 +4,7 @@ use Botble\Base\Facades\AdminHelper;
 use Illuminate\Support\Facades\Route;
 
 AdminHelper::registerRoutes(function () {
-    Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers'], function () {
+    Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'prefix' => 'ecommerce'], function () {
         Route::group(['prefix' => 'taxes', 'as' => 'tax.'], function () {
             Route::resource('', 'TaxController')->parameters(['' => 'tax']);
 

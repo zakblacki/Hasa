@@ -88,7 +88,7 @@ class MediaFile extends BaseModel
 
     protected function previewUrl(): Attribute
     {
-        return Attribute::get(function (): string|null {
+        return Attribute::get(function (): ?string {
             $preview = null;
 
             switch ($this->type) {
@@ -144,7 +144,7 @@ class MediaFile extends BaseModel
         return $name;
     }
 
-    public static function createSlug(string $name, string $extension, string|null $folderPath): string
+    public static function createSlug(string $name, string $extension, ?string $folderPath): string
     {
         if (setting('media_use_original_name_for_file_path')) {
             $slug = $name;

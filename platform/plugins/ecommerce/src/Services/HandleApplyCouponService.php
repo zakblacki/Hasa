@@ -18,7 +18,7 @@ use Illuminate\Support\Arr;
 
 class HandleApplyCouponService
 {
-    public function execute(string $coupon, array $sessionData = [], array $cartData = [], string|null $prefix = ''): array
+    public function execute(string $coupon, array $sessionData = [], array $cartData = [], ?string $prefix = ''): array
     {
         $token = OrderHelper::getOrderSessionToken();
 
@@ -231,14 +231,14 @@ class HandleApplyCouponService
             }
         }
 
-        if (! $discount->can_use_with_promotion && (float)Arr::get($sessionData, 'promotion_discount_amount')) {
+        if (! $discount->can_use_with_promotion && (float) Arr::get($sessionData, 'promotion_discount_amount')) {
             return [
                 'error' => true,
                 'message' => trans('plugins/ecommerce::discount.cannot_use_same_time_with_other_discount_program'),
             ];
         }
 
-        $rawTotal = (float)Arr::get($sessionData, 'raw_total');
+        $rawTotal = (float) Arr::get($sessionData, 'raw_total');
 
         if (
             in_array($discount->type_option, [DiscountTypeOptionEnum::AMOUNT, DiscountTypeOptionEnum::PERCENTAGE])

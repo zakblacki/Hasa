@@ -48,7 +48,7 @@ class GeneralSettingForm extends SettingForm
                 'colspan' => 3,
             ])
             ->add('store_country', 'customSelect', [
-                'label' => trans('plugins/location::city.country'),
+                'label' => trans('plugins/ecommerce::ecommerce.country'),
                 'selected' => get_ecommerce_setting('store_country'),
                 'choices' => EcommerceHelper::getAvailableCountries(),
                 'attr' => [
@@ -60,7 +60,7 @@ class GeneralSettingForm extends SettingForm
 
         if (EcommerceHelper::loadCountriesStatesCitiesFromPluginLocation()) {
             $this->add('store_state', 'customSelect', [
-                'label' => trans('plugins/location::city.state'),
+                'label' => trans('plugins/ecommerce::ecommerce.state'),
                 'selected' => get_ecommerce_setting('store_state'),
                 'choices' => get_ecommerce_setting('store_country') || ! EcommerceHelper::isUsingInMultipleCountries()
                     ? EcommerceHelper::getAvailableStatesByCountry(get_ecommerce_setting('store_country'))
@@ -73,7 +73,7 @@ class GeneralSettingForm extends SettingForm
             ]);
         } else {
             $this->add('store_state', 'text', [
-                'label' => trans('plugins/location::city.state'),
+                'label' => trans('plugins/ecommerce::ecommerce.state'),
                 'value' => get_ecommerce_setting('store_state'),
                 'colspan' => 1,
             ]);
@@ -81,13 +81,13 @@ class GeneralSettingForm extends SettingForm
 
         if (EcommerceHelper::useCityFieldAsTextField()) {
             $this->add('store_city', 'text', [
-                'label' => trans('plugins/location::city.city'),
+                'label' => trans('plugins/ecommerce::ecommerce.city'),
                 'value' => get_ecommerce_setting('store_city'),
                 'colspan' => 1,
             ]);
         } else {
             $this->add('store_city', 'customSelect', [
-                'label' => trans('plugins/location::city.city'),
+                'label' => trans('plugins/ecommerce::ecommerce.city'),
                 'selected' => get_ecommerce_setting('store_city'),
                 'choices' => get_ecommerce_setting('store_city')
                     ? EcommerceHelper::getAvailableCitiesByState(get_ecommerce_setting('store_state'))

@@ -50,7 +50,7 @@ class MollieController extends BaseController
             $status = PaymentStatusEnum::PENDING;
         }
 
-        $orderIds = (array)$result->metadata->order_id;
+        $orderIds = (array) $result->metadata->order_id;
 
         do_action(PAYMENT_ACTION_PAYMENT_PROCESSED, [
             'amount' => $request->input('amount'),

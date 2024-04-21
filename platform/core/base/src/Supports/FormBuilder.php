@@ -24,7 +24,7 @@ class FormBuilder
 
     protected HtmlBuilder $html;
 
-    protected UrlGenerator|null $url;
+    protected ?UrlGenerator $url;
 
     protected Factory $view;
 
@@ -46,7 +46,7 @@ class FormBuilder
 
     protected array $skipValueTypes = ['file', 'password', 'checkbox', 'radio'];
 
-    protected string|null $type = null;
+    protected ?string $type = null;
 
     protected array $payload;
 
@@ -451,7 +451,7 @@ class FormBuilder
             return $selected->contains($value) ? 'selected' : null;
         }
         if (is_int($value) && is_bool($selected)) {
-            return (bool)$value === $selected;
+            return (bool) $value === $selected;
         }
 
         return ((string) $value === (string) $selected) ? 'selected' : null;
