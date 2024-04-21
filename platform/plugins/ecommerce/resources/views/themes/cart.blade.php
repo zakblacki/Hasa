@@ -1,12 +1,12 @@
-<section class="cart-area pt-50 pb-50">
+<section data-bb-toggle="cart-content" class="cart-area pt-50 pb-50">
     <div class="container">
         @if ($products->isNotEmpty())
             <div class="row">
                 <div class="col-xl-9 col-lg-8">
                     <x-core::form method="POST" :url="route('public.cart.update')" class="mw-100 overflow-x-auto">
                         <div class="cart-list mb-25 mr-30">
-                            <table class="table">
-                                <thead class="bg-secondary-subtle">
+                            <table data-bb-value="cart-table" class="table">
+                                <thead class="table-light">
                                 <tr>
                                     <th colspan="2" class="cart-header-product">{{ __('Product') }}</th>
                                     <th class="cart-header-price">{{ __('Price') }}</th>
@@ -23,7 +23,7 @@
 
                                     @continue(empty($product))
 
-                                    <tr>
+                                    <tr data-bb-value="cart-row-{{ $cartItem->rowId }}">
                                         <input type="hidden" name="items[{{ $key }}][rowId]" value="{{ $cartItem->rowId }}">
 
                                         <td class="cart-img">
@@ -61,22 +61,20 @@
                                                 ['options' => $cartItem->options]
                                             )
                                         </td>
-                                        <td class="cart-price align-middle">
-                                            <span class="fw-medium fs-5">{{ format_price($product->front_sale_price_with_taxes) }}</span>
-                                            @if ($product->isOnSale())
-                                                <del class="text-muted">{{ format_price($product->price_with_taxes) }}</del>
-                                            @endif
+                                        <td data-bb-value="cart-product-price-text" class="cart-price align-middle">
+                                            @include(EcommerceHelper::viewPath('includes.product-price'))
                                         </td>
-                                        <td class="cart-quantity align-middle">
+                                        <td data-bb-value="cart-product-quantity" class="cart-quantity align-middle">
                                             @include(EcommerceHelper::viewPath('includes.cart-quantity'))
                                         </td>
-                                        <td class="cart-total align-middle">
-                                            <span class="fw-medium fs-5">{{ format_price($cartItem->price * $cartItem->qty) }}</span>
+                                        <td data-bb-value="cart-product-total-price" class="cart-total align-middle bb-product-price">
+                                            <span class="bb-product-price-text fw-bold">{{ format_price($cartItem->price * $cartItem->qty) }}</span>
                                         </td>
                                         <td class="cart-action align-middle">
                                             <a
                                                 class="btn btn-danger btn-icon"
-                                                href="{{ route('public.cart.remove', $cartItem->rowId) }}"
+                                                data-url="{{ route('public.cart.remove', $cartItem->rowId) }}"
+                                                data-bb-toggle="remove-from-cart"
                                                 {!! EcommerceHelper::getGtmAttributes('remove-from-cart', $product, ['data-product-quantity' => $cartItem->qty]) !!}
                                             >
                                                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -94,15 +92,14 @@
                                 </tbody>
                             </table>
                         </div>
-                        <button class="btn btn-primary text-end" type="submit">{{ __('Update cart') }}</button>
                     </x-core::form>
                     <div class="cart-bottom mt-4 mb-4">
                         <div class="cart-coupon row">
                             <div class="col-lg-6">
-                                <x-core::form :url="route('public.coupon.apply')" method="post" id="counpon-form">
+                                <x-core::form :url="route('public.coupon.apply')" method="post" data-bb-toggle="coupon-form" id="coupon-form">
                                     <div class="input-group mb-3 w-auto">
                                         <input type="text" class="form-control" name="coupon_code" placeholder="{{ __('Enter Coupon Code') }}" value="{{ BaseHelper::stringify(old('coupon_code', session('applied_coupon_code'))) }}">
-                                        <button class="btn btn-primary" type="submit" @disabled(session('applied_coupon_code'))>{{ __('Apply') }}</button>
+                                        <button data-bb-toggle="coupon-form-btn" class="btn btn-primary" type="submit" @disabled(session('applied_coupon_code'))>{{ __('Apply') }}</button>
                                     </div>
                                 </x-core::form>
                             </div>
@@ -112,13 +109,13 @@
                 <div class="col-xl-3 col-lg-4 col-md-6">
                     <div class="card p-4">
                         <div class="cart-checkout-top d-flex align-items-center justify-content-between pb-2 border-bottom mb-2">
-                            <span class="cart-checkout-top-title fs-5 fw-bold">{{ __('Subtotal') }}</span>
-                            <span class="cart-checkout-top-price fs-5 fw-bold">{{ format_price(Cart::instance('cart')->rawSubTotal()) }}</span>
+                            <span class="cart-checkout-top-title fw-bold">{{ __('Subtotal') }}</span>
+                            <span data-bb-value="cart-subtotal" class="cart-checkout-top-price fw-bold">{{ format_price(Cart::instance('cart')->rawSubTotal()) }}</span>
                         </div>
                         @if (EcommerceHelper::isTaxEnabled())
-                            <div class="cart-checkout-tax d-flex align-items-center justify-content-between mb-2 text-muted">
+                            <div class="cart-checkout-tax d-flex align-items-center justify-content-between mb-2">
                                 <span class="cart-checkout-tax-title">{{ __('Tax') }}</span>
-                                <span class="cart-checkout-tax-price">{{ format_price(Cart::instance('cart')->rawTax()) }}</span>
+                                <span data-bb-value="cart-tax" class="cart-checkout-tax-price">{{ format_price(Cart::instance('cart')->rawTax()) }}</span>
                             </div>
                         @endif
                         @if ($couponDiscountAmount > 0 && session('applied_coupon_code'))
@@ -128,38 +125,34 @@
                                     <span class="small">({{ session('applied_coupon_code') }})</span>
                                     <a class="small btn-link text-danger lh-1" data-bb-toggle="remove-coupon" href="{{ route('public.coupon.remove') }}">{{ __('Remove') }}</a>
                                 </div>
-                                <span>{{ format_price($couponDiscountAmount) }}</span>
+                                <span data-bb-value="cart-coupon-discount-amount">{{ format_price($couponDiscountAmount) }}</span>
                             </div>
                         @endif
                         @if ($promotionDiscountAmount)
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <span>{{ __('Promotion') }}</span>
-                                <span>{{ format_price($promotionDiscountAmount) }}</span>
+                                <span data-bb-value="cart-promotion-discount-amount">{{ format_price($promotionDiscountAmount) }}</span>
                             </div>
                         @endif
                         <div class="cart-checkout-total d-flex align-items-center justify-content-between mt-3 mb-0">
-                            <span class="fs-5 fw-bold">{{ __('Total') }}</span>
-                            <span class="fs-5 fw-bold">{{ ($promotionDiscountAmount + $couponDiscountAmount) > Cart::instance('cart')->rawTotal() ? format_price(0) : format_price(Cart::instance('cart')->rawTotal() - $promotionDiscountAmount - $couponDiscountAmount) }}</span>
+                            <span class="fw-bold mb-1">{{ __('Total') }}</span>
+                            <span data-bb-value="cart-total" class="fw-bold">{{ ($promotionDiscountAmount + $couponDiscountAmount) > Cart::instance('cart')->rawTotal() ? format_price(0) : format_price(Cart::instance('cart')->rawTotal() - $promotionDiscountAmount - $couponDiscountAmount) }}</span>
                         </div>
                         <small class="small">{{ __('(Shipping fees not included)') }}</small>
                         <div class="cart-checkout-proceed mt-3">
-                            <a href="{{ route('public.checkout.information', OrderHelper::getOrderSessionToken()) }}" class="cart-checkout-btn w-100 btn btn-primary">
+                            <a href="{{ route('public.checkout.information', OrderHelper::getOrderSessionToken()) }}" data-bb-toggle="cart-checkout" class="cart-checkout-btn w-100 btn btn-primary">
                                 {{ __('Proceed to Checkout') }}
                             </a>
                         </div>
 
-                        <a href="{{ route('public.products') }}" class="btn-link d-block text-center mt-3">
+                        <a href="{{ route('public.products') }}" data-bb-toggle="continue-shopping" class="btn-link d-block text-center mt-3">
                             {{ __('Continue Shopping') }}
                         </a>
                     </div>
                 </div>
             </div>
         @else
-            <div class="text-center pt-50">
-                <h3 class="mb-3">{{ __('Your cart is empty') }}</h3>
-                <p class="mb-3">{{ __('Explore and add items to get started') }}</p>
-                <a href="{{ route('public.products') }}" class="btn btn-outline-primary btn-sm">{{ __('Start Shopping') }}</a>
-            </div>
+            @include(EcommerceHelper::viewPath('includes.empty-state'))
         @endif
     </div>
 </section>

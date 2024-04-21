@@ -243,7 +243,9 @@ class ProductVariationTable extends TableAbstract
     {
         $columns = [
             CheckboxColumn::make(),
-            IdColumn::make(),
+            IdColumn::make()->getValueUsing(function (IdColumn $column) {
+                return $column->getItem()->product->id;
+            }),
             ImageColumn::make()
                 ->orderable(false)
                 ->searchable(false),

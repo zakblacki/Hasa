@@ -29,7 +29,6 @@ class DatabaseSeeder extends BaseSeeder
             TaxSeeder::class,
             CustomerSeeder::class,
             ReviewSeeder::class,
-            OrderEcommerceSeeder::class,
             ShippingSeeder::class,
             FlashSaleSeeder::class,
             SimpleSliderSeeder::class,

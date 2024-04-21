@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool isCartEnabled()
  * @method static bool isWishlistEnabled()
  * @method static bool isCompareEnabled()
+ * @method static bool isProductInCompare(int|string $productId)
  * @method static bool isReviewEnabled()
  * @method static bool isOrderTrackingEnabled()
  * @method static bool isOrderAutoConfirmedEnabled()
@@ -95,6 +96,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getAdminPrefix()
  * @method static \Illuminate\Routing\RouteRegistrar registerRoutes(\Closure|callable $closure, array $middleware = [])
  * @method static \Illuminate\Routing\RouteRegistrar registerFallbackRoutes(string $prefix)
+ * @method static int getMinimumOrderQuantity()
+ * @method static int getMaximumOrderQuantity()
  *
  * @see \Botble\Ecommerce\Supports\EcommerceHelper
  */

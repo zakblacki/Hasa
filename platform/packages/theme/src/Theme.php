@@ -989,9 +989,11 @@ class Theme implements ThemeContract
 
     public function htmlAttributes(): string
     {
-        $this->addHtmlAttributes([
-            'lang' => str_replace('_', '-', app()->getLocale()),
-        ]);
+        $lang = str_replace('_', '-', app()->getLocale());
+
+        if ($lang) {
+            $this->addHtmlAttributes(['lang' => $lang]);
+        }
 
         return apply_filters('theme_html_attributes', Html::attributes($this->htmlAttributes));
     }

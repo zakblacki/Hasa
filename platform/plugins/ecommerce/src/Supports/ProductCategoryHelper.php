@@ -106,7 +106,7 @@ class ProductCategoryHelper
         return $this->treeCategories;
     }
 
-    public function getTreeCategoriesOptions(array|Collection $categories, array $options = [], string $indent = null): array
+    public function getTreeCategoriesOptions(array|Collection $categories, array $options = [], ?string $indent = null): array
     {
         if (! $categories instanceof Collection) {
             foreach ($categories as $category) {
@@ -135,7 +135,7 @@ class ProductCategoryHelper
         return $options;
     }
 
-    public function renderProductCategoriesSelect(int|string $selected = null): string
+    public function renderProductCategoriesSelect(int|string|null $selected = null): string
     {
         $query = ProductCategory::query()
             ->toBase()
@@ -157,7 +157,7 @@ class ProductCategoryHelper
         ])->render();
     }
 
-    public function getProductCategoriesWithUrl(array $categoryIds = [], array $condition = [], int $limit = null): Collection
+    public function getProductCategoriesWithUrl(array $categoryIds = [], array $condition = [], ?int $limit = null): Collection
     {
         $query = ProductCategory::query()
             ->toBase()
@@ -165,6 +165,7 @@ class ProductCategoryHelper
             ->select([
                 'ec_product_categories.id',
                 'ec_product_categories.name',
+                'ec_product_categories.order',
                 'parent_id',
                 DB::raw('CONCAT(slugs.prefix, "/", slugs.key) as url'),
                 'icon',
@@ -190,7 +191,6 @@ class ProductCategoryHelper
                     );
             })
             ->orderBy('ec_product_categories.order')
-            ->orderByDesc('ec_product_categories.created_at')
             ->when(
                 ! empty($categoryIds),
                 fn (Builder $query) => $query->whereIn('ec_product_categories.id', $categoryIds)

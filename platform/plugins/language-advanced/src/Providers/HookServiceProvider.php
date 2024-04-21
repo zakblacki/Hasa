@@ -40,11 +40,16 @@ class HookServiceProvider extends ServiceProvider
         add_filter('stored_meta_box_key', [$this, 'storeMetaBoxKey'], 1134, 2);
         add_filter('slug_helper_get_slug_query', [$this, 'getSlugQuery'], 1134, 2);
         add_filter(['model_after_execute_get', 'model_after_execute_paginate'], function ($data, BaseModel $model) {
+
+            if ($model instanceof LanguageModel) {
+                return $data;
+            }
+
             if (
                 is_plugin_active('language') &&
                 is_plugin_active('language-advanced') &&
-                Language::getCurrentLocaleCode() != Language::getDefaultLocaleCode() &&
-                LanguageAdvancedManager::isSupported($model)
+                LanguageAdvancedManager::isSupported($model) &&
+                Language::getCurrentLocaleCode() != Language::getDefaultLocaleCode()
             ) {
                 $data->loadMissing('translations');
             }

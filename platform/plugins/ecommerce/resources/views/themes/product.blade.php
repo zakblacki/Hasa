@@ -5,19 +5,22 @@
     @include(EcommerceHelper::viewPath('includes.product-detail'))
 
     <div class="card product-detail-tabs mt-5">
-        <ul class="nav nav-pills nav-fill product-content-tabs p-4 pb-0">
+        <ul class="nav nav-pills nav-fill bb-product-content-tabs p-4 pb-0">
             <li class="nav-item">
                 <a class="nav-link active" data-bs-toggle="tab" aria-current="page" href="#tab_description">{{ __('Description') }}</a>
             </li>
 
             @if (EcommerceHelper::isReviewEnabled())
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#tab_reviews">{{ __('Reviews') }}</a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab_reviews">{{ __('Reviews :number', [
+                        'number' => $product->reviews_count > 1 ? sprintf('(%s)', $product->reviews_count) : null
+                    ]) }}
+                    </a>
                 </li>
             @endif
         </ul>
 
-        <div class="product-content-tabs-wrapper tab-content container p-4">
+        <div class="bb-product-content-tabs-wrapper tab-content container p-4">
             <div
                 class="tab-pane fade in active show"
                 id="tab_description"

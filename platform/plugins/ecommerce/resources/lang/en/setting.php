@@ -134,6 +134,10 @@ return [
                 'max' => 'Maximum number of customer recently viewed products',
                 'max_helper' => 'If you set 0, it will save all products.',
             ],
+            'minimum_order_quantity' => 'Minimum order quantity',
+            'minimum_order_quantity_helper' => 'Minimum quantity to place an order. Let it is 0 if you do not want to set it.',
+            'maximum_order_quantity' => 'Maximum order quantity',
+            'maximum_order_quantity_helper' => 'Maximum quantity to place an order. Let it is 0 if you do not want to set it.',
         ],
     ],
     'return' => [

@@ -8,6 +8,7 @@ use Botble\Base\Forms\FieldOptions\ContentFieldOption;
 use Botble\Base\Forms\FieldOptions\EditorFieldOption;
 use Botble\Base\Forms\FieldOptions\MediaImageFieldOption;
 use Botble\Base\Forms\FieldOptions\NameFieldOption;
+use Botble\Base\Forms\FieldOptions\NumberFieldOption;
 use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\StatusFieldOption;
@@ -15,6 +16,7 @@ use Botble\Base\Forms\Fields\EditorField;
 use Botble\Base\Forms\Fields\MediaImageField;
 use Botble\Base\Forms\Fields\MediaImagesField;
 use Botble\Base\Forms\Fields\MultiCheckListField;
+use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\OnOffField;
 use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TagField;
@@ -182,6 +184,27 @@ class ProductForm extends FormAbstract
                         'value' => old('taxes', $selectedTaxes),
                     ]);
                 }
+            })
+            ->when(EcommerceHelper::isCartEnabled(), function (ProductForm $form) {
+                $form
+                    ->add(
+                        'minimum_order_quantity',
+                        NumberField::class,
+                        NumberFieldOption::make()
+                            ->label(trans('plugins/ecommerce::products.form.minimum_order_quantity'))
+                            ->helperText(trans('plugins/ecommerce::products.form.minimum_order_quantity_helper'))
+                            ->defaultValue(0)
+                            ->toArray()
+                    )
+                    ->add(
+                        'maximum_order_quantity',
+                        NumberField::class,
+                        NumberFieldOption::make()
+                            ->label(trans('plugins/ecommerce::products.form.maximum_order_quantity'))
+                            ->helperText(trans('plugins/ecommerce::products.form.maximum_order_quantity_helper'))
+                            ->defaultValue(0)
+                            ->toArray()
+                    );
             })
             ->add('tag', TagField::class, [
                 'label' => trans('plugins/ecommerce::products.form.tags'),

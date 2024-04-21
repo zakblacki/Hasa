@@ -2,32 +2,8 @@
 
 namespace Database\Seeders;
 
-use Botble\Ecommerce\Models\ProductLabel;
-use Illuminate\Database\Seeder;
+use Botble\Ecommerce\Database\Seeders\ProductLabelSeeder as BaseProductLabelSeeder;
 
-class ProductLabelSeeder extends Seeder
+class ProductLabelSeeder extends BaseProductLabelSeeder
 {
-    public function run(): void
-    {
-        ProductLabel::query()->truncate();
-
-        $productCollections = [
-            [
-                'name' => 'Hot',
-                'color' => '#ec2434',
-            ],
-            [
-                'name' => 'New',
-                'color' => '#00c9a7',
-            ],
-            [
-                'name' => 'Sale',
-                'color' => '#fe9931',
-            ],
-        ];
-
-        foreach ($productCollections as $item) {
-            ProductLabel::query()->create($item);
-        }
-    }
 }
