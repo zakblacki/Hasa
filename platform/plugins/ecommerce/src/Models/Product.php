@@ -98,8 +98,7 @@ class Product extends BaseModel
         'details_d_article_anglais',
         'duree_de_livraison',
         'size',
-        'images_for_website'
-
+        'images_for_website',
         'minimum_order_quantity',
         'maximum_order_quantity',
     ];
