@@ -386,8 +386,7 @@ body,
 .select--arrow {
     position: relative;
 
-    i,
-    svg {
+    i, svg {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
@@ -662,8 +661,7 @@ body,
         border-bottom-right-radius: 0;
     }
 
-    .remove-coupon-code,
-    .apply-coupon-code {
+    .remove-coupon-code, .apply-coupon-code {
         padding: 0.25rem 0.75rem;
         cursor: pointer;
         transition: 0.2s all;

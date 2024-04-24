@@ -15,7 +15,6 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 class ThemeService
 {
@@ -70,8 +69,37 @@ class ThemeService
         }
 
         if (! empty($inheritTheme)) {
-            $this->copyThemeOptions($theme);
-            $this->copyThemeWidgets($theme);
+            $themeOptions = ThemeOption::getOptions();
+
+            if (! empty($themeOptions)) {
+                $copiedOptions = [];
+                foreach ($themeOptions as $key => $option) {
+                    $key = str_replace(ThemeOption::getOptionKey(''), 'theme-' . $theme . '-', $key);
+                    $copiedOptions[] = [
+                        'key' => $key,
+                        'value' => $option,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ];
+                }
+
+                Setting::query()
+                    ->insertOrIgnore($copiedOptions);
+
+                $copiedWidgets = Widget::query()
+                    ->where('theme', $inheritTheme)
+                    ->get()
+                    ->toArray();
+
+                foreach ($copiedWidgets as $key => $widget) {
+                    $copiedWidgets[$key]['theme'] = $theme;
+                    $copiedWidgets[$key]['data'] = json_encode($widget['data']);
+                    unset($copiedWidgets[$key]['id']);
+                }
+
+                Widget::query()
+                    ->insertOrIgnore($copiedWidgets);
+            }
         }
 
         Theme::setThemeName($theme);
@@ -92,66 +120,6 @@ class ThemeService
             'error' => false,
             'message' => trans('packages/theme::theme.active_success', ['name' => $theme]),
         ];
-    }
-
-    public function copyThemeOptions(string $theme): void
-    {
-        $fromTheme = setting('theme');
-
-        if ($fromTheme === $theme) {
-            return;
-        }
-
-        $themeOptions = ThemeOption::getOptions();
-
-        $themeOptions = collect($themeOptions)
-            ->filter(
-                fn (mixed $value, string $key) => Str::startsWith($key, 'theme-' . $fromTheme . '-')
-            )
-            ->toArray();
-
-        $copiedThemeOptions = [];
-
-        $now = Carbon::now();
-
-        foreach ($themeOptions as $key => $option) {
-            $key = str_replace('theme-' . $fromTheme . '-', 'theme-' . $theme . '-', $key);
-
-            $copiedThemeOptions[] = [
-                'key' => $key,
-                'value' => $option,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ];
-        }
-
-        if (! empty($copiedThemeOptions)) {
-            Setting::query()
-                ->insertOrIgnore($copiedThemeOptions);
-        }
-    }
-
-    public function copyThemeWidgets(string $theme): void
-    {
-        $fromTheme = setting('theme');
-
-        if ($fromTheme === $theme) {
-            return;
-        }
-
-        $copiedWidgets = Widget::query()
-            ->where('theme', $fromTheme)
-            ->get()
-            ->toArray();
-
-        foreach ($copiedWidgets as $key => $widget) {
-            $copiedWidgets[$key]['theme'] = $theme;
-            $copiedWidgets[$key]['data'] = json_encode($widget['data']);
-            unset($copiedWidgets[$key]['id']);
-        }
-
-        Widget::query()
-            ->insertOrIgnore($copiedWidgets);
     }
 
     protected function validate(string $theme): array

@@ -1,9 +1,9 @@
 @extends(EcommerceHelper::viewPath('customers.master'))
 
-@section('title', SeoHelper::getTitle())
-
 @section('content')
     @include(EcommerceHelper::viewPath('customers.product-reviews.icons'))
+
+    <h3 class="customer-page-title mb-4">{{ SeoHelper::getTitle() }}</h3>
 
     <div class="product-reviews-page">
         <ul class="nav nav-tabs nav-fill" role="tablist">

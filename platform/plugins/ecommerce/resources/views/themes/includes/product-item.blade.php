@@ -2,50 +2,46 @@
     $isConfigurable = $product->variations()->count() > 0;
 @endphp
 
-<div class="card bb-product-item">
-    <a title="{{ $product->name }}" href="{{ $product->url }}">
-        <div class="wrapper">
-            <div class="image">
-                {!! RvMedia::image($product->image, $product->name, 'product-thumb', attributes: ['class' => 'card-img-top']) !!}
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="card-title product-name fw-bold mb-3" >
-                <a class="text-black" title="{{ $product->name }}" href="{{ $product->url }}">{{ $product->name }}</a>
-            </div>
-
-            @include(EcommerceHelper::viewPath('includes.product-price'))
-
-            @if(EcommerceHelper::isReviewEnabled())
-                @include(EcommerceHelper::viewPath('includes.rating'))
-            @endif
-
-            <div class="product-add-cart-btn-large-wrapper">
-                @if (EcommerceHelper::isCartEnabled())
-                    <button
-                        type="button"
-                        class="btn btn-primary bb-btn-product-actions-icon"
-                        @if($isConfigurable)
-                            data-bb-toggle="quick-shop"
-                            data-url="{{ route('public.ajax.quick-shop', $product->slug) }}"
-                        @else
-                            data-bb-toggle="add-to-cart"
-                            data-url="{{ route('public.cart.add-to-cart') }}"
-                            data-id="{{ $product->original_product->id }}"
-                            {!! EcommerceHelper::getGtmAttributes('add-to-cart', $product) !!}
-                        @endif
-                    >
-                        <x-core::icon name="ti ti-shopping-cart"/>
-                        <span class="tp-product-tooltip tp-product-tooltip-right">
-                            @if ($isConfigurable)
-                                {{ __('Select Options') }}
-                            @else
-                                {{ __('Add To Cart') }}
-                            @endif
-                </span>
-                    </button>
-                @endif
-            </div>
-        </div>
+<div class="card product-item">
+    <a href="{{ $product->url }}">
+        {!! RvMedia::image($product->image, $product->name, 'product-thumb', attributes: ['class' => 'card-img-top']) !!}
     </a>
+    <div class="card-body">
+        <div class="card-title product-name fw-bold fs-5 mb-3" >
+            <a class="text-black" title="{{ $product->name }}" href="{{ $product->url }}">{{ $product->name }}</a>
+        </div>
+
+        <div class="product-price-wrapper mb-3">
+            <span class="product-price new-price h5 fw-bold text-primary">{{ format_price($product->front_sale_price_with_taxes) }}</span>
+            @if ($product->isOnSale())
+                <span class="product-price old-price text-black-50 ms-1 fw-medium"><del>{{ format_price($product->price_with_taxes) }}</del></span>
+            @endif
+        </div>
+
+        @if(EcommerceHelper::isReviewEnabled())
+            @include(EcommerceHelper::viewPath('includes.rating'))
+        @endif
+
+        <div class="product-add-cart-btn-large-wrapper">
+            @if(!$isConfigurable)
+                <a
+                    class=" btn btn-primary"
+                    href="{{ route('public.cart.add-to-cart', $product->id) }}"
+                >
+                    <x-core::icon name="ti ti-eye"/>
+
+                    {{ __('Buy') }}
+                </a>
+            @else
+                <a
+                    class=" btn btn-primary"
+                    href="{{ $product->url }}"
+                >
+                    <x-core::icon name="ti ti-eye"/>
+
+                    {{ __('View') }}
+                </a>
+            @endif
+        </div>
+    </div>
 </div>

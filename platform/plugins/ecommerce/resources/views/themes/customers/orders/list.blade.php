@@ -1,8 +1,8 @@
 @extends(EcommerceHelper::viewPath('customers.master'))
 
-@section('title', __('Orders'))
-
 @section('content')
+    <h2 class="customer-page-title mb-4">{{ __('Orders') }}</h2>
+
     <div class="table-responsive customer-list-order">
         <table class="table table-bordered table-striped">
             <thead>
@@ -53,4 +53,4 @@
 
         {!! $orders->links() !!}
     </div>
-@stop
+@endsection

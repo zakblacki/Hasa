@@ -1,7 +1,5 @@
 @extends(EcommerceHelper::viewPath('customers.master'))
 
-@section('title', __('Overview'))
-
 @section('content')
     @php
         $customer = auth('customer')->user();

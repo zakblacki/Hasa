@@ -16,9 +16,7 @@ use Botble\Ecommerce\Services\HandleApplyCouponService;
 use Botble\Ecommerce\Services\HandleApplyPromotionsService;
 use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\Theme\Facades\Theme;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Route;
 use Throwable;
 
 class PublicCartController extends BaseController
@@ -34,8 +32,8 @@ class PublicCartController extends BaseController
         $promotionDiscountAmount = 0;
         $couponDiscountAmount = 0;
 
-        $products = new Collection();
-        $crossSellProducts = new Collection();
+        $products = collect();
+        $crossSellProducts = collect();
 
         if (Cart::instance('cart')->isNotEmpty()) {
             [$products, $promotionDiscountAmount, $couponDiscountAmount] = $this->getCartData();
@@ -43,7 +41,7 @@ class PublicCartController extends BaseController
             $crossSellProducts = get_cart_cross_sale_products(
                 $products->pluck('original_product.id')->all(),
                 (int) theme_option('number_of_cross_sale_product', 4)
-            ) ?: new Collection();
+            ) ?: collect();
         }
 
         SeoHelper::setTitle(__('Shopping Cart'));
@@ -327,29 +325,10 @@ class PublicCartController extends BaseController
 
     protected function getDataForResponse(): array
     {
-        $cartContent = null;
-
-        $cartData = $this->getCartData();
-
-        [$products, $promotionDiscountAmount, $couponDiscountAmount] = $cartData;
-
-        if (Route::is('public.cart.*')) {
-            $crossSellProducts = get_cart_cross_sale_products(
-                $products->pluck('original_product.id')->all(),
-                (int) theme_option('number_of_cross_sale_product', 4)
-            ) ?: collect();
-
-            $cartContent = view(
-                EcommerceHelper::viewPath('cart'),
-                compact('products', 'promotionDiscountAmount', 'couponDiscountAmount', 'crossSellProducts')
-            )->render();
-        }
-
         return apply_filters('ecommerce_cart_data_for_response', [
             'count' => Cart::instance('cart')->count(),
             'total_price' => format_price(Cart::instance('cart')->rawSubTotal()),
             'content' => Cart::instance('cart')->content(),
-            'cart_content' => $cartContent,
-        ], $cartData);
+        ], $this->getCartData());
     }
 }

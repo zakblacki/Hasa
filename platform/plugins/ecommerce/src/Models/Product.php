@@ -26,11 +26,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -73,8 +70,15 @@ class Product extends BaseModel
         'type_de_taille',
         'type_de_tissu',
         'coupe_pantalon',
+        'contenu_de_paquet',
+        'type_dencolure',
+        'type_des_manches',
+        'zone_dutilisation',
+        'modele',
+        'longueur_des_manches',
+        'product_id',
         'longueur',
-        'coupe_silhouette',
+        'coupe_silouhette',
         'motif',
         'couleur',
         'poche',
@@ -89,18 +93,16 @@ class Product extends BaseModel
         'sizes_exist',
         'sizes_not_exist',
         'brand_codeid',
-        'nom_d_article_anglais',
-        'nom_d_article_arabe',
+        'nom_darticle_anglais',
+        'nom_darticle_arabe',
         'product_details_attr',
         'product_details_attr_ar',
         'product_details_attr_en',
-        'details_d_article_arabe',
-        'details_d_article_anglais',
+        'details_darticle_arabe',
+        'details_darticle_anglais',
         'duree_de_livraison',
         'size',
-        'images_for_website',
-        'minimum_order_quantity',
-        'maximum_order_quantity',
+        'images_for_website'
     ];
 
     protected $appends = [
@@ -120,10 +122,8 @@ class Product extends BaseModel
         'sale_type' => 'int',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
-        'minimum_order_quantity' => 'int',
-        'maximum_order_quantity' => 'int',
     ];
-
+    
     protected float $originalPrice = 0;
 
     protected float $finalPrice = 0;
@@ -163,11 +163,7 @@ class Product extends BaseModel
                 Product::query()
                     ->whereIn('id', $product->variations()->pluck('product_id')->all())
                     ->where('is_variation', 1)
-                    ->update([
-                        'name' => $product->name,
-                        'minimum_order_quantity' => $product->minimum_order_quantity,
-                        'maximum_order_quantity' => $product->maximum_order_quantity,
-                    ]);
+                    ->update(['name' => $product->name]);
             }
 
             EcommerceHelper::clearProductMaxPriceCache();
@@ -343,13 +339,13 @@ class Product extends BaseModel
     protected function images(): Attribute
     {
         return Attribute::make(
-            get: function (?string $value): array {
+            get: function (string|null $value): array {
                 try {
                     if ($value === '[null]') {
                         return [];
                     }
 
-                    $images = json_decode((string) $value, true);
+                    $images = json_decode((string)$value, true);
 
                     if (is_array($images)) {
                         $images = array_filter($images);
@@ -366,7 +362,7 @@ class Product extends BaseModel
     protected function image(): Attribute
     {
         return Attribute::make(
-            get: function (?string $value) {
+            get: function (string|null $value) {
                 $firstImage = Arr::first($this->images) ?: null;
 
                 if ($this->is_variation) {
@@ -395,7 +391,7 @@ class Product extends BaseModel
     protected function stockStatusLabel(): Attribute
     {
         return Attribute::make(
-            get: function (): ?string {
+            get: function (): string|null {
                 if ($this->with_storehouse_management) {
                     return $this->isOutOfStock() ? StockStatusEnum::OUT_OF_STOCK()->label() : StockStatusEnum::IN_STOCK()
                         ->label();
@@ -409,7 +405,7 @@ class Product extends BaseModel
     protected function stockStatusHtml(): Attribute
     {
         return Attribute::make(
-            get: function (): ?string {
+            get: function (): string|null {
                 if ($this->with_storehouse_management) {
                     return $this->isOutOfStock() ? StockStatusEnum::OUT_OF_STOCK()->toHtml() : StockStatusEnum::IN_STOCK()
                         ->toHtml();
@@ -429,15 +425,6 @@ class Product extends BaseModel
                 }
 
                 return $this->variationInfo->id ? $this->variationInfo->configurableProduct : $this;
-            }
-        );
-    }
-
-    protected function hasVariations(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
-                return (bool) $this->defaultVariation->id;
             }
         );
     }
@@ -559,7 +546,7 @@ class Product extends BaseModel
 
     protected function frontSalePriceWithTaxes(): Attribute
     {
-        return Attribute::get(function (): ?float {
+        return Attribute::get(function (): float|null {
             if (! EcommerceHelper::isDisplayProductIncludingTaxes()) {
                 return $this->front_sale_price;
             }
@@ -570,7 +557,7 @@ class Product extends BaseModel
 
     protected function priceWithTaxes(): Attribute
     {
-        return Attribute::get(function (): ?float {
+        return Attribute::get(function (): float|null {
             if (! EcommerceHelper::isDisplayProductIncludingTaxes()) {
                 return $this->price;
             }
@@ -651,7 +638,7 @@ class Product extends BaseModel
         return Attribute::get(function () {
             $this->loadMissing('metadata');
 
-            $faqs = (array) $this->getMetaData('faq_schema_config', true);
+            $faqs = (array)$this->getMetaData('faq_schema_config', true);
 
             if (is_plugin_active('faq')) {
                 $selectedExistingFaqs = $this->getMetaData('faq_ids', true);
@@ -701,7 +688,7 @@ class Product extends BaseModel
     protected function reviewImages(): Attribute
     {
         return Attribute::get(fn () => $this->reviews->sortByDesc('created_at')->reduce(function ($carry, $item) {
-            return array_merge($carry, (array) $item->images);
+            return array_merge($carry, (array)$item->images);
         }, []));
     }
 
@@ -782,7 +769,7 @@ class Product extends BaseModel
         return $this->front_sale_price !== $this->price;
     }
 
-    public function generateSku(): ?string
+    public function generateSku(): string|null
     {
         if (
             ! get_ecommerce_setting('auto_generate_product_sku', true) ||
@@ -827,7 +814,7 @@ class Product extends BaseModel
         return $this->originalPrice;
     }
 
-    public function setOriginalPrice(?float $price): static
+    public function setOriginalPrice(float|null $price): static
     {
         $this->originalPrice = (float) $price;
 
@@ -839,41 +826,10 @@ class Product extends BaseModel
         return $this->finalPrice;
     }
 
-    public function setFinalPrice(?float $price): static
+    public function setFinalPrice(float|null $price): static
     {
         $this->finalPrice = (float) $price;
 
         return $this;
-    }
-
-    public static function getGroupedVariationQuery(): QueryBuilder
-    {
-        return self::query()
-            ->toBase()
-            ->select([
-                'ec_products.id',
-                'ec_products.name',
-                'ec_products.sku',
-                'ec_products.is_variation',
-                'ec_product_variations.configurable_product_id as parent_product_id',
-                'variation_attributes' => DB::table('ec_product_variations')
-                    ->selectRaw("GROUP_CONCAT(ec_product_attribute_sets.title, ': ', ec_product_attributes.title SEPARATOR ', ')")
-                    ->whereColumn('ec_products.id', 'ec_product_variations.product_id')
-                    ->leftJoin('ec_product_variation_items', 'ec_product_variation_items.variation_id', '=', 'ec_product_variations.id')
-                    ->leftJoin('ec_product_attributes', 'ec_product_attributes.id', '=', 'ec_product_variation_items.attribute_id')
-                    ->leftJoin('ec_product_attribute_sets', 'ec_product_attribute_sets.id', '=', 'ec_product_attributes.attribute_set_id')
-                    ->groupBy('product_id'),
-                'variations_count' => DB::table('ec_product_variations')
-                    ->selectRaw('COUNT(*)')
-                    ->whereColumn('ec_products.id', 'ec_product_variations.configurable_product_id')
-                    ->groupBy('configurable_product_id'),
-            ])
-            ->leftJoin('ec_product_variations', function (JoinClause $join) {
-                $join
-                    ->on('ec_products.id', '=', 'ec_product_variations.product_id')
-                    ->where('ec_products.is_variation', 1);
-            })
-            ->orderBy('name')
-            ->orderBy('parent_product_id');
     }
 }

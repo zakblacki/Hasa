@@ -18,7 +18,9 @@
                                 @foreach ($productImages as $img)
                                     <div class="item">
                                         <a href="{{ RvMedia::getImageUrl($img) }}">
+                                          <div class="zoom">
                                             <img src="{{ RvMedia::getImageUrl($img) }}" alt="{{ $product->name }}" loading="lazy" />
+                                          </div>
                                         </a>
                                     </div>
                                 @endforeach
@@ -144,8 +146,6 @@
                         <figcaption>{{ __('Share') }}:</figcaption>
                         <ul class="list--social">
                             <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}&title={{ rawurldecode(strip_tags(SeoHelper::getDescription())) }}" target="_blank" title="{{ __('Share on Facebook') }}"><i class="feather icon icon-facebook"></i></a></li>
-                            <li><a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ rawurldecode(strip_tags(SeoHelper::getDescription())) }}" target="_blank" title="{{ __('Share on Twitter') }}"><i class="feather icon icon-twitter"></i></a></li>
-                            <li><a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(url()->current()) }}&summary={{ rawurldecode(strip_tags(SeoHelper::getDescription())) }}&source=Linkedin" title="{{ __('Share on Linkedin') }}" target="_blank"><i class="feather icon icon-linkedin"></i></a></li>
                             <li><a href="https://wa.me/?text={{ urlencode(url()->current()) }}" title="{{ __('Share on WhatsApp') }}" target="_blank"><i class="fa fa-whatsapp"></i></a></li>
                         </ul>
                     </figure>
@@ -153,7 +153,7 @@
             </div>
             <hr style="margin-top: 2%">
 
-            @if (!empty($product->type_de_taille) || !empty($product->type_de_tissu) || !empty($product->coupe_pantalon) || !empty($product->longueur) || !empty($product->coupe_silhouette) || !empty($product->motif) || !empty($product->couleur) || !empty($product->poche) || !empty($product->type_de_produit) || !empty($product->taille) || !empty($product->grandes_occasions) || !empty($product->personnage) || !empty($product->matiere) || !empty($product->duree_de_livraison))
+            @if (!empty($product->type_de_taille) || !empty($product->type_de_tissu) || !empty($product->type_dencolure) || !empty($product->type_des_manches) || !empty($product->modele) || !empty($product->type_de_tissu) || !empty($product->longueur_des_manches) || !empty($product->coupe_pantalon) || !empty($product->longueur) || !empty($product->coupe_silouhette) || !empty($product->motif) || !empty($product->couleur) || !empty($product->poche) || !empty($product->type_de_produit) || !empty($product->taille) || !empty($product->grandes_occasions) || !empty($product->personnage) || !empty($product->matiere) || !empty($product->duree_de_livraison))
             <div style="margin-top: 4%; margin-bottom: 3%">
                 <h4>{{trans('Product Features')}}</h4>
                 <div class="row" style="margin-top: 2%">
@@ -183,16 +183,28 @@
                                 <td><b>{{$product->longueur}}</b></td>
                             </tr>
                             @endif
-                            @if (!empty($product->coupe_silhouette))
+                            @if (!empty($product->coupe_silouhette))
                             <tr>
                                 <th>{{trans('Silhouette Cut')}}</th>
-                                <td><b>{{$product->coupe_silhouette}}</b></td>
+                                <td><b>{{$product->coupe_silouhette}}</b></td>
                             </tr>
                             @endif
                             @if (!empty($product->motif))
                             <tr>
                                 <th>{{trans('Pattern')}}</th>
                                 <td><b>{{$product->motif}}</b></td>
+                            </tr>
+                            @endif
+            			    @if (!empty($product->type_dencolure))
+                            <tr>
+                                <th>{{trans('Type encolure')}}</th>
+                                <td><b>{{$product->type_dencolure}}</b></td>
+                            </tr>
+                            @endif
+	            		    @if (!empty($product->type_des_manches))
+                            <tr>
+                                <th>{{trans('Type de manche')}}</th>
+                                <td><b>{{$product->type_des_manches}}</b></td>
                             </tr>
                             @endif
                             @if (!empty($product->couleur))
@@ -239,6 +251,18 @@
                             <tr>
                                 <th>{{trans('Matter')}}</th>
                                 <td><b>{{$product->matiere}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->modele))
+                            <tr>
+                                <th>{{trans('Modèle')}}</th>
+                                <td><b>{{$product->modele}}</b></td>
+                            </tr>
+                            @endif
+			                @if (!empty($product->type_de_tissu))
+                            <tr>
+                                <th>{{trans('Type de tissu')}}</th>
+                                <td><b>{{$product->type_de_tissu}}</b></td>
                             </tr>
                             @endif
                             @if (!empty($product->duree_de_livraison))

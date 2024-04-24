@@ -20,8 +20,4 @@ return [
         'flag' => 'systems.cronjob',
         'parent_flag' => 'core.system',
     ],
-    [
-        'name' => 'Tools',
-        'flag' => 'core.tools',
-    ],
 ];

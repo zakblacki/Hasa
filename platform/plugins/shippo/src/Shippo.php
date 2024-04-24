@@ -552,17 +552,18 @@ class Shippo
                 $city = Location::getCityById($cityId);
                 if ($city) {
                     $addr['city'] = $city->name;
-                    $addr['state'] = $city->state->abbreviation ?: $city->state->name;
+                    $addr['state'] = $city->state->abbreviation;
                     $addr['country'] = $city->state->country->code;
                 }
             } else {
                 $state = State::query()->find($addr['state']);
 
                 if ($state) {
-                    $addr['state'] = $state->abbreviation ?: $state->name;
+                    $addr['state'] = $state->abbreviation;
                     $addr['country'] = $state->country->code;
                 }
             }
+
         }
 
         return $addr;

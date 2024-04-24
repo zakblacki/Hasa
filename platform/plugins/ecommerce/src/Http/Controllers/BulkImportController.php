@@ -56,6 +56,7 @@ class BulkImportController extends BaseController
                 'total_error' => $this->validateProductImport->errors()->count(),
                 'failures' => $this->validateProductImport->failures(),
             ];
+           
 
             $message = trans('plugins/ecommerce::bulk-import.import_failed_description');
 
@@ -78,6 +79,7 @@ class BulkImportController extends BaseController
             'failures' => $this->productImport->failures(),
             'successes' => $this->productImport->successes(),
         ];
+        
 
         $message = trans('plugins/ecommerce::bulk-import.imported_successfully');
 

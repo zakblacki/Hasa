@@ -47,15 +47,13 @@ class PublicController extends BaseController
                 ->pluck('value')
                 ->all();
 
-            if (! empty($badWords)) {
+            if (count($badWords)) {
                 return $this
                     ->httpResponse()
                     ->setError()
                     ->setMessage(__('Your message contains blacklist words: ":words".', ['words' => implode(', ', $badWords)]));
             }
         }
-
-        do_action('form_extra_fields_validate', $request, ContactForm::class);
 
         $receiverEmails = null;
 
