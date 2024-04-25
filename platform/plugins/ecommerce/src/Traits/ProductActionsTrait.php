@@ -68,6 +68,8 @@ trait ProductActionsTrait
                 $productRelatedToVariation->status = $product->status;
                 $productRelatedToVariation->brand_id = $product->brand_id;
                 $productRelatedToVariation->is_variation = 1;
+                $productRelatedToVariation->minimum_order_quantity = $product->minimum_order_quantity;
+                $productRelatedToVariation->maximum_order_quantity = $product->maximum_order_quantity;
 
                 $productRelatedToVariation->sku = Arr::get($version, 'sku');
                 if (! $productRelatedToVariation->sku && Arr::get($version, 'auto_generate_sku')) {

@@ -8,6 +8,10 @@ if (! defined('BASE_FILTER_GET_LIST_DATA')) {
     define('BASE_FILTER_GET_LIST_DATA', 'get_list_data');
 }
 
+if (! defined('BASE_FILTER_GET_LIST_DATA_FOR_QUERY_TABLE')) {
+    define('BASE_FILTER_GET_LIST_DATA_FOR_QUERY_TABLE', 'get_list_data_for_query_table');
+}
+
 if (! defined('BASE_FILTER_TABLE_BUTTONS')) {
     define('BASE_FILTER_TABLE_BUTTONS', 'base_filter_table_buttons');
 }

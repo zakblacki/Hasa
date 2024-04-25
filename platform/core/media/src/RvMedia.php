@@ -409,6 +409,8 @@ class RvMedia
         ?string $folderSlug = null,
         bool $skipValidation = false
     ): array {
+        $fileUpload = apply_filters('core_media_file_upload', $fileUpload);
+
         $request = request();
 
         if ($uploadPath = $request->input('path')) {
@@ -487,10 +489,9 @@ class RvMedia
 
             $file = new MediaFile();
 
-            $file->name = MediaFile::createName(
-                File::name($fileUpload->getClientOriginalName()),
-                $folderId
-            );
+            $fileName = apply_filters('core_media_upload_filename', File::name($fileUpload->getClientOriginalName()), $fileUpload);
+
+            $file->name = MediaFile::createName($fileName, $folderId);
 
             $folderPath = MediaFolder::getFullPath($folderId);
 
@@ -531,7 +532,13 @@ class RvMedia
 
             MediaFileUploaded::dispatch($file);
 
-            $this->generateThumbnails($file, $fileUpload);
+            do_action('core_media_file_uploaded', $file);
+
+            $customizedGeneratedThumbnails = apply_filters('core_media_customized_generate_thumbnails_function', null);
+
+            if (! $customizedGeneratedThumbnails) {
+                $this->generateThumbnails($file, $fileUpload);
+            }
 
             return [
                 'error' => false,
@@ -611,11 +618,17 @@ class RvMedia
                 $fileUpload = $this->getRealPath($file->url);
             }
 
+            $thumbnailPath = File::name($file->url) . '-' . $size . '.' . File::extension($file->url);
+
+            if (Storage::exists($thumbnailPath)) {
+                continue;
+            }
+
             $this->thumbnailService
                 ->setImage($fileUpload)
                 ->setSize($readableSize[0], $readableSize[1])
                 ->setDestinationPath(File::dirname($file->url))
-                ->setFileName(File::name($file->url) . '-' . $size . '.' . File::extension($file->url))
+                ->setFileName($thumbnailPath)
                 ->save();
         }
 
@@ -636,13 +649,19 @@ class RvMedia
 
         $watermarkPath = $this->getRealPath($watermarkImage);
 
-        if (! File::exists($watermarkPath)) {
-            return false;
+        if ($this->isUsingCloud()) {
+            $watermark = $this->imageManager()->read(file_get_contents($watermarkPath));
+
+            $imageSource = $this->imageManager()->read(file_get_contents($this->getRealPath($image)));
+        } else {
+            if (! Storage::exists($watermarkPath)) {
+                return false;
+            }
+
+            $watermark = $this->imageManager()->read($watermarkPath);
+
+            $imageSource = $this->imageManager()->read($this->getRealPath($image));
         }
-
-        $watermark = $this->imageManager()->read($watermarkPath);
-
-        $imageSource = $this->imageManager()->read($this->getRealPath($image));
 
         // 10% less than an actual image (play with this value)
         // Watermark will be 10 less than the actual width of the image

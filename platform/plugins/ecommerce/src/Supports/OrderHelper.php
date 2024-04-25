@@ -17,6 +17,7 @@ use Botble\Ecommerce\Events\OrderCompletedEvent;
 use Botble\Ecommerce\Events\OrderPaymentConfirmedEvent;
 use Botble\Ecommerce\Events\OrderPlacedEvent;
 use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
+use Botble\Ecommerce\Exceptions\ProductIsNotActivatedYetException;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\Discount;
 use Botble\Ecommerce\Facades\EcommerceHelper;
@@ -491,7 +492,7 @@ class OrderHelper
     public function handleAddCart(Product $product, Request $request): array
     {
         if ($product->status != BaseStatusEnum::PUBLISHED) {
-            throw new Exception(__('Product is not published yet.'));
+            throw new ProductIsNotActivatedYetException();
         }
 
         $parentProduct = $product->original_product;

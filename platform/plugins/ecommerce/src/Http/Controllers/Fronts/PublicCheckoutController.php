@@ -649,6 +649,33 @@ class PublicCheckoutController extends BaseController
                 ->setMessage(__('Your shopping cart has digital product(s), so you need to sign in to continue!'));
         }
 
+        $totalQuality = Cart::instance('cart')->rawTotalQuantity();
+
+        if (($minimumQuantity = EcommerceHelper::getMinimumOrderQuantity()) > 0
+            && $totalQuality < $minimumQuantity) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(
+                    __('Minimum order quantity is :qty, you need to buy more :more to place an order!', [
+                        'qty' => $totalQuality,
+                        'more' => $minimumQuantity - $totalQuality,
+                    ])
+                );
+        }
+
+        if (($maximumQuantity = EcommerceHelper::getMaximumOrderQuantity()) > 0
+            && $totalQuality > $maximumQuantity) {
+            return $this
+                ->httpResponse()
+                ->setError()
+                ->setMessage(
+                    __('Maximum order quantity is :qty, please check your cart and retry again!', [
+                        'qty' => $maximumQuantity,
+                    ])
+                );
+        }
+
         if (EcommerceHelper::getMinimumOrderAmount() > Cart::instance('cart')->rawSubTotal()) {
             return $this
                 ->httpResponse()
@@ -675,6 +702,33 @@ class PublicCheckoutController extends BaseController
                     ->setError()
                     ->setMessage(
                         __('Product :product is out of stock!', ['product' => $product->original_product->name])
+                    );
+            }
+
+            $quantityOfProduct = Cart::instance('cart')->rawQuantityByItemId($product->id);
+
+            if ($product->minimum_order_quantity > 0 && $quantityOfProduct < $product->minimum_order_quantity) {
+                return $this
+                    ->httpResponse()
+                    ->setError()
+                    ->setMessage(
+                        __('Minimum order quantity of product :product is :quantity, you need to buy more :more to place an order! ', [
+                            'product' => $product->original_product->name,
+                            'quantity' => $product->minimum_order_quantity,
+                            'more' => $product->minimum_order_quantity - $quantityOfProduct,
+                        ])
+                    );
+            }
+
+            if ($product->maximum_order_quantity > 0 && $quantityOfProduct > $product->maximum_order_quantity) {
+                return $this
+                    ->httpResponse()
+                    ->setError()
+                    ->setMessage(
+                        __('Maximum order quantity of product :product is :quantity! ', [
+                            'product' => $product->original_product->name,
+                            'quantity' => $product->minimum_order_quantity,
+                        ])
                     );
             }
         }

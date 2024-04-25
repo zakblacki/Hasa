@@ -43,7 +43,7 @@ class OrderReturnRequest extends Request
     public function messages(): array
     {
         return [
-            'unique' => __('plugins/ecommerce::order.return_order_unique'),
+            'unique' => trans('plugins/ecommerce::order.return_order_unique'),
         ];
     }
 }

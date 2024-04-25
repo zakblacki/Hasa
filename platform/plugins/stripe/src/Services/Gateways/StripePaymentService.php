@@ -125,6 +125,10 @@ class StripePaymentService extends StripePaymentAbstract
 
     protected function convertAmount(float $amount): int
     {
+        if (! cms_currency()->getApplicationCurrency()->decimals) {
+            $amount = round($amount);
+        }
+
         $multiplier = StripeHelper::getStripeCurrencyMultiplier($this->currency);
 
         if ($multiplier > 1) {

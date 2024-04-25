@@ -17,6 +17,12 @@ use Illuminate\Http\Request;
 
 class OrderController extends BaseController
 {
+    public function __construct()
+    {
+        Theme::asset()
+            ->add('customer-style', 'vendor/core/plugins/ecommerce/css/customer.css', ['bootstrap-css']);
+    }
+
     public function index()
     {
         SeoHelper::setTitle(__('Orders'));

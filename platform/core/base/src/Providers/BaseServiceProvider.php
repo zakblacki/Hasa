@@ -143,6 +143,13 @@ class BaseServiceProvider extends ServiceProvider
                     'icon' => 'ti ti-user-shield',
                     'route' => 'system.index',
                     'permissions' => ['core.system'],
+                ])
+                ->registerItem([
+                    'id' => 'cms-core-tools',
+                    'priority' => 9000,
+                    'name' => 'core/base::layouts.tools',
+                    'icon' => 'ti ti-tool',
+                    'permission' => ['core.tools'],
                 ]);
         });
     }

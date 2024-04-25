@@ -241,9 +241,9 @@ class Order extends BaseModel
             return false;
         }
 
-        $shipmentDayCount = Carbon::now()->diffInDays($this->completed_at);
+        $overReturnDate = Carbon::now()->subDays(EcommerceHelper::getReturnableDays())->gt($this->completed_at);
 
-        if ($shipmentDayCount > EcommerceHelper::getReturnableDays()) {
+        if ($overReturnDate) {
             return false;
         }
 

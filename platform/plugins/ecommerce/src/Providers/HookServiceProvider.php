@@ -342,12 +342,6 @@ class HookServiceProvider extends ServiceProvider
 
             if (config('packages.theme.general.enable_custom_js')) {
                 add_filter('ecommerce_checkout_header', function ($html) {
-                    $customCSSFile = public_path(Theme::path() . '/css/style.integration.css');
-                    if (File::exists($customCSSFile)) {
-                        $html .= Html::style(Theme::asset()
-                            ->url('css/style.integration.css?v=' . filectime($customCSSFile)));
-                    }
-
                     return $html . ThemeSupport::getCustomJS('header');
                 }, 15);
 
@@ -364,6 +358,17 @@ class HookServiceProvider extends ServiceProvider
                 }
             }
 
+            add_filter('ecommerce_checkout_header', function ($html) {
+                $customCSSFile = Theme::getStyleIntegrationPath();
+
+                if (File::exists($customCSSFile)) {
+                    $html .= Html::style(Theme::asset()
+                        ->url('css/style.integration.css?v=' . filectime($customCSSFile)));
+                }
+
+                return $html;
+            }, 15);
+
             add_filter([THEME_FRONT_HEADER, 'ecommerce_checkout_header'], function ($html) {
                 $pixelID = get_ecommerce_setting('facebook_pixel_id');
 
@@ -372,11 +377,11 @@ class HookServiceProvider extends ServiceProvider
                 }
 
                 return $html . view('plugins/ecommerce::orders.partials.facebook-pixel', compact('pixelID'))->render();
-            }, 15);
+            }, 16);
 
             add_filter('ecommerce_checkout_header', function ($html) {
                 return $html . ThemeSupport::renderGoogleTagManagerScript();
-            }, 16);
+            }, 17);
 
             if (
                 defined('FAQ_MODULE_SCREEN_NAME')

@@ -21,13 +21,14 @@
         ])
     @endforeach
 
-    @include('core/base::layouts.partials.navbar-nav-item', [
+    @includeWhen($otherItems->isNotEmpty(), 'core/base::layouts.partials.navbar-nav-item', [
         'menu' => [
             'id' => 'others',
             'icon' => false,
             'name' => $otherIcon,
             'title' => trans('core/base::base.panel.others'),
             'children' => $otherItems->all(),
+            'url' => '#',
             'active' => $otherItems->contains('active', true),
             'priority' => 9999,
             'class' => 'd-none d-md-flex',

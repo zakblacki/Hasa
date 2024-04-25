@@ -10,6 +10,7 @@ class Botble {
         this.manageSidebar()
         this.handleWayPoint()
         this.handleTurnOffDebugMode()
+        Botble.initNavbarMinimal()
         Botble.initResources()
         Botble.initGlobalResources()
         Botble.handleCounterUp()
@@ -419,9 +420,36 @@ class Botble {
         })
     }
 
+    static initNavbarMinimal() {
+        $(document).on('click', '[data-bb-toggle="navbar-minimal"]', (event) => {
+            const _self = $(event.currentTarget)
+            const navbar = $(_self.data('bb-target'))
+
+            if (navbar.length > 0) {
+                navbar.toggleClass('navbar-minimal')
+
+                $httpClient
+                    .makeWithoutErrorHandler()
+                    .post(
+                        _self.data('url'),
+                        {
+                            _method: _self.data('method'),
+                            minimal_sidebar: navbar.hasClass('navbar-minimal') ? 'yes' : 'no'
+                        }
+                    )
+                    .then(() => {})
+                    .catch(() => {})
+            }
+        })
+    }
+
     static initDatePicker(element) {
         if (jQuery().flatpickr) {
-            let format = $(document).find(element).find('input').data('date-format')
+            const $element = $(document).find(element);
+
+            const $input = $element.find('input')
+
+            let format = $input.data('date-format')
 
             if (!format) {
                 format = 'Y-m-d'
@@ -433,13 +461,17 @@ class Botble {
                 locale = 'vn'
             }
 
-            $(document)
-                .find(element)
-                .flatpickr({
-                    dateFormat: format,
-                    wrap: true,
-                    locale: locale || 'en',
-                })
+            let options = {
+                dateFormat: format,
+                wrap: true,
+                locale: locale || 'en',
+            }
+
+            if ($input.data('options')) {
+                options = Object.assign(options, $input.data('options'))
+            }
+
+            $element.flatpickr(options)
         }
     }
 
@@ -1244,7 +1276,7 @@ class Botble {
         if ($menuItems.length) {
             $httpClient
                 .make()
-                .get($menuItems.data('url'))
+                .get($menuItems.data('url') || BotbleVariables.menu_item_count_url)
                 .then(({ data }) => {
                     data.data.map((x) => {
                         if (x.value > 0) {

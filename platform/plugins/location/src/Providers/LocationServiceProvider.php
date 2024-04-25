@@ -4,9 +4,13 @@ namespace Botble\Location\Providers;
 
 use Botble\Base\Facades\DashboardMenu;
 use Botble\Base\Facades\MacroableModels;
+use Botble\Base\Facades\PanelSectionManager;
 use Botble\Base\Models\BaseModel;
+use Botble\Base\PanelSections\PanelSectionItem;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
+use Botble\DataSynchronize\PanelSections\ExportPanelSection;
+use Botble\DataSynchronize\PanelSections\ImportPanelSection;
 use Botble\LanguageAdvanced\Supports\LanguageAdvancedManager;
 use Botble\Location\Facades\Location;
 use Botble\Location\Models\City;
@@ -100,21 +104,27 @@ class LocationServiceProvider extends ServiceProvider
                     'parent_id' => 'cms-plugins-location',
                     'name' => 'plugins/location::city.name',
                     'route' => 'city.index',
-                ])
-                ->registerItem([
-                    'id' => 'cms-plugins-location-bulk-import',
-                    'priority' => 3,
-                    'parent_id' => 'cms-plugins-location',
-                    'name' => 'plugins/location::bulk-import.name',
-                    'route' => 'location.bulk-import.index',
-                ])
-                ->registerItem([
-                    'id' => 'cms-plugins-location-export',
-                    'priority' => 4,
-                    'parent_id' => 'cms-plugins-location',
-                    'name' => 'plugins/location::export.name',
-                    'route' => 'location.export.index',
                 ]);
+        });
+
+        PanelSectionManager::setGroupId('data-synchronize')->beforeRendering(function () {
+            PanelSectionManager::default()
+                ->registerItem(
+                    ExportPanelSection::class,
+                    fn () => PanelSectionItem::make('location')
+                        ->setTitle(trans('plugins/location::location.name'))
+                        ->withDescription(trans('plugins/location::location.export.description'))
+                        ->withPriority(100)
+                        ->withRoute('location.export.index')
+                )
+                ->registerItem(
+                    ImportPanelSection::class,
+                    fn () => PanelSectionItem::make('location')
+                        ->setTitle(trans('plugins/location::location.name'))
+                        ->withDescription(trans('plugins/location::location.import.description'))
+                        ->withPriority(90)
+                        ->withRoute('location.bulk-import.index')
+                );
         });
 
         $this->app->booted(function () {

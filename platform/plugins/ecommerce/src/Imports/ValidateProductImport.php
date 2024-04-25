@@ -57,7 +57,7 @@ class ValidateProductImport extends ProductImport
         return null;
     }
 
-    public function storeVariant($product, $row = []): ?ProductVariation
+    public function storeVariant($product): ?ProductVariation
     {
         if (! $product) {
             if (method_exists($this, 'onFailure')) {

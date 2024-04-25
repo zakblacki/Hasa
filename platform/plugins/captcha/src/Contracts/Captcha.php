@@ -31,7 +31,7 @@ abstract class Captcha
             return [];
         }
 
-        return [self::RECAPTCHA_INPUT_NAME => 'captcha'];
+        return [self::RECAPTCHA_INPUT_NAME => ['required', 'captcha']];
     }
 
     public function isEnabled(): bool
@@ -55,7 +55,7 @@ abstract class Captcha
 
     public function mathCaptchaRules(): array
     {
-        return ['math-captcha' => 'required|string|math_captcha'];
+        return ['math-captcha' => ['required', 'string', 'math_captcha']];
     }
 
     public function captchaType(): string

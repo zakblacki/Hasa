@@ -32,8 +32,8 @@ class WebsiteTrackingSettingForm extends SettingForm
                         RadioField::class,
                         RadioFieldOption::make()
                             ->choices([
-                                'id' => $tagIdLabel = trans('core/setting::setting.website_tracking.google_tag_manager_id'),
-                                'code' => $codeLabel = trans('core/setting::setting.website_tracking.google_tag_manager_code'),
+                                'id' => $tagIdLabel = trans('core/setting::setting.website_tracking.google_tag_id'),
+                                'code' => $codeLabel = trans('core/setting::setting.website_tracking.google_tag_code'),
                             ])
                             ->selected($targetValue = old('google_tag_manager_type', $defaultType))
                             ->toArray()
@@ -45,7 +45,7 @@ class WebsiteTrackingSettingForm extends SettingForm
                             TextFieldOption::make()
                                 ->label($tagIdLabel)
                                 ->value($googleTagManagerId)
-                                ->placeholder(trans('core/setting::setting.website_tracking.google_tag_manager_id_placeholder'))
+                                ->placeholder(trans('core/setting::setting.website_tracking.google_tag_id_placeholder'))
                                 ->helperText(
                                     sprintf(
                                         "<a href='https://support.google.com/analytics/answer/9539598#find-G-ID' target='_blank'>%s</a>",
@@ -63,7 +63,10 @@ class WebsiteTrackingSettingForm extends SettingForm
                                 ->label($codeLabel)
                                 ->value($googleTagManagerCode)
                                 ->mode('html')
-                                ->helperText(trans('core/setting::setting.website_tracking.google_tag_manager_code_helper'))
+                                ->helperText(sprintf(
+                                    "<a href='https://developers.google.com/tag-platform/gtagjs/install' target='_blank'>%s</a>",
+                                    'https://developers.google.com/tag-platform/gtagjs/install'
+                                ))
                                 ->toArray()
                         );
                     }, targetFieldValue: 'code', isOpened: $targetValue === 'code')

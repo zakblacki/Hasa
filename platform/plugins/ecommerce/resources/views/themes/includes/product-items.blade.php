@@ -5,3 +5,6 @@
         </div>
     @endforeach
 </div>
+
+@include(EcommerceHelper::viewPath('includes.quick-shop-modal'))
+@include(EcommerceHelper::viewPath('includes.quick-view-modal'))

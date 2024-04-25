@@ -84,6 +84,7 @@
                     class="form-control"
                     id="address_name"
                     name="address[name]"
+                    autocomplete="name"
                     type="text"
                     value="{{ old('address.name', Arr::get($sessionCheckoutData, 'name')) ?: (auth('customer')->check() ? auth('customer')->user()->name : null) }}"
                     required
@@ -107,6 +108,7 @@
                                 class="form-control"
                                 id="address_email"
                                 name="address[email]"
+                                autocomplete="email"
                                 type="email"
                                 value="{{ old('address.email', Arr::get($sessionCheckoutData, 'email')) ?: (auth('customer')->check() ? auth('customer')->user()->email : null) }}"
                                 required
@@ -130,6 +132,7 @@
                                 class="form-control"
                                 id="address_phone"
                                 name="address[phone]"
+                                autocomplete="phone"
                                 type="tel"
                                 value="{{ old('address.phone', Arr::get($sessionCheckoutData, 'phone')) ?: (auth('customer')->check() ? auth('customer')->user()->phone : null) }}"
                             >
@@ -150,6 +153,7 @@
                         class="form-control"
                         id="address_country"
                         name="address[country]"
+                        autocomplete="country"
                         data-form-parent=".customer-address-payment-form"
                         data-type="country"
                         required
@@ -185,6 +189,7 @@
                                     class="form-control"
                                     id="address_state"
                                     name="address[state]"
+                                    autocomplete="state"
                                     data-form-parent=".customer-address-payment-form"
                                     data-type="state"
                                     data-url="{{ route('ajax.states-by-country') }}"
@@ -192,7 +197,7 @@
                                 >
                                     <option value="">{{ __('Select state...') }}</option>
                                     @if (old('address.country', Arr::get($sessionCheckoutData, 'country')) || !EcommerceHelper::isUsingInMultipleCountries())
-                                        @foreach (EcommerceHelper::getAvailableStatesByCountry(old('address.country', Arr::get($sessionCheckoutData, 'country'))) as $stateId => $stateName)
+                                        @foreach (EcommerceHelper::getAvailableStatesByCountry(old('address.country', Arr::get($sessionCheckoutData, 'country')) ?: EcommerceHelper::getFirstCountryId()) as $stateId => $stateName)
                                             <option
                                                 value="{{ $stateId }}"
                                                 @if (old('address.state', Arr::get($sessionCheckoutData, 'state')) == $stateId) selected @endif
@@ -209,6 +214,7 @@
                                     class="form-control"
                                     id="address_state"
                                     name="address[state]"
+                                    autocomplete="state"
                                     type="text"
                                     value="{{ old('address.state', Arr::get($sessionCheckoutData, 'state')) }}"
                                     required
@@ -230,6 +236,7 @@
                                     class="form-control"
                                     id="address_city"
                                     name="address[city]"
+                                    autocomplete="city"
                                     type="text"
                                     value="{{ old('address.city', Arr::get($sessionCheckoutData, 'city')) }}"
                                     required
@@ -242,6 +249,7 @@
                                     class="form-control"
                                     id="address_city"
                                     name="address[city]"
+                                    autocomplete="city"
                                     data-type="city"
                                     data-using-select2="false"
                                     data-url="{{ route('ajax.cities-by-state') }}"
@@ -274,6 +282,7 @@
                         class="form-control"
                         id="address_address"
                         name="address[address]"
+                        autocomplete="address"
                         type="text"
                         value="{{ old('address.address', Arr::get($sessionCheckoutData, 'address')) }}"
                         required
@@ -291,6 +300,7 @@
                         class="form-control"
                         id="address_zip_code"
                         name="address[zip_code]"
+                        autocomplete="postal-code"
                         type="text"
                         value="{{ old('address.zip_code', Arr::get($sessionCheckoutData, 'zip_code')) }}"
                         required

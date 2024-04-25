@@ -317,7 +317,7 @@ class Language
         'he_IL' => ['he', 'he_IL', 'עברית', 'rtl', 'il'],
         'hi_IN' => ['hi', 'hi_IN', 'हिन्दी', 'ltr', 'in'],
         'hr' => ['hr', 'hr', 'Hrvatski', 'ltr', 'hr'],
-        'ht' => ['fr', 'fr_HT', 'Haiti', 'ltr', 'ht'],
+        'ht' => ['ht', 'ht', 'Kreyòl Ayisyen', 'ltr', 'ht'],
         'hu_HU' => ['hu', 'hu_HU', 'Magyar', 'ltr', 'hu'],
         'hy' => ['hy', 'hy', 'Հայերեն', 'ltr', 'am'],
         'id_ID' => ['id', 'id_ID', 'Bahasa Indonesia', 'ltr', 'id'],

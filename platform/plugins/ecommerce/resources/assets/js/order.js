@@ -5,7 +5,8 @@ class OrderAdminManagement {
 
             const _self = $(event.currentTarget)
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withButtonLoading(_self)
                 .post(_self.closest('form').prop('action'), _self.closest('form').serialize())
                 .then(({ data }) => {
@@ -30,7 +31,8 @@ class OrderAdminManagement {
 
             const _self = $(event.currentTarget)
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withButtonLoading(_self)
                 .post(_self.data('action'))
                 .then(({ data }) => {
@@ -54,7 +56,8 @@ class OrderAdminManagement {
             if (!$formBody.hasClass('shipment-data-loaded')) {
                 Botble.showLoading($formBody)
 
-                $httpClient.make()
+                $httpClient
+                    .make()
                     .get(_self.data('target'))
                     .then(({ data }) => {
                         if (data.error) {
@@ -108,7 +111,8 @@ class OrderAdminManagement {
 
             const _self = $(event.currentTarget)
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withButtonLoading(_self)
                 .post(_self.closest('form').prop('action'), _self.closest('form').serialize())
                 .then(({ data }) => {
@@ -133,15 +137,14 @@ class OrderAdminManagement {
 
             const _self = $(event.currentTarget)
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withButtonLoading(_self)
                 .post(_self.data('action'))
                 .then(({ data }) => {
                     if (!data.error) {
                         Botble.showSuccess(data.message)
-                        $('.carrier-status')
-                            .addClass(`carrier-status-${data.data.status}`)
-                            .text(data.data.status_text)
+                        $('.carrier-status').addClass(`carrier-status-${data.data.status}`).text(data.data.status_text)
                         $('#cancel-shipment-modal').modal('hide')
                         $('#order-history-wrapper').load(`${window.location.href} #order-history-wrapper > *`)
                         $('.shipment-actions-wrapper').remove()
@@ -172,7 +175,8 @@ class OrderAdminManagement {
             const _self = $(event.currentTarget)
             const form = _self.closest('.modal-content').find('form')
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withLoading(form.find('.shipment-create-wrap'))
                 .withButtonLoading(_self)
                 .post(form.prop('action'), form.serialize())
@@ -201,7 +205,8 @@ class OrderAdminManagement {
             const _self = $(event.currentTarget)
             const form = _self.closest('.modal-content').find('form')
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withButtonLoading(_self)
                 .post(form.prop('action'), form.serialize())
                 .then(({ data }) => {
@@ -222,10 +227,11 @@ class OrderAdminManagement {
 
             const _self = $(event.currentTarget)
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withButtonLoading(_self)
                 .post(_self.closest('form').prop('action'), _self.closest('form').serialize())
-                .then(({ data}) => {
+                .then(({ data }) => {
                     if (!data.error) {
                         Botble.showSuccess(data.message)
                     } else {
@@ -250,7 +256,8 @@ class OrderAdminManagement {
             event.preventDefault()
             const _self = $(event.currentTarget)
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withButtonLoading(_self)
                 .post(_self.data('target'))
                 .then(({ data }) => {
@@ -274,7 +281,8 @@ class OrderAdminManagement {
             event.preventDefault()
             const _self = $(event.currentTarget)
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withButtonLoading(_self)
                 .post(_self.data('target'))
                 .then(({ data }) => {
@@ -329,7 +337,8 @@ class OrderAdminManagement {
             const _self = $(event.currentTarget)
             const form = _self.closest('.modal-dialog').find('form')
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withButtonLoading(_self)
                 .post(form.prop('action'), form.serialize())
                 .then(({ data }) => {
@@ -358,7 +367,8 @@ class OrderAdminManagement {
             const _self = $(event.currentTarget)
             const form = _self.closest('.modal-dialog').find('form')
 
-            $httpClient.make()
+            $httpClient
+                .make()
                 .withButtonLoading(_self)
                 .post(form.prop('action'), form.serialize())
                 .then(({ data }) => {
