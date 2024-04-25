@@ -67,9 +67,10 @@
                         </p>
                         <p>
                             @if (EcommerceHelper::isWishlistEnabled())
-                                <a class="product__add-wishlist add-to-wishlist-button" href="#" data-url="{{ route('public.wishlist.add', $product->id) }}" data-add-text="{{ __('Add to wishlist') }}" data-added-text="{{ __('Added to wishlist') }}"><i class="fa fa-heart-o"></i>
-                                    <span>{{ __('Add to wishlist') }}</span>
-                                </a>
+                            <a class="product__add-wishlist add-to-wishlist-button" href="#" data-url="{{ route('public.wishlist.add', $product->id) }}" data-add-text="{{ __('Add to wishlist') }}" data-added-text="{{ __('Added to wishlist') }}">
+                                <i class="fa fa-heart-o heart-icon"></i>
+                                <span class="wishlist-text">{{ __('Add to wishlist') }}</span>
+                            </a>
                             @endif
                             @if (EcommerceHelper::isCompareEnabled())
                                 <a class="product__add-wishlist ml-3 js-add-to-compare-button" data-url="{{ route('public.compare.add', $product->id) }}" href="#"><i class="feather icon icon-plus-circle"></i> <span>{{ __('Compare') }}</span></a>
@@ -111,6 +112,8 @@
                                                 <span class="text-danger">({{ __('Out of stock') }})</span>
                                             @endif
                                         </div>
+                                    
+                                        
                                     </div>
                                 </div>
                                 <button type="submit" @if ($product->isOutOfStock()) disabled @endif class="btn--custom btn--outline btn--rounded btn-add-cart @if (!EcommerceHelper::isQuickBuyButtonEnabled()) btn--fullwidth @endif @if ($product->isOutOfStock()) btn-disabled @endif">
@@ -130,18 +133,17 @@
                                 </div>
                             </form>
                         @endif
+                        
+
                     </div>
 
-                    @if (!$product->tags->isEmpty())
-                        <figure class="product__tags">
-                            <figcaption>{{ __('Tags') }}:</figcaption>
-                            @foreach ($product->tags as $tag)
-                                <a href="{{ $tag->url }}">
-                                    {{ $tag->name }}
-                                </a>
-                            @endforeach
-                        </figure>
+                    @if (!empty($product->duree_de_livraison))
+                    <figure class="product__sharing">
+                        <figcaption>{{trans('Delivery time')}}:   {{$product->duree_de_livraison}} </figcaption>
+                    </figure>
                     @endif
+                    
+                    
                     <figure class="product__sharing">
                         <figcaption>{{ __('Share') }}:</figcaption>
                         <ul class="list--social">
@@ -153,8 +155,36 @@
             </div>
             <hr style="margin-top: 2%">
 
-            @if (!empty($product->type_de_taille) || !empty($product->type_de_tissu) || !empty($product->type_dencolure) || !empty($product->type_des_manches) || !empty($product->modele) || !empty($product->type_de_tissu) || !empty($product->longueur_des_manches) || !empty($product->coupe_pantalon) || !empty($product->longueur) || !empty($product->coupe_silouhette) || !empty($product->motif) || !empty($product->couleur) || !empty($product->poche) || !empty($product->type_de_produit) || !empty($product->taille) || !empty($product->grandes_occasions) || !empty($product->personnage) || !empty($product->matiere) || !empty($product->duree_de_livraison))
-            <div style="margin-top: 4%; margin-bottom: 3%">
+     
+
+    <div class="product__content tab-root">
+        <ul class="tab-list">
+            <li class="active"><a href="#tab-description">{{ __('Description') }}</a></li>
+            
+            <li><a href="#tab-features">{{ __('Product Features') }}</a></li>  
+            
+            @if (EcommerceHelper::isReviewEnabled())
+                <li><a href="#tab-reviews">{{ __('Reviews') }}({{ $product->reviews_count }})</a></li>
+            @endif
+            
+            @if (is_plugin_active('faq'))
+                @if (count($product->faq_items) > 0)
+                    <li>
+                        <a href="#tab-faq">{{ __('Questions and Answers') }}</a>
+                    </li>
+                @endif
+            @endif
+        </ul>
+        <div class="tabs">
+            <div class="tab active" id="tab-description">
+                <div class="document ck-content">
+                    {!! BaseHelper::clean($product->content) !!}
+                </div>
+            </div>
+            
+            <div class="tab active" id="tab-features"> 
+              @if (!empty($product->type_de_taille) || !empty($product->type_de_tissu) || !empty($product->type_dencolure) || !empty($product->type_des_manches) || !empty($product->modele) || !empty($product->type_de_tissu) || !empty($product->longueur_des_manches) || !empty($product->coupe_pantalon) || !empty($product->longueur) || !empty($product->coupe_silouhette) || !empty($product->motif) || !empty($product->couleur) || !empty($product->poche) || !empty($product->type_de_produit) || !empty($product->taille) || !empty($product->grandes_occasions) || !empty($product->personnage) || !empty($product->matiere) || !empty($product->duree_de_livraison))
+              <div style="margin-top: 4%; margin-bottom: 3%">
                 <h4>{{trans('Product Features')}}</h4>
                 <div class="row" style="margin-top: 2%">
                     <div class="col-6">
@@ -195,13 +225,13 @@
                                 <td><b>{{$product->motif}}</b></td>
                             </tr>
                             @endif
-            			    @if (!empty($product->type_dencolure))
+                            @if (!empty($product->type_dencolure))
                             <tr>
                                 <th>{{trans('Type encolure')}}</th>
                                 <td><b>{{$product->type_dencolure}}</b></td>
                             </tr>
                             @endif
-	            		    @if (!empty($product->type_des_manches))
+                            @if (!empty($product->type_des_manches))
                             <tr>
                                 <th>{{trans('Type de manche')}}</th>
                                 <td><b>{{$product->type_des_manches}}</b></td>
@@ -259,75 +289,52 @@
                                 <td><b>{{$product->modele}}</b></td>
                             </tr>
                             @endif
-			                @if (!empty($product->type_de_tissu))
+                            @if (!empty($product->type_de_tissu))
                             <tr>
                                 <th>{{trans('Type de tissu')}}</th>
                                 <td><b>{{$product->type_de_tissu}}</b></td>
                             </tr>
                             @endif
-                            @if (!empty($product->duree_de_livraison))
-                            <tr>
-                                <th>{{trans('Delivery time')}}</th>
-                                <td><b>{{$product->duree_de_livraison}}</b></td>
-                            </tr>
-                            @endif
                         </table>
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            <div class="product__content tab-root">
-                <ul class="tab-list">
-                    <li class="active"><a href="#tab-description">{{ __('Description') }}</a></li>
-                    @if (EcommerceHelper::isReviewEnabled())
-                        <li><a href="#tab-reviews">{{ __('Reviews') }}({{ $product->reviews_count }})</a></li>
-                    @endif
-                    @if (is_plugin_active('faq'))
-                        @if (count($product->faq_items) > 0)
-                            <li>
-                                <a href="#tab-faq">{{ __('Questions and Answers') }}</a>
-                            </li>
-                        @endif
-                    @endif
-                </ul>
-                <div class="tabs">
-                    <div class="tab active" id="tab-description">
-                        <div class="document ck-content">
-                            {!! BaseHelper::clean($product->content) !!}
+                        </div>
                         </div>
                     </div>
-                    @if (is_plugin_active('faq') && count($product->faq_items) > 0)
-                        <div class="tab faqs-list" id="tab-faq">
-                            <div class="accordion" id="faq-accordion">
-                                @foreach($product->faq_items as $faq)
-                                    <div class="card">
-                                        <div class="card-header" id="heading-faq-{{ $loop->index }}">
-                                            <h2 class="mb-0">
-                                                <button class="btn btn-link btn-block text-left @if (!$loop->first) collapsed @endif" type="button" data-toggle="collapse" data-target="#collapse-faq-{{ $loop->index }}" aria-expanded="true" aria-controls="collapse-faq-{{ $loop->index }}">
-                                                    {!! BaseHelper::clean($faq[0]['value']) !!}
-                                                </button>
-                                            </h2>
-                                        </div>
+                    @endif
+                </div>
+                
+                @if (is_plugin_active('faq') && count($product->faq_items) > 0)
+                <div class="tab faqs-list" id="tab-faq">
+                    <div class="accordion" id="faq-accordion">
+                        @foreach($product->faq_items as $faq)
+                            <div class="card">
+                                <div class="card-header" id="heading-faq-{{ $loop->index }}">
+                                    <h2 class="mb-0">
+                                        <button class="btn btn-link btn-block text-left @if (!$loop->first) collapsed @endif" type="button" data-toggle="collapse" data-target="#collapse-faq-{{ $loop->index }}" aria-expanded="true" aria-controls="collapse-faq-{{ $loop->index }}">
+                                            {!! BaseHelper::clean($faq[0]['value']) !!}
+                                        </button>
+                                    </h2>
+                                </div>
 
-                                        <div id="collapse-faq-{{ $loop->index }}" class="collapse @if ($loop->first) show @endif" aria-labelledby="heading-faq-{{ $loop->index }}" data-parent="#faq-accordion">
-                                            <div class="card-body">
-                                                {!! BaseHelper::clean($faq[1]['value']) !!}
-                                            </div>
-                                        </div>
+                                <div id="collapse-faq-{{ $loop->index }}" class="collapse @if ($loop->first) show @endif" aria-labelledby="heading-faq-{{ $loop->index }}" data-parent="#faq-accordion">
+                                    <div class="card-body">
+                                        {!! BaseHelper::clean($faq[1]['value']) !!}
                                     </div>
-                                @endforeach
+                                </div>
                             </div>
-                        </div>
-                    @endif
-                    @if (EcommerceHelper::isReviewEnabled())
-                        <div class="tab product-reviews-container" id="tab-reviews">
-                            @include('plugins/ecommerce::themes.includes.reviews')
-                        </div>
-                    @endif
+                        @endforeach
+                    </div>
                 </div>
+            @endif
+            @if (EcommerceHelper::isReviewEnabled())
+                <div class="tab product-reviews-container" id="tab-reviews">
+                    @include('plugins/ecommerce::themes.includes.reviews')
+                </div>
+            @endif
+                
             </div>
-        </article>
+        </div>
+    </article>
+
 
         <br />
         {!! apply_filters(BASE_FILTER_PUBLIC_COMMENT_AREA, null, $product) !!}
