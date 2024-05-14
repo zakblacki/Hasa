@@ -11,9 +11,14 @@ use Illuminate\Validation\Rule;
 
 class ProductInventoryImporter extends Importer
 {
-    public function getHeading(): string
+    public function getLabel(): string
     {
         return trans('plugins/ecommerce::product-inventory.import.name');
+    }
+
+    public function getHeading(): string
+    {
+        return $this->getLabel();
     }
 
     public function getDoneMessage(int $count): string
@@ -23,24 +28,24 @@ class ProductInventoryImporter extends Importer
 
     public function getExportUrl(): ?string
     {
-        return Auth::user()->hasPermission('ecommerce.product-prices.export')
-            ? route('ecommerce.product-prices.export.store')
+        return Auth::user()->hasPermission('ecommerce.product-inventory.export')
+            ? route('ecommerce.product-inventory.export.store')
             : null;
     }
 
     public function getValidateUrl(): string
     {
-        return route('ecommerce.product-prices.import.validate');
+        return route('ecommerce.product-inventory.import.validate');
     }
 
     public function getImportUrl(): string
     {
-        return route('ecommerce.product-prices.import.store');
+        return route('ecommerce.product-inventory.import.store');
     }
 
     public function getDownloadExampleUrl(): string
     {
-        return route('ecommerce.product-prices.import.download-example');
+        return route('ecommerce.product-inventory.import.download-example');
     }
 
     public function columns(): array

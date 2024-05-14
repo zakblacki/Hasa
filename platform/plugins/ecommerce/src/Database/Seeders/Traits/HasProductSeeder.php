@@ -11,6 +11,7 @@ use Botble\Ecommerce\Models\OrderAddress;
 use Botble\Ecommerce\Models\OrderHistory;
 use Botble\Ecommerce\Models\OrderProduct;
 use Botble\Ecommerce\Models\Product;
+use Botble\Ecommerce\Models\ProductAttributeSet;
 use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Ecommerce\Models\ProductCollection;
 use Botble\Ecommerce\Models\ProductFile;
@@ -24,12 +25,15 @@ use Botble\Ecommerce\Models\Tax;
 use Botble\Ecommerce\Models\Wishlist;
 use Botble\Ecommerce\Services\Products\StoreProductService;
 use Botble\Faq\Models\Faq;
+use Botble\Media\Facades\RvMedia;
 use Botble\Payment\Models\Payment;
 use Botble\Slug\Facades\SlugHelper;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 trait HasProductSeeder
@@ -67,6 +71,8 @@ trait HasProductSeeder
         $brandIds = Brand::query()->pluck('id');
         $faqIds = is_plugin_active('faq') ? Faq::query()->pluck('id') : collect();
 
+        $insertedProducts = collect();
+
         foreach ($products as $key => $item) {
             if (isset($item['images'])) {
                 $item['images'] = is_array($item['images']) ? json_encode($item['images']) : $item['images'];
@@ -76,7 +82,9 @@ trait HasProductSeeder
 
             $key = $key + 1;
 
-            if ($key % 4 == 0 && ! isset($item['product_type'])) {
+            $item['product_type'] = ProductTypeEnum::PHYSICAL;
+
+            if ($key % 4 == 0) {
                 $item['product_type'] = ProductTypeEnum::DIGITAL;
                 $item['name'] .= ' (' . ProductTypeEnum::DIGITAL()->label() . ')';
             }
@@ -104,7 +112,11 @@ trait HasProductSeeder
                 $item['is_featured'] = $faker->boolean();
             }
 
-            $product = Product::query()->create($item);
+            $product = Product::query()->create(Arr::except($item, ['metadata']));
+
+            $this->createMetadata($product, $item);
+
+            $insertedProducts->push($product);
 
             $product->productCollections()->sync([$collectionIds->random()]);
 
@@ -137,29 +149,35 @@ trait HasProductSeeder
 
         $storeProductService = app(StoreProductService::class);
 
-        foreach ($products as $key => $item) {
-            $product = Product::query()->skip($key)->first();
+        Storage::disk('local')->deleteDirectory(Product::getDigitalProductFilesDirectory());
 
+        $productCount = $insertedProducts->count();
+
+        $productAttributeSets = ProductAttributeSet::query()->with('attributes')->get();
+
+        foreach ($insertedProducts as $key => $product) {
             $key = $key + 1;
 
-            $product->productAttributeSets()->sync($key >= 24 ? [3, 4] : [1, 2]);
-
-            $product->crossSales()->sync([
-                $this->random(1, 20, [$key]),
-                $this->random(1, 20, [$key]),
-                $this->random(1, 20, [$key]),
-                $this->random(1, 20, [$key]),
-                $this->random(1, 20, [$key]),
-                $this->random(1, 20, [$key]),
-                $this->random(1, 20, [$key]),
-            ]);
+            $product->crossSales()->sync(array_unique([
+                $this->random(1, $productCount, [$key]),
+                $this->random(1, $productCount, [$key]),
+                $this->random(1, $productCount, [$key]),
+                $this->random(1, $productCount, [$key]),
+                $this->random(1, $productCount, [$key]),
+                $this->random(1, $productCount, [$key]),
+                $this->random(1, $productCount, [$key]),
+            ]));
 
             if ($faker->boolean()) {
-                for ($j = 0; $j < $faker->numberBetween(1, 5); $j++) {
-                    /**
-                     * @var Product $variation
-                     * @var Product $product
-                     */
+                $selectedProductAttributeSets = $productAttributeSets->take(2);
+
+                if ($key >= (int) ($productCount / 2)) {
+                    $selectedProductAttributeSets = $productAttributeSets->skip(2)->take(2);
+                }
+
+                $product->productAttributeSets()->sync($selectedProductAttributeSets->pluck('id')->all());
+
+                for ($j = 1; $j <= $faker->numberBetween(1, 5); $j++) {
                     $variation = Product::query()->create([
                         'name' => $product->name,
                         'status' => BaseStatusEnum::PUBLISHED,
@@ -184,7 +202,7 @@ trait HasProductSeeder
                     $productVariation = ProductVariation::query()->create([
                         'product_id' => $variation->getKey(),
                         'configurable_product_id' => $product->getKey(),
-                        'is_default' => $j == 0,
+                        'is_default' => $j == 1,
                     ]);
 
                     if ($productVariation->is_default) {
@@ -194,42 +212,45 @@ trait HasProductSeeder
                         ]);
                     }
 
-                    ProductVariationItem::query()->create([
-                        'attribute_id' => $faker->numberBetween(
-                            $key >= 24 ? 11 : 1,
-                            $key >= 24 ? 15 : 5
-                        ),
-                        'variation_id' => $productVariation->id,
-                    ]);
-
-                    ProductVariationItem::query()->create([
-                        'attribute_id' => $faker->numberBetween(
-                            $key >= 24 ? 16 : 6,
-                            $key >= 24 ? 20 : 10
-                        ),
-                        'variation_id' => $productVariation->id,
-                    ]);
-
-                    if ($product->isTypeDigital()) {
-                        foreach ($product->images as $img) {
-                            $productFile = database_path('seeders/files/' . $img);
-
-                            if (! File::isFile($productFile)) {
-                                continue;
-                            }
-
-                            $fileUpload = new UploadedFile(
-                                $productFile,
-                                Str::replace('products/', '', $img),
-                                'image/jpeg',
-                                null,
-                                true
-                            );
-                            $productFileData = $storeProductService->saveProductFile($fileUpload);
-                            $variation->productFiles()->create($productFileData);
+                    $selectedProductAttributeSets->each(
+                        function (ProductAttributeSet $productAttributeSet) use ($faker, $productVariation) {
+                            /**
+                             * @var Collection $attributes
+                             */
+                            $attributes = $productAttributeSet->attributes;
+                            ProductVariationItem::query()->create([
+                                'attribute_id' => $attributes->random()->id,
+                                'variation_id' => $productVariation->id,
+                            ]);
                         }
-                    }
+                    );
                 }
+            }
+        }
+
+        foreach (Product::query()->where('product_type', ProductTypeEnum::DIGITAL)->get() as $product) {
+            foreach ($product->images as $index => $img) {
+                if ($index > 1) {
+                    continue;
+                }
+
+                $productFile = RvMedia::getRealPath($img);
+
+                if (! File::exists($productFile)) {
+                    continue;
+                }
+
+                $fileUpload = new UploadedFile(
+                    $productFile,
+                    basename($img),
+                    RvMedia::getMimeType($productFile),
+                    null,
+                    true
+                );
+
+                $productFileData = $storeProductService->saveProductFile($fileUpload);
+
+                $product->productFiles()->create($productFileData);
             }
         }
     }

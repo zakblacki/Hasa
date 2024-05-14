@@ -68,6 +68,8 @@ trait ProductActionsTrait
                 $productRelatedToVariation->status = $product->status;
                 $productRelatedToVariation->brand_id = $product->brand_id;
                 $productRelatedToVariation->is_variation = 1;
+                $productRelatedToVariation->minimum_order_quantity = $product->minimum_order_quantity;
+                $productRelatedToVariation->maximum_order_quantity = $product->maximum_order_quantity;
 
                 $productRelatedToVariation->sku = Arr::get($version, 'sku');
                 if (! $productRelatedToVariation->sku && Arr::get($version, 'auto_generate_sku')) {
@@ -506,15 +508,29 @@ trait ProductActionsTrait
 
     public function getRelationBoxes(int|string|null $id, BaseHttpResponse $response): BaseHttpResponse
     {
+        if (! EcommerceHelper::isEnabledCrossSaleProducts() && ! EcommerceHelper::isEnabledRelatedProducts()) {
+            return $response->setData('');
+        }
+
         $product = null;
 
         if ($id) {
-            $product = Product::query()->with(['products', 'crossSales'])->find($id);
+            $with = [];
+
+            if (EcommerceHelper::isEnabledCrossSaleProducts()) {
+                $with[] = 'crossSales';
+            }
+
+            if (EcommerceHelper::isEnabledRelatedProducts()) {
+                $with[] = 'products';
+            }
+
+            $product = Product::query()->with($with)->find($id);
         }
 
         $dataUrl = route(
             'products.get-list-product-for-search',
-            ['product_id' => $product ? $product->getKey() : null]
+            ['product_id' => $product?->getKey()]
         );
 
         return $response->setData(

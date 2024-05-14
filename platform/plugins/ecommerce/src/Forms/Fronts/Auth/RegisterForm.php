@@ -51,26 +51,26 @@ class RegisterForm extends AuthForm
                 'email',
                 EmailField::class,
                 EmailFieldOption::make()
+                    ->label(__('Email'))
                     ->when(EcommerceHelper::isLoginUsingPhone(), function (EmailFieldOption $fieldOption) {
                         $fieldOption->label(__('Email (optional)'));
-                    }, function (EmailFieldOption $fieldOption) {
-                        $fieldOption->label(__('Email'));
                     })
                     ->placeholder(__('Your email'))
                     ->icon('ti ti-mail')
+                    ->addAttribute('autocomplete', 'email')
                     ->toArray()
             )
             ->add(
                 'phone',
                 PhoneNumberField::class,
                 TextFieldOption::make()
+                    ->label(__('Phone (optional)'))
                     ->when(EcommerceHelper::isLoginUsingPhone(), function (TextFieldOption $fieldOption) {
                         $fieldOption->label(__('Phone'));
-                    }, function (TextFieldOption $fieldOption) {
-                        $fieldOption->label(__('Phone (optional)'));
                     })
                     ->placeholder(__('Phone number'))
                     ->icon('ti ti-phone')
+                    ->addAttribute('autocomplete', 'tel')
                     ->toArray()
             )
             ->add(

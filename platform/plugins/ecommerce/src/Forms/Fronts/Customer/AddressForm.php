@@ -19,9 +19,10 @@ use Botble\Ecommerce\Models\Address;
 
 class AddressForm extends FormAbstract
 {
+    protected string $formSelectInputClass;
+
     public function setup(): void
     {
-        $selectClass = $selectClass ?? '';
         $model = $this->getModel();
 
         $this
@@ -35,6 +36,8 @@ class AddressForm extends FormAbstract
                 TextFieldOption::make()
                     ->label(trans('plugins/ecommerce::addresses.name'))
                     ->placeholder(trans('plugins/ecommerce::addresses.name_placeholder'))
+                    ->colspan(1)
+                    ->toArray()
             )
             ->add(
                 'phone',
@@ -42,14 +45,18 @@ class AddressForm extends FormAbstract
                 TextFieldOption::make()
                     ->label(trans('plugins/ecommerce::addresses.phone'))
                     ->placeholder(trans('plugins/ecommerce::addresses.phone_placeholder'))
+                    ->colspan(1)
+                    ->toArray()
             )
-            ->add('email', EmailField::class, EmailFieldOption::make())
+            ->add('email', EmailField::class, EmailFieldOption::make()->colspan(1)->toArray())
             ->add(
                 'zip_code',
                 TextField::class,
                 TextFieldOption::make()
                     ->placeholder(trans('plugins/ecommerce::addresses.zip_placeholder'))
                     ->label(trans('plugins/ecommerce::addresses.zip'))
+                    ->colspan(1)
+                    ->toArray()
             )
             ->add(
                 'address',
@@ -58,8 +65,9 @@ class AddressForm extends FormAbstract
                     ->label(trans('plugins/ecommerce::addresses.address'))
                     ->placeholder(trans('plugins/ecommerce::addresses.address_placeholder'))
                     ->colspan(2)
+                    ->toArray()
             )
-            ->when(EcommerceHelper::isUsingInMultipleCountries(), function (AddressForm $form) use ($selectClass) {
+            ->when(EcommerceHelper::isUsingInMultipleCountries(), function (AddressForm $form) {
                 $form->add(
                     'country',
                     SelectField::class,
@@ -67,35 +75,60 @@ class AddressForm extends FormAbstract
                         ->label(trans('plugins/ecommerce::addresses.country'))
                         ->attributes([
                             'data-type' => 'country',
-                            'class' => $selectClass,
                         ])
                         ->choices(EcommerceHelper::getAvailableCountries())
                         ->colspan(2)
+                        ->toArray()
                 );
             }, function (AddressForm $form) {
-                $form->add('country', 'hidden', InputFieldOption::make()->value(EcommerceHelper::getFirstCountryId()));
+                $form->add(
+                    'country',
+                    'hidden',
+                    InputFieldOption::make()
+                        ->value(EcommerceHelper::getFirstCountryId())
+                        ->toArray()
+                );
             })
-            ->when(EcommerceHelper::loadCountriesStatesCitiesFromPluginLocation(), function (AddressForm $form) use ($selectClass) {
+            ->when(EcommerceHelper::loadCountriesStatesCitiesFromPluginLocation(), function (AddressForm $form) {
                 $model = $this->getModel();
 
                 $form->add(
                     'state',
                     SelectField::class,
                     SelectFieldOption::make()
-                        ->choices(EcommerceHelper::getAvailableStatesByCountry(old('country', $model->country)))
+                        ->choices(
+                            ['' => __('Select state...')] + EcommerceHelper::getAvailableStatesByCountry(
+                                old('country', $model->country) ?: EcommerceHelper::getFirstCountryId()
+                            )
+                        )
                         ->attributes([
                             'data-type' => 'state',
                             'data-url' => route('ajax.states-by-country'),
-                            'class' => $selectClass,
                         ])
+                        ->colspan(1)
                         ->label(trans('plugins/ecommerce::addresses.state'))
+                        ->toArray()
                 );
             }, function (AddressForm $form) {
-                $form->add('state', TextField::class, TextFieldOption::make()->label(trans('plugins/ecommerce::addresses.state')));
+                $form->add(
+                    'state',
+                    TextField::class,
+                    TextFieldOption::make()
+                        ->label(trans('plugins/ecommerce::addresses.state'))
+                        ->colspan(1)
+                        ->toArray()
+                );
             })
             ->when(EcommerceHelper::useCityFieldAsTextField(), function (AddressForm $form) {
-                $form->add('city', TextField::class, TextFieldOption::make()->label(trans('plugins/ecommerce::addresses.city')));
-            }, function (AddressForm $form) use ($selectClass) {
+                $form->add(
+                    'city',
+                    TextField::class,
+                    TextFieldOption::make()
+                        ->label(trans('plugins/ecommerce::addresses.city'))
+                        ->colspan(1)
+                        ->toArray()
+                );
+            }, function (AddressForm $form) {
                 $form->add(
                     'city',
                     SelectField::class,
@@ -104,9 +137,14 @@ class AddressForm extends FormAbstract
                         ->attributes([
                             'data-type' => 'city',
                             'data-url' => route('ajax.cities-by-state'),
-                            'class' => $selectClass,
                         ])
-                        ->choices(EcommerceHelper::getAvailableCitiesByState(old('state', $form->getModel()->state)))
+                        ->colspan(1)
+                        ->choices(
+                            ['' => __('Select city...')] + EcommerceHelper::getAvailableCitiesByState(
+                                old('state', $form->getModel()->state)
+                            )
+                        )
+                    ->toArray()
                 );
             })
             ->add(
@@ -114,6 +152,7 @@ class AddressForm extends FormAbstract
                 CheckboxField::class,
                 CheckboxFieldOption::make()
                     ->label(__('Use this address as default.'))
+                    ->checked($model && $model->is_default)
                     ->colspan(2)
                     ->toArray()
             )
@@ -126,6 +165,31 @@ class AddressForm extends FormAbstract
                     ->cssClass('btn btn-primary mt-2')
                     ->toArray()
             );
-        ;
+    }
+
+    public function setFormSelectInputClass(string $cssClass): static
+    {
+        $this->formSelectInputClass = $cssClass;
+
+        return $this;
+    }
+
+    public function renderForm(
+        array $options = [],
+        bool $showStart = true,
+        bool $showFields = true,
+        bool $showEnd = true
+    ): string {
+        foreach ($this->getFields() as &$field) {
+            if ($field->getType() != SelectField::class) {
+                continue;
+            }
+
+            if (isset($this->formSelectClass)) {
+                $field->setOption('attr.class', $this->formSelectClass);
+            }
+        }
+
+        return parent::renderForm($options, $showStart, $showFields, $showEnd);
     }
 }

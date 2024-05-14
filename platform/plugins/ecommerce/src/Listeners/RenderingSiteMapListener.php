@@ -83,9 +83,9 @@ class RenderingSiteMapListener
                         ->with('slugable')
                         ->wherePublished()
                         ->where('is_variation', 0)
-                        ->whereYear('updated_at', $year)
-                        ->whereMonth('updated_at', $month)
-                        ->orderByDesc('updated_at')
+                        ->whereYear('created_at', $year)
+                        ->whereMonth('created_at', $month)
+                        ->orderByDesc('created_at')
                         ->select(['id', 'name', 'updated_at'])
                         ->get();
 
@@ -101,21 +101,21 @@ class RenderingSiteMapListener
         } else {
             $products = Product::query()
                 ->selectRaw(
-                    'YEAR(updated_at) as updated_year, MONTH(updated_at) as updated_month, MAX(updated_at) as updated_at'
+                    'YEAR(created_at) as created_year, MONTH(created_at) as created_month, MAX(created_at) as created_at'
                 )
                 ->where('is_variation', 0)
-                ->groupBy('updated_year', 'updated_month')
-                ->orderByDesc('updated_year')
-                ->orderByDesc('updated_month')
+                ->groupBy('created_year', 'created_month')
+                ->orderByDesc('created_year')
+                ->orderByDesc('created_month')
                 ->get();
 
             foreach ($products as $product) {
                 $key = sprintf(
                     'products-%s-%s',
-                    $product->updated_year,
-                    str_pad($product->updated_month, 2, '0', STR_PAD_LEFT)
+                    $product->created_year,
+                    str_pad($product->created_month, 2, '0', STR_PAD_LEFT)
                 );
-                SiteMapManager::addSitemap(SiteMapManager::route($key), $product->updated_at);
+                SiteMapManager::addSitemap(SiteMapManager::route($key), $product->created_at);
             }
 
             $productCategory = ProductCategory::query()

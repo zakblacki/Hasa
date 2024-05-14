@@ -1,14 +1,21 @@
-<div class="bb-product-price mb-3">
-    @if ($product->front_sale_price !== $product->price)
-        <span>
-            <span class="bb-product-price-text fw-bold">{{ format_price($product->front_sale_price) }}</span>
-            <span class="bb-product-price-text-old">
-                <small><del class="text-muted">{{ format_price($product->price) }}</del></small>
-            </span>
-        </span>
-    @else
-        <span>
-            <span class="bb-product-price-text fw-bold">{{ format_price($product->price) }}</span>
-        </span>
+@php
+    $isDisplayPriceOriginal ??= true;
+    $priceWrapperClassName ??= null;
+    $priceClassName ??= null;
+    $priceOriginalClassName ??= null;
+    $priceOriginalWrapperClassName ??= null;
+@endphp
+
+<div class="{{ $priceWrapperClassName === null ? 'bb-product-price mb-3' : $priceWrapperClassName }}">
+    <span
+        class="{{ $priceClassName === null ? 'bb-product-price-text fw-bold' : $priceClassName }}"
+        data-bb-value="product-price"
+    >{{ $product->price()->displayAsText() }}</span>
+
+    @if($isDisplayPriceOriginal && $product->isOnSale())
+        @include(EcommerceHelper::viewPath('includes.product-prices.original'), [
+            'priceWrapperClassName' => $priceOriginalWrapperClassName,
+            'priceClassName' => $priceOriginalClassName,
+        ])
     @endif
 </div>

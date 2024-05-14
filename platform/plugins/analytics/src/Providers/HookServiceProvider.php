@@ -18,7 +18,7 @@ class HookServiceProvider extends ServiceProvider
         $this->app['events']->listen(RenderingDashboardWidgets::class, function () {
             if (
                 ! config('plugins.analytics.general.enabled_dashboard_widgets')
-                || setting('analytics_dashboard_widgets', '1') != '1'
+                || setting('analytics_dashboard_widgets', '0') != '1'
             ) {
                 return;
             }

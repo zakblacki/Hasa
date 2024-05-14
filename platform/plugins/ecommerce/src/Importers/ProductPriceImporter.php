@@ -9,9 +9,14 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductPriceImporter extends Importer
 {
-    public function getHeading(): string
+    public function getLabel(): string
     {
         return trans('plugins/ecommerce::product-prices.import.name');
+    }
+
+    public function getHeading(): string
+    {
+        return $this->getLabel();
     }
 
     public function getDoneMessage(int $count): string
@@ -47,7 +52,7 @@ class ProductPriceImporter extends Importer
             ImportColumn::make('id')
                 ->label('ID')
                 ->rules(
-                    ['required', 'string', 'exists:ec_products,id'],
+                    ['required', 'exists:ec_products,id'],
                     trans('plugins/ecommerce::product-prices.import.rules.id')
                 ),
             ImportColumn::make('name')

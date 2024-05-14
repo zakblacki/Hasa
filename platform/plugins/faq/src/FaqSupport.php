@@ -35,7 +35,7 @@ class FaqSupport implements FaqContract
             ];
         }
 
-        $schema = json_encode($schema);
+        $schema = json_encode($schema, JSON_UNESCAPED_UNICODE);
 
         Theme::asset()
             ->container('header')

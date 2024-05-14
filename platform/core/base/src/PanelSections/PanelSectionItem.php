@@ -106,7 +106,7 @@ class PanelSectionItem implements PanelSectionItemContract
         return $this->priority;
     }
 
-    public function withView(string $view)
+    public function withView(string $view): static
     {
         $this->view = $view;
 
@@ -142,7 +142,7 @@ class PanelSectionItem implements PanelSectionItemContract
         return $this->urlShouldOpenNewTab;
     }
 
-    public function withRoute(string $route, array $parameters = [], bool $absolute = true)
+    public function withRoute(string $route, array $parameters = [], bool $absolute = true): static
     {
         return $this
             ->withUrl(route($route, $parameters, $absolute))

@@ -38,6 +38,8 @@ class DashboardWidgetInstance
 
     protected array $predefinedRanges = [];
 
+    protected int $priority = 999;
+
     public function getType(): string
     {
         return $this->type;
@@ -158,6 +160,18 @@ class DashboardWidgetInstance
         return $this;
     }
 
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): self
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
     public function getStatsTotal(): int
     {
         return $this->statsTotal;
@@ -240,6 +254,7 @@ class DashboardWidgetInstance
         $widgets[$this->key] = [
             'id' => $widget->id,
             'type' => $this->type,
+            'priority' => $this->priority,
             'view' => view('core/dashboard::widgets.stats', compact('widget', 'widgetSetting'))->render(),
         ];
 

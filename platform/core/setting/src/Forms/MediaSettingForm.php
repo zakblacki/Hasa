@@ -41,12 +41,12 @@ class MediaSettingForm extends SettingForm
                 'html' => view('core/setting::partials.media.media-driver-field')->render(),
                 'colspan' => 6,
             ])
-            ->add('media_use_original_name_for_file_path', 'onOffCheckbox', [
+            ->add('media_use_original_name_for_file_path', OnOffCheckboxField::class, [
                 'label' => trans('core/setting::setting.media.use_original_name_for_file_path'),
                 'value' => setting('media_use_original_name_for_file_path'),
                 'colspan' => 6,
             ])
-            ->add('media_turn_off_automatic_url_translation_into_latin', 'onOffCheckbox', [
+            ->add('media_turn_off_automatic_url_translation_into_latin', OnOffCheckboxField::class, [
                 'label' => trans('core/setting::setting.media.turn_off_automatic_url_translation_into_latin'),
                 'value' => RvMedia::turnOffAutomaticUrlTranslationIntoLatin(),
                 'colspan' => 6,
@@ -94,12 +94,13 @@ class MediaSettingForm extends SettingForm
                             ->colspan(6)
                     )
                     ->fieldset(function (MediaSettingForm $form) use ($folders, $folderIds) {
-                        $form->add('media_folders_can_add_watermark_field', 'html', [
-                            'html' => view(
-                                'core/setting::partials.media.media-folders-can-add-watermark-field',
-                                compact('folders', 'folderIds')
-                            )->render(),
-                        ])
+                        $form
+                            ->add('media_folders_can_add_watermark_field', 'html', [
+                                'html' => view(
+                                    'core/setting::partials.media.media-folders-can-add-watermark-field',
+                                    compact('folders', 'folderIds')
+                                )->render(),
+                            ])
                             ->add('row_1', 'html', [
                                 'html' => '<div class="row">',
                             ])
@@ -198,7 +199,7 @@ class MediaSettingForm extends SettingForm
                 'choices' => array_merge(
                     ['gd' => 'GD Library'],
                     extension_loaded('imagick')
-                        ? ['imagick' => 'Imagick', ]
+                        ? ['imagick' => 'Imagick']
                         : [],
                 ),
                 'colspan' => 6,
@@ -241,14 +242,24 @@ class MediaSettingForm extends SettingForm
             }
         }
 
-        $this->add(
-            'media_sizes_helper',
-            AlertField::class,
-            AlertFieldOption::make()
-                ->content(trans('core/setting::setting.media.media_sizes_helper'))
-                ->addAttribute('class', 'mb-0')
-                ->colspan(6)
-                ->toArray()
-        );
+        $this
+            ->add(
+                'media_sizes_helper',
+                AlertField::class,
+                AlertFieldOption::make()
+                    ->content(trans('core/setting::setting.media.media_sizes_helper'))
+                    ->addAttribute('class', 'mb-0')
+                    ->colspan(6)
+                    ->toArray()
+            )
+            ->add(
+                'update_thumbnail_sizes_warning',
+                AlertField::class,
+                AlertFieldOption::make()
+                    ->type('warning')
+                    ->content(trans('core/setting::setting.media.update_thumbnail_sizes_warning', ['button_text' => trans('core/setting::setting.generate_thumbnails')]))
+                    ->colspan(6)
+                    ->toArray()
+            );
     }
 }

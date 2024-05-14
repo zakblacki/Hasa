@@ -52,7 +52,7 @@ class BaseHelper
         return $this->formatTime($date, $format, $translated);
     }
 
-    public function formatDateTime(CarbonInterface|int|string|null $date, string $format = null, bool $translated = false): ?string
+    public function formatDateTime(CarbonInterface|int|string|null $date, ?string $format = null, bool $translated = false): ?string
     {
         if (empty($format)) {
             $format = $this->getDateTimeFormat();
@@ -180,7 +180,7 @@ class BaseHelper
     }
 
     /**
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $query
      */
     public function isJoined($query, string $table): bool
     {
@@ -299,7 +299,7 @@ class BaseHelper
         return $formats;
     }
 
-    public function clean(array|string|null $dirty, array|string $config = null): array|string|null
+    public function clean(array|string|null $dirty, array|string|null $config = null): array|string|null
     {
         if (config('core.base.general.enable_less_secure_web', false)) {
             return $dirty;
@@ -316,7 +316,7 @@ class BaseHelper
         return clean($dirty, $config);
     }
 
-    public function html(array|string|null $dirty, array|string $config = null): HtmlString
+    public function html(array|string|null $dirty, array|string|null $config = null): HtmlString
     {
         return new HtmlString((string) $this->clean($dirty, $config));
     }
@@ -423,7 +423,7 @@ class BaseHelper
         return null;
     }
 
-    public function getGoogleFontsURL(string $path = null): string
+    public function getGoogleFontsURL(?string $path = null): string
     {
         $url = config('core.base.general.google_fonts_url', 'https://fonts.bunny.net');
 
@@ -507,7 +507,7 @@ class BaseHelper
         return IconFacade::has($name);
     }
 
-    public function renderIcon(string $name, string $size = null, array $attributes = [], bool $safe = false): string
+    public function renderIcon(string $name, ?string $size = null, array $attributes = [], bool $safe = false): string
     {
         if ($safe && ! $this->hasIcon($name)) {
             return '';

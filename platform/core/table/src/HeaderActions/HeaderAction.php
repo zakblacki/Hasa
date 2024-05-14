@@ -12,12 +12,12 @@ use Illuminate\Contracts\Support\Arrayable;
 
 class HeaderAction implements Arrayable
 {
-    use HasLabel;
+    use HasAttributes;
     use HasColor;
     use HasIcon;
-    use HasUrl;
+    use HasLabel;
     use HasPermissions;
-    use HasAttributes;
+    use HasUrl;
 
     public function __construct(protected string $name)
     {

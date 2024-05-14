@@ -13,7 +13,7 @@
                                 type="radio"
                                 name="attribute_{{ $set->slug }}_{{ $key }}"
                                 value="{{ $attribute->id }}"
-                                checked="checked"
+                                {{ $selected->where('id', $attribute->id)->count() ? 'checked' : '' }}>
                             <span style="{{ $attribute->getAttributeStyle($set, $productVariations) }}"></span>
                         </label>
                     </div>

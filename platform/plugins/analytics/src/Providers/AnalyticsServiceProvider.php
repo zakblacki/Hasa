@@ -42,6 +42,7 @@ class AnalyticsServiceProvider extends ServiceProvider
             ->loadRoutes()
             ->loadAndPublishViews()
             ->loadAndPublishTranslations()
+            ->loadMigrations()
             ->publishAssets();
 
         PanelSectionManager::default()->beforeRendering(function () {

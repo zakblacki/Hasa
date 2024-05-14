@@ -3,14 +3,22 @@
 namespace Botble\Contact\Http\Requests;
 
 use Botble\Base\Rules\EmailRule;
+use Botble\Base\Rules\OnOffRule;
 use Botble\Base\Rules\PhoneNumberRule;
+use Botble\Contact\Enums\CustomFieldType;
+use Botble\Contact\Models\CustomField;
 use Botble\Support\Http\Requests\Request;
+use Illuminate\Database\Eloquent\Collection;
 
 class ContactRequest extends Request
 {
+    protected $errorBag = 'contact';
+
     protected array $mandatoryFields;
 
     protected array $displayFields;
+
+    protected Collection $customFields;
 
     public function mandatoryFields(array $fields): static
     {
@@ -39,17 +47,52 @@ class ContactRequest extends Request
 
         $rules = $this->applyRules($rules, $this->request->getString('display_fields'), $this->request->getString('required_fields'));
 
+        $customFields = $this->getCustomFields();
+
+        if ($customFields->isNotEmpty()) {
+            $rules['contact_custom_fields'] = ['required', 'array'];
+        }
+
+        foreach ($customFields as $customField) {
+            $customFieldRules = [$customField->required ? 'required' : 'nullable'];
+
+            $rules["contact_custom_fields.$customField->id"] = match ($customField->type->getValue()) {
+                CustomFieldType::TEXT, CustomFieldType::DROPDOWN, CustomFieldType::RADIO => [...$customFieldRules, 'string', 'max:255'],
+                CustomFieldType::TEXTAREA => [...$customFieldRules, 'string', 'max:1000'],
+                CustomFieldType::NUMBER => [...$customFieldRules, 'numeric'],
+                CustomFieldType::CHECKBOX => [new OnOffRule()],
+                default => $customFieldRules,
+            };
+        }
+
         return apply_filters('contact_request_rules', $rules, $this);
     }
 
     public function attributes(): array
     {
-        return [
+        $attributes = [
             'name' => __('Name'),
             'email' => __('Email'),
             'phone' => __('Phone'),
             'content' => __('Content'),
         ];
+
+        $customFields = $this->getCustomFields();
+
+        foreach ($customFields as $customField) {
+            $attributes["contact_custom_fields.$customField->id"] = $customField->name;
+        }
+
+        return $attributes;
+    }
+
+    protected function getCustomFields(): Collection
+    {
+        if (isset($this->customFields)) {
+            return $this->customFields;
+        }
+
+        return $this->customFields = CustomField::query()->wherePublished()->with('options')->get();
     }
 
     protected function filtersByDisplayFields(array $rules): array

@@ -9,7 +9,7 @@ trait HasUuidsOrIntegerIds
     public static function bootHasUuidsOrIntegerIds(): void
     {
         static::creating(static function (self $model): void {
-            if (self::getTypeOfId() === 'BIGINT') {
+            if (static::getTypeOfId() === 'BIGINT') {
                 return;
             }
 
@@ -19,7 +19,7 @@ trait HasUuidsOrIntegerIds
 
     public function newUniqueId(): ?string
     {
-        return match (self::getTypeOfId()) {
+        return match (static::getTypeOfId()) {
             'ULID' => (string) Str::ulid(),
             'BIGINT' => null,
             default => (string) Str::orderedUuid(),
@@ -28,7 +28,7 @@ trait HasUuidsOrIntegerIds
 
     public function getKeyType(): string
     {
-        if (self::getTypeOfId() !== 'BIGINT') {
+        if (static::getTypeOfId() !== 'BIGINT') {
             return 'string';
         }
 
@@ -37,7 +37,7 @@ trait HasUuidsOrIntegerIds
 
     public function getIncrementing(): bool
     {
-        if (self::getTypeOfId() !== 'BIGINT') {
+        if (static::getTypeOfId() !== 'BIGINT') {
             return false;
         }
 
@@ -46,12 +46,12 @@ trait HasUuidsOrIntegerIds
 
     public static function determineIfUsingUuidsForId(): bool
     {
-        return self::getTypeOfId() === 'UUID';
+        return static::getTypeOfId() === 'UUID';
     }
 
     public static function determineIfUsingUlidsForId(): bool
     {
-        return self::getTypeOfId() === 'ULID';
+        return static::getTypeOfId() === 'ULID';
     }
 
     public static function getTypeOfId(): string
@@ -69,7 +69,7 @@ trait HasUuidsOrIntegerIds
 
     public function ensureIdCanBeCreated(): void
     {
-        if (self::getTypeOfId() !== 'BIGINT') {
+        if (static::getTypeOfId() !== 'BIGINT') {
             $this->id = $this->newUniqueId();
         }
     }

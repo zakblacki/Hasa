@@ -45,6 +45,7 @@ class LoginForm extends AuthForm
                         ->label(__('Phone'))
                         ->placeholder(__('Phone number'))
                         ->icon('ti ti-phone')
+                        ->addAttribute('autocomplete', 'tel')
                         ->toArray()
                 );
             })
@@ -66,6 +67,7 @@ class LoginForm extends AuthForm
                     EmailFieldOption::make()
                         ->label(__('Email or phone'))
                         ->placeholder(__('Email or Phone number'))
+                        ->addAttribute('autocomplete', 'email')
                         ->icon('ti ti-user')
                         ->toArray()
                 );

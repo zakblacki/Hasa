@@ -4,6 +4,7 @@ return [
     [
         'name' => 'Galleries',
         'flag' => 'galleries.index',
+        'parent_flag' => 'core.cms',
     ],
     [
         'name' => 'Create',

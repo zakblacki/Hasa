@@ -11,6 +11,7 @@
         @if ($title)
             <h2>{{ $title }}</h2>
         @endif
+
         @if ($description)
             <p class="text-muted">{!! BaseHelper::clean($description) !!}</p>
         @endif

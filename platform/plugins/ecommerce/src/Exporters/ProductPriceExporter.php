@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 
 class ProductPriceExporter extends Exporter
 {
-    public function label(): string
+    public function getLabel(): string
     {
         return trans('plugins/ecommerce::product-prices.name');
     }

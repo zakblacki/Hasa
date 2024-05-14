@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 
 class ProductInventoryExporter extends Exporter
 {
-    public function label(): string
+    public function getLabel(): string
     {
         return trans('plugins/ecommerce::product-inventory.name');
     }

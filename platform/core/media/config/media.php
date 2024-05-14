@@ -19,14 +19,14 @@ return [
     'libraries' => [
         'stylesheets' => [
             'vendor/core/core/media/libraries/jquery-context-menu/jquery.contextMenu.min.css',
-            'vendor/core/core/media/css/media.css?v=' . get_cms_version(),
+            'vendor/core/core/media/css/media.css',
         ],
         'javascript' => [
             'vendor/core/core/media/libraries/lodash/lodash.min.js',
             'vendor/core/core/base/libraries/dropzone/dropzone.js',
             'vendor/core/core/media/libraries/jquery-context-menu/jquery.ui.position.min.js',
             'vendor/core/core/media/libraries/jquery-context-menu/jquery.contextMenu.min.js',
-            'vendor/core/core/media/js/media.js?v=' . get_cms_version(),
+            'vendor/core/core/media/js/media.js',
         ],
     ],
     'allowed_mime_types' => env(
@@ -135,6 +135,7 @@ return [
     'default_upload_folder' => env('RV_MEDIA_DEFAULT_UPLOAD_FOLDER'),
     'default_upload_url' => env('RV_MEDIA_DEFAULT_UPLOAD_URL', url('storage')),
     'generate_thumbnails_enabled' => env('RV_MEDIA_GENERATE_THUMBNAILS_ENABLED', true),
+    'generate_thumbnails_chunk_limit' => env('RV_MEDIA_GENERATE_THUMBNAILS_CHUNK_LIMIT', 50),
     'folder_colors' => [
         '#3498db',
         '#2ecc71',

@@ -24,9 +24,9 @@
             'class' => $classes,
             'href' => $url,
         ]) }}
-        @if(str_contains($color, '#'))
-            style="background-color: {{ $color }}"
-        @endif
+        @style([
+            'background-color: ' . $color => str_contains($color, '#'),
+        ])
     >
         <div class="d-flex justify-content-between align-items-center">
             <div class="details px-4 py-3 d-flex flex-column justify-content-between">

@@ -143,6 +143,13 @@ class BaseServiceProvider extends ServiceProvider
                     'icon' => 'ti ti-user-shield',
                     'route' => 'system.index',
                     'permissions' => ['core.system'],
+                ])
+                ->registerItem([
+                    'id' => 'cms-core-tools',
+                    'priority' => 9000,
+                    'name' => 'core/base::layouts.tools',
+                    'icon' => 'ti ti-tool',
+                    'permission' => ['core.tools'],
                 ]);
         });
     }
@@ -165,7 +172,7 @@ class BaseServiceProvider extends ServiceProvider
         $memoryLimit = Arr::get($baseConfig, 'memory_limit');
 
         if (! $memoryLimit) {
-            if (false === Helper::isIniValueChangeable('memory_limit')) {
+            if (Helper::isIniValueChangeable('memory_limit') === false) {
                 $memoryLimit = $currentLimit;
             } else {
                 $memoryLimit = '256M';
@@ -173,7 +180,7 @@ class BaseServiceProvider extends ServiceProvider
         }
 
         $limitInt = Helper::convertHrToBytes($memoryLimit);
-        if (-1 !== $currentLimitInt && (-1 === $limitInt || $limitInt > $currentLimitInt)) {
+        if ($currentLimitInt !== -1 && ($limitInt === -1 || $limitInt > $currentLimitInt)) {
             BaseHelper::iniSet('memory_limit', $memoryLimit);
         }
 

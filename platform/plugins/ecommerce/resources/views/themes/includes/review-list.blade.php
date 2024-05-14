@@ -26,9 +26,7 @@
             </div>
 
             <div class="mb-2 review-item__rating">
-                <div class="bb-product-rating">
-                    <span style="width: {{ $review->star * 20 }}%"></span>
-                </div>
+                @include(EcommerceHelper::viewPath('includes.rating-star'), ['avg' => $review->star, 'size' => 80])
             </div>
 
             <div class="review-item__body">

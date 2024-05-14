@@ -27,7 +27,7 @@
                             name="add-to-cart"
                             class="bb-product-details-add-to-cart-btn w-100 bb-btn-product-actions-icon btn btn-primary justify-content-center h-100"
                             @disabled($product->isOutOfStock())
-                            {!! EcommerceHelper::getGtmAttributes('add-to-cart-in-form', $product) !!}
+                            {!! EcommerceHelper::jsAttributes('add-to-cart-in-form', $product) !!}
                         >
                             <x-core::icon name="ti ti-shopping-cart"/>
                             {{ __('Add To Cart') }}

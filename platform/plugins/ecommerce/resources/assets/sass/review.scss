@@ -110,7 +110,6 @@
         > input:checked ~ label,
         &:not(:checked) > label:hover,
         &:not(:checked) > label:hover ~ label {
-
             color: #fab528;
         }
 
@@ -169,7 +168,6 @@
             > input:checked ~ label,
             &:not(:checked) > label:hover,
             &:not(:checked) > label:hover ~ label {
-
                 color: #fab528;
             }
 
@@ -333,5 +331,5 @@
 
 .required:after {
     color: #cb4321;
-    content: " *";
+    content: ' *';
 }

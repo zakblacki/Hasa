@@ -3,6 +3,7 @@
 namespace Botble\Ecommerce\Tables;
 
 use Botble\Base\Facades\BaseHelper;
+use Botble\Base\Facades\Html;
 use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
@@ -67,10 +68,7 @@ class OrderTable extends TableAbstract
                 return BaseHelper::clean($item->payment->payment_channel->label() ?: '&mdash;');
             })
             ->formatColumn('amount', PriceFormatter::class)
-            ->formatColumn('shipping_amount', PriceFormatter::class)
-            ->editColumn('user_id', function (Order $item) {
-                return BaseHelper::clean($item->user->name ?: $item->address->name);
-            });
+            ->formatColumn('shipping_amount', PriceFormatter::class);
 
         if (EcommerceHelper::isTaxEnabled()) {
             $data = $data->formatColumn('tax_amount', PriceFormatter::class);
@@ -132,10 +130,7 @@ class OrderTable extends TableAbstract
     {
         $columns = [
             IdColumn::make(),
-            Column::make('user_id')
-                ->title(trans('plugins/ecommerce::order.customer_label'))
-                ->alignStart(),
-            FormattedColumn::make('customer_email')
+            FormattedColumn::make('user_id')
                 ->title(trans('plugins/ecommerce::order.email'))
                 ->alignStart()
                 ->orderable(false)
@@ -143,8 +138,9 @@ class OrderTable extends TableAbstract
                     $item = $column->getItem();
 
                     return sprintf(
-                        '%s <br> %s',
-                        $item->user->email ?: $item->address->email,
+                        '%s <br> %s <br> %s',
+                        $item->user->name ?: $item->address->name,
+                        Html::mailto($item->user->email ?: $item->address->email),
                         $item->user->phone ?: $item->address->phone
                     );
                 }),

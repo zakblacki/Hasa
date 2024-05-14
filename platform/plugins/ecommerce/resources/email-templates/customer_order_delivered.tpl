@@ -1,13 +1,34 @@
 {{ header }}
 
-<h2>Your order is delivering!</h2>
+<div class="bb-main-content">
+    <table class="bb-box" cellpadding="0" cellspacing="0">
+        <tbody>
+            <tr>
+                <td class="bb-content bb-pb-0" align="center">
+                    <table class="bb-icon bb-icon-lg bb-bg-blue" cellspacing="0" cellpadding="0">
+                        <tbody>
+                            <tr>
+                                <td valign="middle" align="center">
+                                    <img src="{{ 'truck-delivery' | icon_url }}" class="bb-va-middle" width="40" height="40" alt="Icon">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-<p>Hi {{ customer_name }},</p>
-
-<p>Your products are delivered.</p>
-
-{{ order_delivery_notes }}
-
-<p>If you have any question, please contact us via <a href="mailto:{{ site_admin_email }}">{{ site_admin_email }}</a></p>
+                    <h1 class="bb-text-center bb-m-0 bb-mt-md">Your order has been delivered!</h1>
+                </td>
+            </tr>
+            <tr>
+                <td class="bb-content">
+                    <p>Dear {{ customer_name }},</p>
+                    <p>Your products are delivered.</p>
+                    {% if order_delivery_notes %}
+                        <p><i>" {{ order_delivery_notes }} "</i></p>
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 {{ footer }}

@@ -8,6 +8,7 @@ use Botble\Contact\Forms\Fronts\ContactForm;
 use Botble\Contact\Forms\ShortcodeContactAdminConfigForm;
 use Botble\Contact\Http\Requests\ContactRequest;
 use Botble\Contact\Models\Contact;
+use Botble\Contact\Models\CustomField;
 use Botble\Shortcode\Compilers\Shortcode;
 use Botble\Shortcode\Facades\Shortcode as ShortcodeFacade;
 use Botble\Theme\Facades\Theme;
@@ -37,6 +38,19 @@ class HookServiceProvider extends ServiceProvider
                 return ShortcodeContactAdminConfigForm::createFromArray($attributes);
             });
         }
+
+        add_filter('form_extra_fields_render', function (?string $fields = null, ?string $form = null): ?string {
+            $customFields = CustomField::query()
+                ->wherePublished()->with('options')
+                ->orderBy('order')
+                ->get();
+
+            if ($customFields->isEmpty()) {
+                return $fields;
+            }
+
+            return $fields . view('plugins/contact::forms.old-version-support', compact('customFields'))->render();
+        }, 128, 2);
     }
 
     public function registerTopHeaderNotification(?string $options): ?string

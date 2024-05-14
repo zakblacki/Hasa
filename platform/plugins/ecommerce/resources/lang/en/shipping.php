@@ -102,6 +102,7 @@ return [
     'update_cod_status_success' => 'Updated COD status of shipping successfully!',
     'updated_cod_status_by' => 'Updated COD status to :status . Updated by: %user_name%',
     'all' => 'All',
+    'all_countries' => 'All countries',
     'error_when_adding_new_region' => 'There is an error when adding new region!',
     'delivery' => 'Delivery',
     'adjustment_price_of' => 'Adjustment price of :key',
@@ -109,6 +110,7 @@ return [
     'delivery_note' => 'Delivery note',
     'shipments' => 'Shipments',
     'order_id' => 'Order ID',
+    'shipment_id' => 'Shipment ID',
     'not_available' => 'Not available',
     'shipping_amount' => 'Shipping Amount',
     'additional_shipment_information' => 'Additional shipment information',
@@ -157,6 +159,7 @@ return [
                 'adjustment_price_placeholder' => 'Adjustment price',
                 'is_enabled' => 'Is enabled?',
                 'no_shipping_rule' => 'No shipping rule',
+                'adjustment_price_helper' => 'To subtract from the price, simply utilize a negative number. e.g. -10',
             ],
             'bulk-import' => [
                 'menu' => 'Bulk import Shipping Rule Items',
@@ -174,5 +177,15 @@ return [
     'empty_shipping_options' => [
         'title' => 'No shipping options',
         'subtitle' => 'Click on add country from the left side to add new shipping options.',
+    ],
+    'shipping_based_on_location_instruction' => 'If you want to set shipping fee based on location, you need to enable ":link_text" in Settings -> Checkout and import location data in Tools -> Import/Export Data.',
+    'shipping_based_on_zip_code_instruction' => 'If you want to set shipping fee based on zip code, you need to enable ":link_text" in Settings -> Checkout and set zip code for store address.',
+    'shipping_label' => [
+        'name' => 'Shipping label',
+        'print' => 'Print',
+        'print_shipping_label' => 'Print shipping label',
+        'sender' => 'Sender',
+        'order_date' => 'Order date',
+        'scan_qr_code' => 'Scan QR code to track your shipment',
     ],
 ];

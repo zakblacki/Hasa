@@ -1,8 +1,6 @@
 <div class="product-rating d-flex align-items-center mb-3">
     <div class="product-rating-icon">
-        <div class="bb-product-rating" style="--bb-rating-size: 70px">
-            <span style="width: {{ $product->reviews_avg * 20 }}%"></span>
-        </div>
+        @include(EcommerceHelper::viewPath('includes.rating-star'), ['avg' => $product->reviews_avg])
     </div>
     <div class="product-rating-text ms-2 fs-6">
         <a href="{{ $product->url }}#product-review" data-bb-toggle="scroll-to-review">

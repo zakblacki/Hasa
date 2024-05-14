@@ -1,26 +1,16 @@
-<div class="container" id="product-detail">
+<div class="container bb-product-detail" id="bb-product-detail">
     <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-12 mb-30">
             @include(EcommerceHelper::viewPath('includes.product-gallery'))
         </div>
         <div class="col-lg-6 col-md-6 col-sm-12 mb-30">
-            <div class="product-page-content">
+            <div class="bb-product-page-content">
                 <h2 class="product-title mb-2">{{ $product->name }}</h2>
                 @if (EcommerceHelper::isReviewEnabled())
                     @include(EcommerceHelper::viewPath('includes.rating'))
                 @endif
-                <div class="product-price mb-3">
-                    @if ($product->front_sale_price !== $product->price)
-                        <del>{{ format_price($product->front_sale_price) }}</del>
-                        <span>
-                            <span class="product-price-text fw-bold fs-4 text-primary">{{ format_price($product->front_sale_price) }}</span>
-                        </span>
-                    @else
-                        <span>
-                            <span class="product-price-text fw-bold fs-4 text-primary">{{ format_price($product->price) }}</span>
-                        </span>
-                    @endif
-                </div>
+
+                @include(EcommerceHelper::viewPath('includes.product-price'))
 
                 {!! apply_filters('ecommerce_before_product_description', null, $product) !!}
                 <p
@@ -32,15 +22,16 @@
                 {!! apply_filters('ecommerce_after_product_description', null, $product) !!}
 
                 <div class="text-warning"></div>
-                <div class="row product-filters">
-                    @if ($product->variations()->count() > 0)
-                        {!! render_product_swatches($product, [
-                            'selected' => $selectedAttrs,
-                        ]) !!}
-                    @endif
-                </div>
-                <form class="single-variation-wrap" action="{{ route('public.cart.add-to-cart') }}" method="post">
+                <form class="single-variation-wrap" data-bb-toggle="product-form" action="{{ route('public.cart.add-to-cart') }}" method="post">
                     @csrf
+                    <div class="row product-filters">
+                        @if ($product->variations()->count() > 0)
+                            {!! render_product_swatches($product, [
+                                'selected' => $selectedAttrs,
+                            ]) !!}
+                        @endif
+                    </div>
+
                     {!! apply_filters(ECOMMERCE_PRODUCT_DETAIL_EXTRA_HTML, null) !!}
                     <input
                         id="hidden-product-is_out_of_stock"
@@ -54,36 +45,50 @@
                         type="hidden"
                         value="{{ $product->id }}"
                     />
-                    <div class="product-quantity mb-3">
-                    <span
-                        class="quantity-btn quantityPlus"
-                        data-value="+"
-                    ></span>
-                        <input
-                            class="quantity input-lg form-control w-auto"
-                            name="qty"
-                            type="number"
-                            value="1"
-                            title="Quantity"
-                            step="1"
-                            min="1"
-                            max="20"
-                        />
-                        <span
-                            class="quantity-btn quantityMinus"
-                            data-value="-"
-                        ></span>
+
+                    <div class="d-flex gap-4 mb-3">
+                        @include(EcommerceHelper::viewPath('includes.product-quantity'))
+                        <button
+                            type="submit"
+                            name="add-to-cart"
+                            class="bb-product-details-add-to-cart-btn btn btn-primary bb-btn-product-actions-icon"
+                            @disabled($product->isOutOfStock())
+                            data-bb-toggle="add-to-cart-in-form"
+                            {!! EcommerceHelper::jsAttributes('add-to-cart-in-form', $product) !!}
+                        >
+                            <x-core::icon name="ti ti-shopping-cart"/>
+                            {{ __('Add To Cart') }}
+                        </button>
                     </div>
-                    <button
-                        class="btn btn-primary mb-3"
-                        id="btn-add-cart"
-                        type="submit"
-                    >
-                        <x-core::icon name="ti ti-shopping-cart-plus"/>
-                    {{ __('Add to cart') }}
-                    </button>
+
+                    @if(EcommerceHelper::isWishlistEnabled() || EcommerceHelper::isCompareEnabled())
+                        <div class="d-flex gap-4 mb-3">
+                            @if (EcommerceHelper::isCompareEnabled())
+                                <button
+                                    @class(['btn bb-btn-compare bb-btn-product-actions-icon', 'active' => EcommerceHelper::isProductInCompare($product->original_product->id)])
+                                    style="border: 0 !important;"
+                                    data-bb-toggle="add-to-compare" title="Add to compare"
+                                    data-url="{{ route('public.compare.add', $product) }}"
+                                    data-remove-url="{{ route('public.compare.remove', $product) }}"
+                                >
+                                    <x-core::icon name="ti ti-refresh"/>
+                                    {{ __('Compare') }}
+                                </button>
+                            @endif
+                            @if (EcommerceHelper::isWishlistEnabled())
+                                <button
+                                    class="btn bb-btn-wishlist bb-btn-product-actions-icon"
+                                    data-bb-toggle="add-to-wishlist" title="Add to wishlist"
+                                    data-url="{{ route('public.wishlist.add', $product) }}"
+                                >
+                                    <x-core::icon name="ti ti-heart"/>
+                                    {{ __('Add Wishlist') }}
+                                </button>
+                            @endif
+                        </div>
+                    @endif
                 </form>
-                <div class="product-meta">
+                <div class="bb-product-meta">
                     @if ($product->sku)
                         <span>{{ __('SKU') }} : <span
                                 class="sku"
@@ -99,10 +104,10 @@
                     @if (!$product->categories->isEmpty())
                         <span>{{ __('Categories') }} :
                         @foreach ($product->categories as $category)
-                                <a href="{{ $category->url }}"> {{ $category->name }}
-                                    @if (!$loop->last), @endif
+                            <a href="{{ $category->url }}"> {{ $category->name }}
+                                @if (!$loop->last), @endif
                             </a>
-                            @endforeach
+                        @endforeach
                     </span>
                     @endif
                 </div>

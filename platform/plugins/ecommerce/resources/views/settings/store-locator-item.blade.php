@@ -113,6 +113,18 @@
             />
         @endif
 
+        @if (EcommerceHelper::isZipCodeEnabled())
+            <x-core::form.text-input
+                wrapper-class="col-md-6"
+                id="store_zip_code"
+                name="zip_code"
+                :value="$locator ? $locator->zip_code : null"
+                :placeholder="trans('plugins/ecommerce::store-locator.zip_code')"
+                :label="trans('plugins/ecommerce::store-locator.zip_code')"
+                :required="true"
+            />
+        @endif
+
         <x-core::form.on-off.checkbox
             name="is_shipping_location"
             label="{{ trans('plugins/ecommerce::store-locator.is_shipping_location') }}"

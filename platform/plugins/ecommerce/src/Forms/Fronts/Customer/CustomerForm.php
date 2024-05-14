@@ -2,6 +2,7 @@
 
 namespace Botble\Ecommerce\Forms\Fronts\Customer;
 
+use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Forms\FieldOptions\ButtonFieldOption;
 use Botble\Base\Forms\FieldOptions\EmailFieldOption;
 use Botble\Base\Forms\FieldOptions\InputFieldOption;
@@ -27,13 +28,17 @@ class CustomerForm extends FormAbstract
                 TextFieldOption::make()
                     ->label(__('Full Name'))
             )
-            ->add(
-                'dob',
-                TextField::class,
-                InputFieldOption::make()
-                    ->addAttribute('id', 'date_of_birth')
-                    ->label(__('Date of birth'))
-            )
+            ->when(get_ecommerce_setting('enabled_customer_dob_field', true), function (CustomerForm $form) {
+                $form->add(
+                    'dob',
+                    TextField::class,
+                    InputFieldOption::make()
+                        ->addAttribute('id', 'date_of_birth')
+                        ->addAttribute('data-date-format', config('core.base.general.date_format.js.date'))
+                        ->value($this->getModel()->dob ? BaseHelper::formatDate($this->getModel()->dob) : null)
+                        ->label(__('Date of birth'))
+                );
+            })
             ->add(
                 'email',
                 EmailField::class,

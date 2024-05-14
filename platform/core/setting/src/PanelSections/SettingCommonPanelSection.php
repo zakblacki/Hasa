@@ -63,12 +63,6 @@ class SettingCommonPanelSection extends PanelSection
                     ->withDescription(trans('core/setting::setting.datatable.description'))
                     ->withPriority(130)
                     ->withRoute('settings.datatables'),
-                PanelSectionItem::make('website_tracking')
-                    ->setTitle(trans('core/setting::setting.website_tracking.title'))
-                    ->withIcon('ti ti-world')
-                    ->withDescription(trans('core/setting::setting.website_tracking.description'))
-                    ->withPriority(140)
-                    ->withRoute('settings.website-tracking'),
             ]);
     }
 }

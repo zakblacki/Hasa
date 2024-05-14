@@ -25,21 +25,21 @@ class SeoHelper implements SeoHelperContract
         $this->openGraph()->addProperty('type', 'website');
     }
 
-    public function setSeoMeta(SeoMetaContract $seoMeta): self
+    public function setSeoMeta(SeoMetaContract $seoMeta): static
     {
         $this->seoMeta = $seoMeta;
 
         return $this;
     }
 
-    public function setSeoOpenGraph(SeoOpenGraphContract $seoOpenGraph): self
+    public function setSeoOpenGraph(SeoOpenGraphContract $seoOpenGraph): static
     {
         $this->seoOpenGraph = $seoOpenGraph;
 
         return $this;
     }
 
-    public function setSeoTwitter(SeoTwitterContract $seoTwitter): self
+    public function setSeoTwitter(SeoTwitterContract $seoTwitter): static
     {
         $this->seoTwitter = $seoTwitter;
 
@@ -51,7 +51,7 @@ class SeoHelper implements SeoHelperContract
         return $this->seoOpenGraph;
     }
 
-    public function setTitle(?string $title, ?string $siteName = null, ?string $separator = null): self
+    public function setTitle(?string $title, ?string $siteName = null, ?string $separator = null): static
     {
         $this->meta()->setTitle($title, $siteName, $separator);
         $this->openGraph()->setTitle($title);
@@ -85,12 +85,17 @@ class SeoHelper implements SeoHelperContract
         return $this->meta()->getTitle();
     }
 
+    public function getTitleOnly(): ?string
+    {
+        return $this->meta()->getTitleOnly();
+    }
+
     public function getDescription(): ?string
     {
         return $this->meta()->getDescription();
     }
 
-    public function setDescription($description): self
+    public function setDescription($description): static
     {
         $description = BaseHelper::cleanShortcodes($description);
 
@@ -188,18 +193,33 @@ class SeoHelper implements SeoHelperContract
         }
     }
 
-    public function registerModule(array|string $model): self
+    public function supportedModules(): array
+    {
+        return config('packages.seo-helper.general.supported', []);
+    }
+
+    public function registerModule(array|string $model): static
     {
         if (! is_array($model)) {
             $model = [$model];
         }
 
         config([
-            'packages.seo-helper.general.supported' => array_merge(
-                config('packages.seo-helper.general.supported', []),
-                $model
-            ),
+            'packages.seo-helper.general.supported' => array_merge($this->supportedModules(), $model),
         ]);
+
+        return $this;
+    }
+
+    public function removeModule(array|string $model): static
+    {
+        if (! is_array($model)) {
+            $model = [$model];
+        }
+
+        $supported = collect($this->supportedModules())->reject(fn ($item) => in_array($item, $model))->toArray();
+
+        config()->set('packages.seo-helper.general.supported', $supported);
 
         return $this;
     }

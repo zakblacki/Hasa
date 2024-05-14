@@ -137,7 +137,7 @@
                                                 <input type="hidden" name="table" value="{{ $table::class }}" />
 
                                                 @foreach($table->getColumns() as $column)
-                                                    @php /** @var \Botble\Table\Columns $column */ @endphp
+                                                    @php /** @var \Botble\Table\Columns\Column $column */ @endphp
 
                                                     @continue(Str::contains($column->className, 'no-column-visibility') || in_array($column->name, $table->getDefaultVisibleColumns(), true))
 

@@ -3,21 +3,39 @@
 namespace Botble\Contact\Forms\Fronts;
 
 use Botble\Base\Forms\FieldOptions\ButtonFieldOption;
+use Botble\Base\Forms\FieldOptions\CheckboxFieldOption;
 use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
+use Botble\Base\Forms\FieldOptions\InputFieldOption;
+use Botble\Base\Forms\FieldOptions\NumberFieldOption;
+use Botble\Base\Forms\FieldOptions\RadioFieldOption;
+use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\TextareaFieldOption;
 use Botble\Base\Forms\FieldOptions\TextFieldOption;
 use Botble\Base\Forms\Fields\EmailField;
 use Botble\Base\Forms\Fields\HtmlField;
+use Botble\Base\Forms\Fields\NumberField;
+use Botble\Base\Forms\Fields\OnOffCheckboxField;
+use Botble\Base\Forms\Fields\RadioField;
+use Botble\Base\Forms\Fields\SelectField;
 use Botble\Base\Forms\Fields\TextareaField;
 use Botble\Base\Forms\Fields\TextField;
+use Botble\Contact\Enums\CustomFieldType;
 use Botble\Contact\Http\Requests\ContactRequest;
 use Botble\Contact\Models\Contact;
+use Botble\Contact\Models\CustomField;
 use Botble\Theme\FormFront;
 use Closure;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 
 class ContactForm extends FormFront
 {
+    protected string $errorBag = 'contact';
+
+    protected ?string $formInputWrapperClass = 'contact-form-group';
+
+    protected ?string $formInputClass = 'contact-form-input';
+
     public static function formTitle(): string
     {
         return trans('plugins/contact::contact.contact_form');
@@ -58,6 +76,11 @@ class ContactForm extends FormFront
                     ->toArray()
             )
             ->addRowWrapper('form_wrapper', function (self $form) use ($displayFields, $mandatoryFields) {
+                $customFields = CustomField::query()
+                    ->wherePublished()->with('options')
+                    ->orderBy('order')
+                    ->get();
+
                 $form
                     ->addColumnWrapper('name_wrapper', function (self $form) {
                         $form
@@ -67,9 +90,9 @@ class ContactForm extends FormFront
                                 TextFieldOption::make()
                                     ->required()
                                     ->label(__('Name'))
-                                    ->placeholder(__('Name'))
-                                    ->wrapperAttributes(['class' => 'contact-form-group'])
-                                    ->cssClass('contact-form-input')
+                                    ->placeholder(__('Your Name'))
+                                    ->wrapperAttributes(['class' => $this->formInputWrapperClass])
+                                    ->cssClass($this->formInputClass)
                                     ->maxLength(-1)
                                     ->toArray()
                             );
@@ -86,9 +109,9 @@ class ContactForm extends FormFront
                                                 $option->required();
                                             })
                                             ->label(__('Email'))
-                                            ->placeholder(__('Email'))
-                                            ->wrapperAttributes(['class' => 'contact-form-group'])
-                                            ->cssClass('contact-form-input')
+                                            ->placeholder(__('Your Email'))
+                                            ->wrapperAttributes(['class' => $this->formInputWrapperClass])
+                                            ->cssClass($this->formInputClass)
                                             ->maxLength(-1)
                                             ->toArray()
                                     );
@@ -105,9 +128,9 @@ class ContactForm extends FormFront
                                             $option->required();
                                         })
                                         ->label(__('Address'))
-                                        ->placeholder(__('Address'))
-                                        ->wrapperAttributes(['class' => 'contact-form-group'])
-                                        ->cssClass('contact-form-input')
+                                        ->placeholder(__('Your Address'))
+                                        ->wrapperAttributes(['class' => $this->formInputWrapperClass])
+                                        ->cssClass($this->formInputClass)
                                         ->maxLength(-1)
                                         ->toArray()
                                 );
@@ -124,9 +147,9 @@ class ContactForm extends FormFront
                                             $option->required();
                                         })
                                         ->label(__('Phone'))
-                                        ->placeholder(__('Phone'))
-                                        ->wrapperAttributes(['class' => 'contact-form-group'])
-                                        ->cssClass('contact-form-input')
+                                        ->placeholder(__('Your Phone'))
+                                        ->wrapperAttributes(['class' => $this->formInputWrapperClass])
+                                        ->cssClass($this->formInputClass)
                                         ->maxLength(-1)
                                         ->toArray()
                                 );
@@ -143,12 +166,58 @@ class ContactForm extends FormFront
                                     })
                                     ->label(__('Subject'))
                                     ->placeholder(__('Subject'))
-                                    ->wrapperAttributes(['class' => 'contact-form-group'])
-                                    ->cssClass('contact-form-input')
+                                    ->wrapperAttributes(['class' => $this->formInputWrapperClass])
+                                    ->cssClass($this->formInputClass)
                                     ->maxLength(-1)
                                     ->toArray()
                             );
                         }, 12);
+                    })
+                    ->when($customFields, function (ContactForm $form, Collection $customFields) {
+                        foreach ($customFields as $customField) {
+                            $options = $customField->options->pluck('label', 'value')->all();
+
+                            $fieldOptions = match ($customField->type->getValue()) {
+                                CustomFieldType::NUMBER => NumberFieldOption::make()
+                                    ->when($customField->placeholder, function (InputFieldOption $options, string $placeholder) {
+                                        $options->placeholder($placeholder);
+                                    }),
+                                CustomFieldType::DROPDOWN => SelectFieldOption::make()
+                                    ->when($customField->placeholder, function (SelectFieldOption $fieldOptions, string $placeholder) use ($options) {
+                                        $fieldOptions->choices(['' => $placeholder, ...$options]);
+                                    }, function (SelectFieldOption $fieldOptions) use ($options) {
+                                        $fieldOptions->choices($options);
+                                    }),
+                                CustomFieldType::CHECKBOX => CheckboxFieldOption::make(),
+                                CustomFieldType::RADIO => RadioFieldOption::make()
+                                    ->choices($options),
+                                default => TextFieldOption::make()
+                                    ->wrapperAttributes(['class' => $this->formInputWrapperClass])
+                                    ->cssClass($this->formInputClass)
+                                    ->when($customField->placeholder, function (InputFieldOption $options, string $placeholder) {
+                                        $options->placeholder($placeholder);
+                                    }),
+                            };
+
+                            $field = match ($customField->type->getValue()) {
+                                CustomFieldType::NUMBER => NumberField::class,
+                                CustomFieldType::TEXTAREA => TextareaField::class,
+                                CustomFieldType::DROPDOWN => SelectField::class,
+                                CustomFieldType::CHECKBOX => OnOffCheckboxField::class,
+                                CustomFieldType::RADIO => RadioField::class,
+                                default => TextField::class,
+                            };
+
+                            $form->addColumnWrapper("custom_field_{$customField->id}_wrapper", function (self $form) use ($customField, $field, $fieldOptions) {
+                                $form->add(
+                                    "contact_custom_fields[$customField->id]",
+                                    $field,
+                                    $fieldOptions
+                                        ->label($customField->name)
+                                        ->required($customField->required)
+                                );
+                            }, 12);
+                        }
                     });
             })
             ->addRowWrapper(
@@ -163,9 +232,9 @@ class ContactForm extends FormFront
                                 TextareaFieldOption::make()
                                     ->required()
                                     ->label(__('Content'))
-                                    ->placeholder(__('Content'))
-                                    ->wrapperAttributes(['class' => 'contact-form-group'])
-                                    ->cssClass('contact-form-input')
+                                    ->placeholder(__('Write your message here'))
+                                    ->wrapperAttributes(['class' => $this->formInputWrapperClass])
+                                    ->cssClass($this->formInputClass)
                                     ->rows(5)
                                     ->maxLength(-1)
                                     ->toArray()

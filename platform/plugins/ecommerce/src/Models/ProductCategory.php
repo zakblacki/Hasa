@@ -66,12 +66,17 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
 
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(ProductCategory::class, 'parent_id')->withDefault();
+        return $this
+            ->belongsTo(ProductCategory::class, 'parent_id')
+            ->whereNot('parent_id', $this->getKey())
+            ->withDefault();
     }
 
     public function children(): HasMany
     {
-        return $this->hasMany(ProductCategory::class, 'parent_id');
+        return $this
+            ->hasMany(ProductCategory::class, 'parent_id')
+            ->whereNot('id', $this->getKey());
     }
 
     public function activeChildren(): HasMany

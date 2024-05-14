@@ -3,9 +3,11 @@
 namespace Botble\Ecommerce\Forms;
 
 use Botble\Base\Facades\Assets;
+use Botble\Base\Forms\Fields\TextField;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Ecommerce\Enums\ShippingRuleTypeEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
+use Botble\Ecommerce\Forms\Fronts\Auth\FieldOptions\TextFieldOption;
 use Botble\Ecommerce\Http\Requests\ShippingRuleItemRequest;
 use Botble\Ecommerce\Models\ShippingRule;
 use Botble\Ecommerce\Models\ShippingRuleItem;
@@ -128,7 +130,7 @@ class ShippingRuleItemForm extends FormAbstract
                 ]);
         } else {
             $this
-                ->add('country', 'text', [
+                ->add('country', TextField::class, [
                     'label' => trans('plugins/ecommerce::shipping.rule.item.forms.country'),
                     'attr' => [
                         'placeholder' => trans('plugins/ecommerce::shipping.rule.item.forms.country_placeholder'),
@@ -138,14 +140,14 @@ class ShippingRuleItemForm extends FormAbstract
                     ],
                     'value' => $country,
                 ])
-                ->add('state', 'text', [
+                ->add('state', TextField::class, [
                     'label' => trans('plugins/ecommerce::shipping.rule.item.forms.state'),
                     'required' => $isRequiredState,
                     'attr' => [
                         'placeholder' => trans('plugins/ecommerce::shipping.rule.item.forms.state_placeholder'),
                     ],
                 ])
-                ->add('city', 'text', [
+                ->add('city', TextField::class, [
                     'label' => trans('plugins/ecommerce::shipping.rule.item.forms.city'),
                     'attr' => [
                         'placeholder' => trans('plugins/ecommerce::shipping.rule.item.forms.city_placeholder'),
@@ -154,21 +156,26 @@ class ShippingRuleItemForm extends FormAbstract
         }
 
         $this
-            ->add('zip_code', 'text', [
+            ->add('zip_code', TextField::class, [
                 'label' => trans('plugins/ecommerce::shipping.rule.item.forms.zip_code'),
                 'attr' => [
                     'placeholder' => trans('plugins/ecommerce::shipping.rule.item.forms.zip_code_placeholder'),
                 ],
             ])
-            ->add('adjustment_price', 'text', [
-                'label' => trans('plugins/ecommerce::shipping.rule.item.forms.adjustment_price'),
-                'required' => true,
-                'attr' => [
-                    'class' => 'form-control input-mask-number',
-                    'placeholder' => trans('plugins/ecommerce::shipping.rule.item.forms.adjustment_price_placeholder'),
-                    'data-placeholder' => '',
-                ],
-            ])
+            ->add(
+                'adjustment_price',
+                TextField::class,
+                TextFieldOption::make()
+                    ->label(trans('plugins/ecommerce::shipping.rule.item.forms.adjustment_price'))
+                    ->required()
+                    ->helperText(trans('plugins/ecommerce::shipping.rule.item.forms.adjustment_price_helper'))
+                    ->attributes([
+                        'class' => 'form-control input-mask-number',
+                        'placeholder' => trans('plugins/ecommerce::shipping.rule.item.forms.adjustment_price_placeholder'),
+                        'data-placeholder' => '',
+                    ])
+                    ->toArray()
+            )
             ->add('is_enabled', 'onOff', [
                 'label' => trans('plugins/ecommerce::shipping.rule.item.forms.is_enabled'),
                 'required' => true,

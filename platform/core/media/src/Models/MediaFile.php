@@ -30,6 +30,7 @@ class MediaFile extends BaseModel
         'folder_id',
         'user_id',
         'alt',
+        'visibility',
     ];
 
     protected $casts = [

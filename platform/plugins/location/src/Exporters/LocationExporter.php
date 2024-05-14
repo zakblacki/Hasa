@@ -4,16 +4,19 @@ namespace Botble\Location\Exporters;
 
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\DataSynchronize\Exporter\ExportColumn;
+use Botble\DataSynchronize\Exporter\ExportCounter;
 use Botble\DataSynchronize\Exporter\Exporter;
 use Botble\Language\Facades\Language;
 use Botble\Location\Enums\ImportType;
+use Botble\Location\Models\City;
 use Botble\Location\Models\Country;
+use Botble\Location\Models\State;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class LocationExporter extends Exporter
 {
-    public function label(): string
+    public function getLabel(): string
     {
         return trans('plugins/location::location.name');
     }
@@ -49,6 +52,33 @@ class LocationExporter extends Exporter
         return $columns;
     }
 
+    public function counters(): array
+    {
+        $countries = Country::query()->count();
+        $states = State::query()->count();
+        $cities = City::query()->count();
+
+        return [
+            ExportCounter::make()
+                ->label(trans('plugins/location::location.export.total'))
+                ->value(number_format($countries + $states + $cities)),
+            ExportCounter::make()
+                ->label(trans('plugins/location::location.export.total_countries'))
+                ->value(number_format($countries)),
+            ExportCounter::make()
+                ->label(trans('plugins/location::location.export.total_states'))
+                ->value(number_format($states)),
+            ExportCounter::make()
+                ->label(trans('plugins/location::location.export.total_cities'))
+                ->value(number_format($cities)),
+        ];
+    }
+
+    public function hasDataToExport(): bool
+    {
+        return Country::query()->exists() && State::query()->exists() && City::query()->exists();
+    }
+
     public function collection(): Collection
     {
         $supportedLocales = [];
@@ -80,7 +110,7 @@ class LocationExporter extends Exporter
         $locations = collect();
 
         foreach ($countries as $country) {
-            $countryData = (object) [
+            $countryData = [
                 'name' => $country->name,
                 'slug' => $country->slug ?: Str::slug($country->name),
                 'abbreviation' => '',
@@ -101,7 +131,7 @@ class LocationExporter extends Exporter
             $locations->push($countryData);
 
             foreach ($country->states as $state) {
-                $stateData = (object) [
+                $stateData = [
                     'name' => $state->name,
                     'slug' => $state->slug ?: Str::slug($state->name),
                     'abbreviation' => $state->abbreviation,
@@ -122,7 +152,7 @@ class LocationExporter extends Exporter
                 $locations->push($stateData);
 
                 foreach ($state->cities as $city) {
-                    $cityData = (object) [
+                    $cityData = [
                         'name' => $city->name,
                         'slug' => $city->slug ?: Str::slug($state->name),
                         'abbreviation' => '',

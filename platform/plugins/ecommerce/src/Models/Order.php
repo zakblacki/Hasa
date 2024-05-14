@@ -98,21 +98,21 @@ class Order extends BaseModel
 
     public function address(): HasOne
     {
-        return $this->hasOne(OrderAddress::class, 'order_id')
-            ->where('type', OrderAddressTypeEnum::SHIPPING)
-            ->withDefault();
+        return $this->shippingAddress();
     }
 
     public function shippingAddress(): HasOne
     {
-        return $this->hasOne(OrderAddress::class, 'order_id')
+        return $this
+            ->hasOne(OrderAddress::class, 'order_id')
             ->where('type', OrderAddressTypeEnum::SHIPPING)
             ->withDefault();
     }
 
     public function billingAddress(): HasOne
     {
-        return $this->hasOne(OrderAddress::class, 'order_id')
+        return $this
+            ->hasOne(OrderAddress::class, 'order_id')
             ->where('type', OrderAddressTypeEnum::BILLING)
             ->withDefault();
     }
@@ -209,8 +209,9 @@ class Order extends BaseModel
 
     public function isInvoiceAvailable(): bool
     {
-        return $this->invoice()->exists() && (! EcommerceHelper::disableOrderInvoiceUntilOrderConfirmed(
-        ) || $this->is_confirmed);
+        return $this->invoice()->exists()
+            && (! EcommerceHelper::disableOrderInvoiceUntilOrderConfirmed() || $this->is_confirmed)
+            && $this->status != OrderStatusEnum::CANCELED;
     }
 
     public function getProductsWeightAttribute(): float|int
@@ -241,9 +242,9 @@ class Order extends BaseModel
             return false;
         }
 
-        $shipmentDayCount = Carbon::now()->diffInDays($this->completed_at);
+        $overReturnDate = Carbon::now()->subDays(EcommerceHelper::getReturnableDays())->gt($this->completed_at);
 
-        if ($shipmentDayCount > EcommerceHelper::getReturnableDays()) {
+        if ($overReturnDate) {
             return false;
         }
 

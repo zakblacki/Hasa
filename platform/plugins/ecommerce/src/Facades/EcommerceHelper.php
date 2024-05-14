@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool isCartEnabled()
  * @method static bool isWishlistEnabled()
  * @method static bool isCompareEnabled()
+ * @method static bool isProductInCompare(string|int $productId)
  * @method static bool isReviewEnabled()
  * @method static bool isOrderTrackingEnabled()
  * @method static bool isOrderAutoConfirmedEnabled()
@@ -35,6 +36,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool isEnableEmailVerification()
  * @method static bool disableOrderInvoiceUntilOrderConfirmed()
  * @method static bool isEnabledProductOptions()
+ * @method static bool isEnabledCrossSaleProducts()
+ * @method static bool isEnabledRelatedProducts()
  * @method static string getPhoneValidationRule()
  * @method static \Illuminate\Pagination\LengthAwarePaginator getProductReviews(\Botble\Ecommerce\Models\Product $product, int $star = 0, int $perPage = 10)
  * @method static string getThousandSeparatorForInputMask()
@@ -92,9 +95,12 @@ use Illuminate\Support\Facades\Facade;
  * @method static void registerThemeAssets()
  * @method static array|string|null getDefaultPageSlug(string|null $key = null)
  * @method static string|null getPageSlug(string $key)
+ * @method static string jsAttributes(string $action, \Botble\Ecommerce\Models\Product $product, array $additional = [])
  * @method static string getAdminPrefix()
  * @method static \Illuminate\Routing\RouteRegistrar registerRoutes(\Closure|callable $closure, array $middleware = [])
  * @method static \Illuminate\Routing\RouteRegistrar registerFallbackRoutes(string $prefix)
+ * @method static int getMinimumOrderQuantity()
+ * @method static int getMaximumOrderQuantity()
  *
  * @see \Botble\Ecommerce\Supports\EcommerceHelper
  */

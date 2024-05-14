@@ -17,14 +17,21 @@ class PublicController extends BaseController
 {
     public function postSubscribe(NewsletterRequest $request)
     {
+        do_action('form_extra_fields_validate', $request, NewsletterForm::class);
+
         $newsletterForm = NewsletterForm::create();
         $newsletterForm->setRequest($request);
 
         $newsletterForm->onlyValidatedData()->saving(function (NewsletterForm $form) {
-            /** @var NewsletterRequest $request */
+            /**
+             * @var NewsletterRequest $request
+             */
             $request = $form->getRequest();
 
-            $newsletter = $form->getModel()->firstOrNew([
+            /**
+             * @var Newsletter $newsletter
+             */
+            $newsletter = $form->getModel()->newQuery()->firstOrNew([
                 'email' => $request->input('email'),
             ], [
                 ...$form->getRequestData(),
@@ -33,7 +40,7 @@ class PublicController extends BaseController
 
             $newsletter->save();
 
-            event(new SubscribeNewsletterEvent($newsletter));
+            SubscribeNewsletterEvent::dispatch($newsletter);
         });
 
         return $this
@@ -58,10 +65,9 @@ class PublicController extends BaseController
             ->first();
 
         if ($newsletter) {
-            $newsletter->status = NewsletterStatusEnum::UNSUBSCRIBED;
-            $newsletter->save();
+            $newsletter->update(['status' => NewsletterStatusEnum::UNSUBSCRIBED]);
 
-            event(new UnsubscribeNewsletterEvent($newsletter));
+            UnsubscribeNewsletterEvent::dispatch($newsletter);
 
             return $this
                 ->httpResponse()

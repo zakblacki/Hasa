@@ -168,7 +168,7 @@
         <td>
             {% if invoice.created_at %}
                 <p>
-                    <strong>{{ invoice.created_at|date('F d, Y') }}</strong>
+                    <strong>{{ invoice.created_at|date(settings.date_format) }}</strong>
                 </p>
             {% endif %}
             <p>
@@ -297,22 +297,28 @@
             </td>
         </tr>
     {% endif %}
-    <tr>
-        <td colspan="4" class="right">
-            {{ 'plugins/ecommerce::products.form.shipping_fee'|trans }}
-        </td>
-        <td class="bold">
-            {{ invoice.shipping_amount|price_format }}
-        </td>
-    </tr>
-    <tr>
-        <td colspan="4" class="right">
-            {{ 'plugins/ecommerce::products.form.discount'|trans }}
-        </td>
-        <td class="bold">
-            {{ invoice.discount_amount|price_format }}
-        </td>
-    </tr>
+
+    {% if invoice.shipping_amount > 0 %}
+        <tr>
+            <td colspan="4" class="right">
+                {{ 'plugins/ecommerce::products.form.shipping_fee'|trans }}
+            </td>
+            <td class="bold">
+                {{ invoice.shipping_amount|price_format }}
+            </td>
+        </tr>
+    {% endif %}
+
+    {% if invoice.discount_amount > 0 %}
+        <tr>
+            <td colspan="4" class="right">
+                {{ 'plugins/ecommerce::products.form.discount'|trans }}
+            </td>
+            <td class="bold">
+                {{ invoice.discount_amount|price_format }}
+            </td>
+        </tr>
+    {% endif %}
     </tbody>
 </table>
 

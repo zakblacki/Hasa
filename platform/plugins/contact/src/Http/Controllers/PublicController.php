@@ -5,11 +5,14 @@ namespace Botble\Contact\Http\Controllers;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\EmailHandler;
 use Botble\Base\Http\Controllers\BaseController;
+use Botble\Contact\Enums\CustomFieldType;
 use Botble\Contact\Events\SentContactEvent;
 use Botble\Contact\Forms\Fronts\ContactForm;
 use Botble\Contact\Http\Requests\ContactRequest;
 use Botble\Contact\Models\Contact;
+use Botble\Contact\Models\CustomField;
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -47,13 +50,15 @@ class PublicController extends BaseController
                 ->pluck('value')
                 ->all();
 
-            if (count($badWords)) {
+            if (! empty($badWords)) {
                 return $this
                     ->httpResponse()
                     ->setError()
                     ->setMessage(__('Your message contains blacklist words: ":words".', ['words' => implode(', ', $badWords)]));
             }
         }
+
+        do_action('form_extra_fields_validate', $request, ContactForm::class);
 
         $receiverEmails = null;
 
@@ -71,9 +76,36 @@ class PublicController extends BaseController
             $form = ContactForm::create();
 
             $form->saving(function (ContactForm $form) use ($receiverEmails) {
+                $data = $form->getRequestData();
+
+                if (Arr::has($data, 'contact_custom_fields')) {
+                    $customFields = CustomField::query()
+                        ->wherePublished()
+                        ->with('options')
+                        ->get();
+
+                    $data['custom_fields'] = collect($data['contact_custom_fields'])
+                        ->mapWithKeys(function ($item, $id) use ($customFields) {
+                            $field = $customFields->firstWhere('id', $id);
+                            $options = $field->options->firstWhere('value', $item);
+
+                            if (! $field) {
+                                return [];
+                            }
+
+                            $value = match ($field->type->getValue()) {
+                                CustomFieldType::CHECKBOX => $item ? __('Yes') : __('No'),
+                                CustomFieldType::RADIO, CustomFieldType::DROPDOWN => $options?->label,
+                                default => $item,
+                            };
+
+                            return [$field->name => $value];
+                        })->all();
+                }
+
                 $form
                     ->getModel()
-                    ->fill($form->getRequestData())
+                    ->fill($data)
                     ->save();
 
                 /**
@@ -92,12 +124,12 @@ class PublicController extends BaseController
 
                 EmailHandler::setModule(CONTACT_MODULE_SCREEN_NAME)
                     ->setVariableValues([
-                        'contact_name' => $contact->name ?? 'N/A',
-                        'contact_subject' => $contact->subject ?? 'N/A',
-                        'contact_email' => $contact->email ?? 'N/A',
-                        'contact_phone' => $contact->phone ?? 'N/A',
-                        'contact_address' => $contact->address ?? 'N/A',
-                        'contact_content' => $contact->content ?? 'N/A',
+                        'contact_name' => $contact->name,
+                        'contact_subject' => $contact->subject,
+                        'contact_email' => $contact->email,
+                        'contact_phone' => $contact->phone,
+                        'contact_address' => $contact->address,
+                        'contact_content' => $contact->content,
                     ])
                     ->sendUsingTemplate('notice', $receiverEmails ?: null, $args);
             });

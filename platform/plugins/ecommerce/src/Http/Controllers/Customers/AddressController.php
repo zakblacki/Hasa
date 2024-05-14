@@ -38,7 +38,7 @@ class AddressController extends BaseController
     {
         $address = Address::query()->findOrFail($id);
 
-        if ($request->input('is_default') == 1) {
+        if ($request->boolean('is_default')) {
             Address::query()
                 ->where([
                     'is_default' => 1,

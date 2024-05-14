@@ -4,8 +4,10 @@ namespace Botble\Ecommerce\Forms\Settings;
 
 use Botble\Base\Facades\Assets;
 use Botble\Base\Forms\FieldOptions\LabelFieldOption;
+use Botble\Base\Forms\FieldOptions\NumberFieldOption;
 use Botble\Base\Forms\Fields\LabelField;
 use Botble\Base\Forms\Fields\MultiCheckListField;
+use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Supports\Helper;
 use Botble\Ecommerce\Facades\EcommerceHelper;
@@ -42,6 +44,24 @@ class CheckoutSettingForm extends SettingForm
                     'group-flat' => true,
                 ],
             ])
+            ->add(
+                'minimum_order_quantity',
+                NumberField::class,
+                NumberFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.checkout.form.minimum_order_quantity'))
+                    ->helperText(trans('plugins/ecommerce::setting.checkout.form.minimum_order_quantity_helper'))
+                    ->value(EcommerceHelper::getMinimumOrderQuantity())
+                    ->toArray()
+            )
+            ->add(
+                'maximum_order_quantity',
+                NumberField::class,
+                NumberFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.checkout.form.maximum_order_quantity'))
+                    ->helperText(trans('plugins/ecommerce::setting.checkout.form.maximum_order_quantity_helper'))
+                    ->value(EcommerceHelper::getMaximumOrderQuantity())
+                    ->toArray()
+            )
             ->add('mandatory_form_fields_at_checkout[]', MultiCheckListField::class, [
                 'label' => trans('plugins/ecommerce::setting.checkout.form.mandatory_form_fields_at_checkout'),
                 'choices' => EcommerceHelper::getMandatoryFieldsAtCheckout(),
@@ -78,6 +98,8 @@ class CheckoutSettingForm extends SettingForm
                         'help_block' => [
                             'text' => trans(
                                 'plugins/ecommerce::setting.checkout.form.load_countries_states_cities_from_location_plugin_placeholder',
+                            ) . ' ' . trans(
+                                'plugins/ecommerce::setting.checkout.form.load_countries_states_cities_from_location_plugin_placeholder_2',
                             ),
                         ],
                         'attr' => [

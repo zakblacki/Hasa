@@ -14,9 +14,11 @@ use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
 use Botble\Ecommerce\Events\OrderCancelledEvent;
 use Botble\Ecommerce\Events\OrderCompletedEvent;
+use Botble\Ecommerce\Events\OrderConfirmedEvent;
 use Botble\Ecommerce\Events\OrderPaymentConfirmedEvent;
 use Botble\Ecommerce\Events\OrderPlacedEvent;
 use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
+use Botble\Ecommerce\Exceptions\ProductIsNotActivatedYetException;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\Discount;
 use Botble\Ecommerce\Facades\EcommerceHelper;
@@ -95,24 +97,14 @@ class OrderHelper
 
             event(new OrderPlacedEvent($order));
 
-            $order->is_finished = true;
-
             if (EcommerceHelper::isOrderAutoConfirmedEnabled()) {
-                $order->is_confirmed = true;
+                $this->confirmOrder($order);
             }
 
+            $order->is_finished = true;
             $order->save();
 
             $this->decreaseProductQuantity($order);
-
-            if (EcommerceHelper::isOrderAutoConfirmedEnabled()) {
-                OrderHistory::query()->create([
-                    'action' => OrderHistoryActionEnum::CONFIRM_ORDER,
-                    'description' => trans('plugins/ecommerce::order.order_was_verified_by'),
-                    'order_id' => $order->id,
-                    'user_id' => 0,
-                ]);
-            }
         }
 
         Cart::instance('cart')->destroy();
@@ -491,7 +483,7 @@ class OrderHelper
     public function handleAddCart(Product $product, Request $request): array
     {
         if ($product->status != BaseStatusEnum::PUBLISHED) {
-            throw new Exception(__('Product is not published yet.'));
+            throw new ProductIsNotActivatedYetException();
         }
 
         $parentProduct = $product->original_product;
@@ -1050,6 +1042,42 @@ class OrderHelper
             return apply_filters('ecommerce_order_bank_info', $bankInfo, $orders);
         } catch (Throwable) {
             return null;
+        }
+    }
+
+    public function confirmOrder(Order $order): void
+    {
+        if ($order->is_confirmed) {
+            return;
+        }
+
+        $order->is_confirmed = 1;
+        if ($order->status == OrderStatusEnum::PENDING) {
+            $order->status = OrderStatusEnum::PROCESSING;
+        }
+
+        $order->save();
+
+        $payment = Payment::query()->where('order_id', $order->getKey())->first();
+
+        if ($payment && Auth::check()) {
+            $payment->user_id = Auth::id();
+            $payment->save();
+        }
+
+        event(new OrderConfirmedEvent($order, EcommerceHelperFacade::isOrderAutoConfirmedEnabled() ? null : Auth::user()));
+
+        OrderHistory::query()->create([
+            'action' => OrderHistoryActionEnum::CONFIRM_ORDER,
+            'description' => trans('plugins/ecommerce::order.order_was_verified_by'),
+            'order_id' => $order->getKey(),
+            'user_id' => Auth::id() ?: 0,
+        ]);
+
+        $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
+        if ($mailer->templateEnabled('order_confirm')) {
+            $this->setEmailVariables($order);
+            $mailer->sendUsingTemplate('order_confirm', $order->user->email ?: $order->address->email);
         }
     }
 }

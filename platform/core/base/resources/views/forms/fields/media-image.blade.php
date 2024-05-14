@@ -14,5 +14,5 @@
     :showError="$showError"
     :nameKey="$nameKey"
 >
-    {!! Form::mediaImage($name, $options['value'] ?? null) !!}
+    {!! Form::mediaImage($name, $options['value'] ?? null, $options) !!}
 </x-core::form.field>

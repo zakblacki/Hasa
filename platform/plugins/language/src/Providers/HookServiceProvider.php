@@ -65,8 +65,12 @@ class HookServiceProvider extends ServiceProvider
 
         GeneralSettingForm::extend(function (GeneralSettingForm $form) {
             $form
-                ->remove('locale_direction')
-                ->modify('locale', HtmlField::class, HtmlFieldOption::make()->view('plugins/language::forms.general-setting-form-label')->toArray());
+                ->addAfter(
+                    'locale_direction',
+                    'language_instruction',
+                    HtmlField::class,
+                    HtmlFieldOption::make()->view('plugins/language::forms.general-setting-form-label')->toArray()
+                );
         });
 
         add_filter('cms_language_flag', function (?string $flag, ?string $name = null) {
@@ -91,10 +95,10 @@ class HookServiceProvider extends ServiceProvider
         }
 
         return $data . view('plugins/language::partials.admin-list-language-chooser', [
-                'route' => 'settings.email.template.edit',
-                'params' => $params,
-                'languages' => $languages,
-            ])->render();
+            'route' => 'settings.email.template.edit',
+            'params' => $params,
+            'languages' => $languages,
+        ])->render();
     }
 
     public function settingEmailTemplatePath(string $path, string $module, string $templateKey): string
@@ -538,7 +542,7 @@ class HookServiceProvider extends ServiceProvider
             }
 
             $languageButtons[] = [
-                'className' => 'change-data-language-item ' . ('all' == $currentLanguage ? 'active' : ''),
+                'className' => 'change-data-language-item ' . ($currentLanguage == 'all' ? 'active' : ''),
                 'text' => Html::tag(
                     'span',
                     trans('plugins/language::language.show_all'),

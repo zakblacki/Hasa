@@ -26,9 +26,7 @@
                                 </span>
                             </div>
                             <div class="product-review-summary-rating">
-                                <div class="bb-product-rating">
-                                    <span style="width: {{ $product->reviews_avg * 20 }}%"></span>
-                                </div>
+                                @include(EcommerceHelper::viewPath('includes.rating-star'), ['avg' => $product->reviews_avg, 'size' => 80])
                                 <p>
                                     @if ($product->reviews_count === 1)
                                         ({{ __('1 Review') }})

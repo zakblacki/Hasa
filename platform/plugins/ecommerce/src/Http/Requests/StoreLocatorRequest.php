@@ -18,6 +18,7 @@ class StoreLocatorRequest extends Request
             'state' => ['required', 'string', 'max:120'],
             'city' => ['required', 'string', 'max:120'],
             'address' => ['required', 'string', 'max:120'],
+            'zip_code' => ['nullable', 'string', 'min:5', 'max:9'],
             'is_shipping_location' => [new OnOffRule()],
         ];
     }

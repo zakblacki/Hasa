@@ -28,6 +28,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static float rawTaxByItems($content)
  * @method static float rawSubTotal()
  * @method static float rawSubTotalByItems($content)
+ * @method static int rawQuantityByItemId($id)
+ * @method static int rawTotalQuantity()
  * @method static \Illuminate\Support\Collection search(\Closure $search)
  * @method static void associate(string $rowId, mixed $model)
  * @method static void setTax(string $rowId, int|float $taxRate)

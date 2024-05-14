@@ -661,13 +661,13 @@
                             </div>
 
                             @php
-                                $userInfo = $order->address->id ? $order->address : $order->user;
+                                $userInfo = $order->user;
                             @endphp
 
                             @if ($userInfo->id)
                                 <p class="mb-1">
                                     <x-core::icon name="ti ti-inbox" />
-                                    {{ $order->user->orders()->count() }}
+                                    {{ $userInfo->orders()->count() }}
                                     {{ trans('plugins/ecommerce::order.orders') }}
                                 </p>
                             @endif
@@ -782,7 +782,7 @@
                             </div>
                         @endif
 
-                        @if ($order->referral()->count())
+                        @if ($order->referral->exists())
                             <div class="hr my-1"></div>
 
                             <div class="p-3">

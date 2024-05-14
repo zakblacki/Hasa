@@ -16,7 +16,7 @@ trait HasCollapsibleField
         return $this;
     }
 
-    public function collapseTrigger(string $trigger, array|string $value, bool $isShow = true): static
+    public function collapseTrigger(string $trigger, array|string|int $value, bool $isShow = true): static
     {
         $this->wrapperAttributes([
             'data-bb-trigger' => $trigger,

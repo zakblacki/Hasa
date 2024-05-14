@@ -90,6 +90,9 @@ class CategoryController extends BaseController
 
         $response = $this->httpResponse();
 
+        /**
+         * @var Category $category
+         */
         $category = $form->getModel();
 
         if ($request->ajax()) {
