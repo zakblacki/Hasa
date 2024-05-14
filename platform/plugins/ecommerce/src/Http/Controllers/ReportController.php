@@ -12,7 +12,6 @@ use Botble\Ecommerce\Tables\Reports\RecentOrdersTable;
 use Botble\Ecommerce\Tables\Reports\TopSellingProductsTable;
 use Botble\Ecommerce\Tables\Reports\TrendingProductsTable;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class ReportController extends BaseController
@@ -66,21 +65,13 @@ class ReportController extends BaseController
         $today = Carbon::now();
 
         $processingOrders = Order::query()
-            ->where(function (Builder $query) {
-                $query
-                    ->whereNotIn('status', [OrderStatusEnum::CANCELED, OrderStatusEnum::COMPLETED])
-                    ->orWhereNull('completed_at');
-            })
+            ->where('status', OrderStatusEnum::PENDING)
             ->whereDate('created_at', '>=', $startOfMonth)
             ->whereDate('created_at', '<=', $today)
             ->count();
 
         $completedOrders = Order::query()
-            ->where(function (Builder $query) {
-                $query
-                    ->where('status', OrderStatusEnum::COMPLETED)
-                    ->orWhereNotNull('completed_at');
-            })
+            ->where('status', OrderStatusEnum::COMPLETED)
             ->whereDate('created_at', '>=', $startOfMonth)
             ->whereDate('created_at', '<=', $today)
             ->count();

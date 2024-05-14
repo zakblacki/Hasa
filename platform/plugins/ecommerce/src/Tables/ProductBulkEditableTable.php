@@ -4,43 +4,28 @@ namespace Botble\Ecommerce\Tables;
 
 use Botble\Ecommerce\Models\Product;
 use Botble\Table\Abstracts\TableAbstract;
-use Botble\Table\Columns\FormattedColumn;
-use Botble\Table\Columns\IdColumn;
+use Closure;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\JsonResponse;
 
 abstract class ProductBulkEditableTable extends TableAbstract
 {
     protected int $pageLength = 100;
 
-    protected array $productIds = [];
-
     public function setup(): void
     {
         $this
-            ->addColumns([
-                IdColumn::make()
-                    ->orderable(false)
-                    ->getValueUsing(function (FormattedColumn $column) {
-                        return ! $column->getItem()->is_variation ? $column->getItem()->id : '';
-                    }),
-                FormattedColumn::make('name')
-                    ->title(trans('plugins/ecommerce::products.name'))
-                    ->renderUsing(function (FormattedColumn $column) {
-                        return view('plugins/ecommerce::product-prices.columns.name', [
-                            'product' => $column->getItem(),
-                        ]);
-                    })
-                    ->nowrap()
-                    ->orderable(false),
-            ]);
+            ->model(Product::class)
+            ->addActions([]);
     }
 
     public function ajax(): JsonResponse
     {
         $data = $this->table
-            ->query($this->query())
+            ->eloquent($this->query())
             ->filter(function ($query) {
-                $keyword = $this->request()->input('search.value');
+                $keyword = request()->input('search.value');
 
                 if ($keyword) {
                     $keyword = '%' . $keyword . '%';
@@ -63,8 +48,37 @@ abstract class ProductBulkEditableTable extends TableAbstract
         return false;
     }
 
-    public function query()
+    public function applyQueryWithVariations(Builder $query, Closure $callback = null): Builder
     {
-        return $this->applyScopes(Product::getGroupedVariationQuery());
+        $query
+            ->select([
+                'ec_products.id',
+                'ec_products.name',
+                'ec_products.sku',
+                'ec_products.is_variation',
+                'ec_product_variations.configurable_product_id as parent_product_id',
+            ])
+            ->leftJoin('ec_product_variations', function (JoinClause $join) {
+                $join
+                    ->on('ec_products.id', '=', 'ec_product_variations.product_id')
+                    ->where('ec_products.is_variation', 1);
+            })
+            ->with(['variationProductAttributes'])
+            ->where(function (Builder $query) {
+                $query
+                    ->where(function (Builder $query) {
+                        $query
+                            ->where('ec_products.is_variation', 0)
+                            ->whereDoesntHave('variations');
+                    })
+                    ->orWhere('ec_products.is_variation', 1);
+            })
+            ->latest('parent_product_id');
+
+        if ($callback) {
+            $callback($query);
+        }
+
+        return $query;
     }
 }

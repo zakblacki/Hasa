@@ -1,10 +1,6 @@
 <aside
-    @class([
-        'navbar navbar-vertical navbar-expand-lg flex-auto',
-        'navbar-minimal' => Auth::user()->getMeta('minimal_sidebar', 'no') === 'yes',
-    ])
+    class="navbar navbar-vertical navbar-expand-lg"
     data-bs-theme="dark"
-    id="sidebar-menu-main"
 >
     <div class="{{ AdminAppearance::getContainerWidth() }}">
         <button
@@ -16,13 +12,11 @@
             aria-expanded="false"
             aria-label="Toggle navigation"
         >
-            <x-core::icon name="ti ti-menu-2" />
+            <span class="navbar-toggler-icon"></span>
         </button>
-
-        <h2 class="d-block d-lg-none navbar-brand navbar-brand-autodark">
+        <h1 class="navbar-brand navbar-brand-autodark">
             @include('core/base::partials.logo')
-        </h2>
-
+        </h1>
         <div class="navbar-nav flex-row d-lg-none">
             <x-core::dropdown
                 wrapper-class="nav-item"

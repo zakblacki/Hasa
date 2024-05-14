@@ -1,26 +1,27 @@
 <x-core::layouts.base>
-    @include('core/base::layouts.' . AdminAppearance::getCurrentLayout() . '.partials.before-content')
+    <div class="page">
+        @include('core/base::layouts.' . AdminAppearance::getCurrentLayout() . '.partials.navbar')
 
-    <div @class([
-        'page-wrapper',
-        'rv-media-integrate-wrapper' => Route::currentRouteName() === 'media.index',
-    ])>
-        @include('core/base::layouts.partials.page-header')
+        <div @class([
+                'page-wrapper',
+                'rv-media-integrate-wrapper' => Route::currentRouteName() === 'media.index',
+            ])>
+            @include('core/base::layouts.partials.page-header')
 
-        <div class="page-body page-content">
-            <div class="{{ AdminAppearance::getContainerWidth() }}">
-                {!! apply_filters('core_layout_before_content', null) !!}
+            <div class="page-body page-content">
+                <div class="{{ AdminAppearance::getContainerWidth() }}">
+                    {!! apply_filters('core_layout_before_content', null) !!}
 
-                @yield('content')
+                    @yield('content')
 
-                {!! apply_filters('core_layout_after_content', null) !!}
+                    {!! apply_filters('core_layout_after_content', null) !!}
+                </div>
             </div>
+
+            @include('core/base::layouts.partials.footer')
         </div>
 
-        @include('core/base::layouts.partials.footer')
     </div>
-
-    @include('core/base::layouts.' . AdminAppearance::getCurrentLayout() . '.partials.after-content')
 
     <x-slot:header-layout>
         @if (\Botble\Base\Supports\Core::make()->isSkippedLicenseReminder())

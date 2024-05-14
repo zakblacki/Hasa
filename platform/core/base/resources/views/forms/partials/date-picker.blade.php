@@ -7,10 +7,6 @@
     if (App::getLocale() != 'en') {
         Assets::addScriptsDirectly('https://npmcdn.com/flatpickr@4.6.13/dist/l10n/index.js');
     }
-
-    if (! empty($attributes['data-options'])) {
-        $attributes['data-options'] = json_encode($attributes['data-options']);
-    }
 @endphp
 
 <div class="input-group datepicker">

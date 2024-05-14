@@ -17,13 +17,13 @@
             display: block;
             color: #aaa;
             padding: 9px 12px;
-            -webkit-transition: all ease 0.5s;
-            transition: all ease 0.5s;
+            -webkit-transition: all ease .5s;
+            transition: all ease .5s;
             position: relative;
             font-size: 12px;
 
             &:hover {
-                color: #2ea2cc;
+                color: #2ea2cc
             }
 
             strong {
@@ -31,7 +31,7 @@
                 line-height: 1.2em;
                 font-weight: 400;
                 display: block;
-                color: rgba(var(--bb-link-color-rgb), var(--bb-link-opacity, 1));
+                color: rgba(var(--bb-link-color-rgb),var(--bb-link-opacity,1));
             }
         }
 
@@ -52,7 +52,7 @@
             border-right: 1px solid #ececec;
 
             i {
-                color: #7ad03a;
+                color: #7ad03a
             }
         }
 
@@ -66,7 +66,7 @@
             border-right: 1px solid #ececec;
 
             i {
-                color: #ffba00;
+                color: #ffba00
             }
         }
 

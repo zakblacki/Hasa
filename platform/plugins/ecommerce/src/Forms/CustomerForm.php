@@ -105,34 +105,28 @@ class CustomerForm extends FormAbstract
             ->add('avatar', MediaImageField::class)
             ->setBreakFieldPoint('status')
             ->when($this->getModel()->getKey(), function () {
-                $wishlist = $this->getModel()->wishlist->loadMissing('product');
-
                 $this
                     ->addMetaBoxes([
-                        'addresses' => [
-                            'title' => trans('plugins/ecommerce::addresses.addresses'),
-                            'content' => view('plugins/ecommerce::customers.addresses.addresses', [
-                                'addresses' => $this->model->addresses()->get(),
-                            ])->render(),
-                            'header_actions' => view('plugins/ecommerce::customers.addresses.address-actions')->render(),
-                            'wrap' => true,
-                            'has_table' => true,
-                        ],
-                        'wishlist' => [
-                            'title' => trans('plugins/ecommerce::ecommerce.wishlist'),
-                            'content' => view('plugins/ecommerce::customers.wishlist', compact('wishlist'))->render(),
-                            'wrap' => true,
-                            'has_table' => true,
-                        ],
-                        'payments' => [
-                            'title' => trans('plugins/ecommerce::payment.name'),
-                            'content' => view('plugins/ecommerce::customers.payments.payments', [
-                                'payments' => $this->model->payments()->get(),
-                            ])->render(),
-                            'wrap' => true,
-                            'has_table' => true,
-                        ],
-                    ]);
+                    'addresses' => [
+                        'title' => trans('plugins/ecommerce::addresses.addresses'),
+                        'content' => view('plugins/ecommerce::customers.addresses.addresses', [
+                            'addresses' => $this->model->addresses()->get(),
+                        ])->render(),
+                        'header_actions' => view('plugins/ecommerce::customers.addresses.address-actions')->render(),
+                        'wrap' => true,
+                        'has_table' => true,
+                    ],
+                ])
+                ->addMetaBoxes([
+                    'payments' => [
+                        'title' => trans('plugins/ecommerce::payment.name'),
+                        'content' => view('plugins/ecommerce::customers.payments.payments', [
+                            'payments' => $this->model->payments()->get(),
+                        ])->render(),
+                        'wrap' => true,
+                        'has_table' => true,
+                    ],
+                ]);
             });
     }
 }

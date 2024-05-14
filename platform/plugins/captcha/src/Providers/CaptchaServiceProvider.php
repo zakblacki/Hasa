@@ -23,7 +23,6 @@ use Botble\Setting\PanelSections\SettingOthersPanelSection;
 use Botble\Support\Http\Requests\Request;
 use Botble\Theme\FormFront;
 use Illuminate\Foundation\AliasLoader;
-use Illuminate\Http\Request as IlluminateRequest;
 use Illuminate\Routing\Events\Routing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
@@ -132,28 +131,6 @@ class CaptchaServiceProvider extends ServiceProvider
                 return $rules;
             }, 128, 2);
         });
-
-        add_filter('form_extra_fields_render', function (?string $fields = null, ?string $form = null): ?string {
-            if (! CaptchaFacade::isEnabled() && ! CaptchaFacade::mathCaptchaEnabled()) {
-                return $fields;
-            }
-
-            return $fields . view('plugins/captcha::forms.old-version-support', compact('form'))->render();
-        }, 128, 2);
-
-        add_action('form_extra_fields_validate', function (IlluminateRequest $request, ?string $form = null): void {
-            if (! CaptchaFacade::isEnabled() && ! CaptchaFacade::mathCaptchaEnabled()) {
-                return;
-            }
-
-            if (CaptchaFacade::reCaptchaEnabled() && (! $form || ! class_exists($form) || CaptchaFacade::formSetting($form, 'enable_recaptcha'))) {
-                Validator::validate($request->input(), CaptchaFacade::rules());
-            }
-
-            if (CaptchaFacade::mathCaptchaEnabled() && (! $form || ! class_exists($form) || CaptchaFacade::formSetting($form, 'enable_math_captcha'))) {
-                Validator::validate($request->input(), CaptchaFacade::mathCaptchaRules());
-            }
-        }, 999, 2);
     }
 
     public function bootValidator(): void

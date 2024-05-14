@@ -10,7 +10,11 @@
             @endif
         </div>
         <div class="section__content">
-            <div class="row">
+            <div class="row" style="
+        @media only screen and (max-width: 980px) {
+                overflow-x: auto;
+                -ms-flex-wrap: nowrap;
+                flex-wrap: nowrap; }">
                 @foreach($products as $product)
                     <div class="col-lg-3 col-md-4 col-6">
                         {!! Theme::partial('product-item', compact('product')) !!}

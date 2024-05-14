@@ -66,12 +66,6 @@
                             <small><del class="product-price-text" @if ($product->front_sale_price == $product->price) style="display: none" @endif>{{ format_price($product->price_with_taxes) }}</del></small>
                         </p>
                         <p>
-                            @if (EcommerceHelper::isWishlistEnabled())
-                            <a class="product__add-wishlist add-to-wishlist-button" href="#" data-url="{{ route('public.wishlist.add', $product->id) }}" data-add-text="{{ __('Add to wishlist') }}" data-added-text="{{ __('Added to wishlist') }}">
-                                <i class="fa fa-heart-o heart-icon"></i>
-                                <span class="wishlist-text">{{ __('Add to wishlist') }}</span>
-                            </a>
-                            @endif
                             @if (EcommerceHelper::isCompareEnabled())
                                 <a class="product__add-wishlist ml-3 js-add-to-compare-button" data-url="{{ route('public.compare.add', $product->id) }}" href="#"><i class="feather icon icon-plus-circle"></i> <span>{{ __('Compare') }}</span></a>
                             @endif
@@ -98,27 +92,40 @@
 
                                 {!! apply_filters(ECOMMERCE_PRODUCT_DETAIL_EXTRA_HTML, null, $product) !!}
                                 <input type="hidden" name="id" class="hidden-product-id" value="{{ ($product->is_variation || !$product->defaultVariation->product_id) ? $product->id : $product->defaultVariation->product_id }}"/>
-                                <div class="form-group product__attribute product__qty">
-                                    <label for="qty-input">{{ __('Qty') }}</label>
-                                    <div class="form-group__content">
-                                        <div class="form-group--number">
-                                            <button type="button" class="up"></button>
-                                            <input class="form-control qty-input" name="qty" type="number" value="1" id="qty-input">
-                                            <button type="button" class="down"></button>
-                                        </div>
+                                <!--<div class="form-group product__attribute product__qty">-->
+                                    <!--<label for="qty-input">{{ __('Qty') }}</label>-->
+                                    <!--<div class="form-group__content">-->
+                                        <!--<div class="form-group--number">-->
+                                        <!--    <button type="button" class="up"></button>-->
+                                        <!--    <input class="form-control qty-input" name="qty" type="number" value="1" id="qty-input">-->
+                                        <!--    <button type="button" class="down"></button>-->
+                                        <!--</div>-->
 
-                                        <div class="float-right number-items-available" style="@if (!$product->isOutOfStock()) display: none; @endif line-height: 45px;">
-                                            @if ($product->isOutOfStock())
-                                                <span class="text-danger">({{ __('Out of stock') }})</span>
-                                            @endif
-                                        </div>
+                                <!--        <div class="float-right number-items-available" style="@if (!$product->isOutOfStock()) display: none; @endif line-height: 45px;">-->
+                                <!--            @if ($product->isOutOfStock())-->
+                                <!--                <span class="text-danger">({{ __('Out of stock') }})</span>-->
+                                <!--            @endif-->
+                                <!--        </div>-->
                                     
                                         
-                                    </div>
-                                </div>
+                                <!--    </div>-->
+                                <!--</div>-->
+                                
+
+                                <div style="text-align: center;">
                                 <button type="submit" @if ($product->isOutOfStock()) disabled @endif class="btn--custom btn--outline btn--rounded btn-add-cart @if (!EcommerceHelper::isQuickBuyButtonEnabled()) btn--fullwidth @endif @if ($product->isOutOfStock()) btn-disabled @endif">
                                     {{ __('Add to cart') }}
                                 </button>
+                                
+                                 @if (EcommerceHelper::isWishlistEnabled())
+                                 &nbsp;
+                                <a class="product__add-wishlist add-to-wishlist-button" href="#" data-url="{{ route('public.wishlist.add', $product->id) }}" data-add-text="{{ __('Add to wishlist') }}" data-added-text="{{ __('Added to wishlist') }}">
+                                <i class="fa fa-heart"></i>
+                                <span>{{ __('Add to wishlist') }}</span>
+                                </a>
+                                @endif
+                                </div>
+                                
                                 @if (EcommerceHelper::isQuickBuyButtonEnabled())
                                     &nbsp;
                                     <button type="submit" name="checkout" @if ($product->isOutOfStock()) disabled @endif class="btn--custom btn--rounded btn-add-cart @if ($product->isOutOfStock()) btn-disabled @endif">
@@ -161,7 +168,7 @@
         <ul class="tab-list">
             <li class="active"><a href="#tab-description">{{ __('Description') }}</a></li>
             
-            <li><a href="#tab-features">{{ __('Product Features') }}</a></li>  
+            <li><a href="#tab-features" id="removeDisply">{{ __('Product Features') }}</a></li>  
             
             @if (EcommerceHelper::isReviewEnabled())
                 <li><a href="#tab-reviews">{{ __('Reviews') }}({{ $product->reviews_count }})</a></li>
@@ -182,7 +189,7 @@
                 </div>
             </div>
             
-            <div class="tab active" id="tab-features"> 
+            <div class="tab active d-none" id="tab-features"> 
               @if (!empty($product->type_de_taille) || !empty($product->type_de_tissu) || !empty($product->type_dencolure) || !empty($product->type_des_manches) || !empty($product->modele) || !empty($product->type_de_tissu) || !empty($product->longueur_des_manches) || !empty($product->coupe_pantalon) || !empty($product->longueur) || !empty($product->coupe_silouhette) || !empty($product->motif) || !empty($product->couleur) || !empty($product->poche) || !empty($product->type_de_produit) || !empty($product->taille) || !empty($product->grandes_occasions) || !empty($product->personnage) || !empty($product->matiere) || !empty($product->duree_de_livraison))
               <div style="margin-top: 4%; margin-bottom: 3%">
                 <h4>{{trans('Product Features')}}</h4>
@@ -366,7 +373,11 @@
             @php
                 $relatedProducts = get_related_products($product, 4);
             @endphp
-            <div class="row">
+            <div class="row" style="
+            @media only screen and (max-width: 980px) {
+                    overflow-x: auto;
+                    -ms-flex-wrap: nowrap;
+                    flex-wrap: nowrap; }">
                 @foreach($relatedProducts as $relatedProduct)
                     <div class="col-lg-3 col-md-4 col-6">
                         {!! Theme::partial('product-item', ['product' => $relatedProduct]) !!}
@@ -376,3 +387,11 @@
         </section>
     </div>
 </main>
+
+<script>
+    $(document).ready(function(){
+      $("#removeDisply").click(function(){
+        $(".tab").removeClass("d-none");
+      });
+    });
+    </script>

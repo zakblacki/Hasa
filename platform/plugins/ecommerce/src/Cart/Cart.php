@@ -416,28 +416,6 @@ class Cart
     }
 
     /**
-     * @return int
-     */
-    public function rawQuantityByItemId($id)
-    {
-        return $this->getContent()->reduce(function ($qty, CartItem $cartItem) use ($id) {
-            return $cartItem->id == $id ? $qty + $cartItem->qty : $qty;
-        }, 0);
-    }
-
-    /**
-     * @return int
-     */
-    public function rawTotalQuantity()
-    {
-        $content = $this->getContent();
-
-        return $content->reduce(function ($qty, CartItem $cartItem) {
-            return $qty + $cartItem->qty;
-        }, 0);
-    }
-
-    /**
      * Search the cart content for a cart item matching the given search closure.
      *
      * @param \Closure $search

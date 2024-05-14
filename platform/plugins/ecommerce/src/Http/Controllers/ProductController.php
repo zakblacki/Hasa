@@ -158,7 +158,6 @@ class ProductController extends BaseController
                 ->update(['is_default' => 0]);
 
             $defaultVariation = ProductVariation::query()->find($request->input('variation_default_id'));
-
             if ($defaultVariation) {
                 $defaultVariation->is_default = true;
                 $defaultVariation->save();

@@ -64,11 +64,6 @@ class EcommerceHelper
         return (bool) get_ecommerce_setting('compare_enabled', 1);
     }
 
-    public function isProductInCompare(int|string $productId): bool
-    {
-        return Cart::instance('compare')->search(fn ($cartItem) => $cartItem->id == $productId)->isNotEmpty();
-    }
-
     public function isReviewEnabled(): bool
     {
         return (bool) get_ecommerce_setting('review_enabled', 1);
@@ -1415,15 +1410,5 @@ class EcommerceHelper
                 })->where('route', '.*');
             });
         });
-    }
-
-    public function getMinimumOrderQuantity(): int
-    {
-        return (int) get_ecommerce_setting('minimum_order_quantity', 0);
-    }
-
-    public function getMaximumOrderQuantity(): int
-    {
-        return (int) get_ecommerce_setting('maximum_order_quantity', 0);
     }
 }

@@ -9,7 +9,7 @@ $(() => {
     }
 
     const getReviewList = (url, successCallback) => {
-        if (!url) {
+        if (! url) {
             return
         }
 
@@ -128,7 +128,7 @@ $(() => {
                     Theme.showSuccess(message)
 
                     getReviewList($reviewListContainer.data('ajax-url'), () => {
-                        if (!$('.review-list').length) {
+                        if (! $('.review-list').length) {
                             setTimeout(() => window.location.reload(), 1000)
                         }
                     })

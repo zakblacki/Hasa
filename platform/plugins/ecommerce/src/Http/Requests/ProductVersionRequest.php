@@ -19,7 +19,7 @@ class ProductVersionRequest extends Request
                     return 'gt:sale_price';
                 }),
             ],
-            'sale_price' => 'numeric|nullable|min:0',
+            'sale_price' => 'numeric|nullable',
             'start_date' => 'date|nullable|required_if:sale_type,1',
             'end_date' => 'date|nullable|after:' . ($this->input('start_date') ?? Carbon::now()->toDateTimeString()),
             'wide' => 'numeric|nullable|min:0|max:100000000',

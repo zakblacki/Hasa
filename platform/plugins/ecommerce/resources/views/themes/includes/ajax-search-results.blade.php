@@ -2,38 +2,46 @@
     <div class="bb-quick-search-content">
         <div class="bb-quick-search-list">
             @foreach ($products as $product)
-                <div class="bb-quick-search-item-wrapper">
-                    <a class="bb-quick-search-item" href="{{ $product->url }}">
-                        <div class="bb-quick-search-item-image">
-                            {{ RvMedia::image($product->image, $product->name, 'thumb', useDefaultImage: true, attributes: ['loading' => false]) }}
+                <a class="bb-quick-search-item" href="{{ $product->url }}">
+                    <div class="bb-quick-search-item-image">
+                        {{ RvMedia::image($product->image, $product->name, 'thumb', useDefaultImage: true, attributes: ['loading' => false]) }}
+                    </div>
+                    <div class="bb-quick-search-item-info">
+                        <div class="bb-quick-search-item-name">
+                            {{ $product->name }}
                         </div>
-                        <div class="bb-quick-search-item-info text-start">
-                            <div class="bb-quick-search-item-name">
-                                {{ $product->name }}
+
+                        @if (EcommerceHelper::isReviewEnabled())
+                            <div class="bb-quick-search-item-rating">
+                                <div class="bb-product-rating" style="--bb-rating-size: 70px">
+                                    <span style="width: {{ $product->reviews_avg * 20 }}%"></span>
+                                </div>
+                                <span>({{ $product->reviews_count }})</span>
                             </div>
+                        @endif
 
-                            @if (EcommerceHelper::isReviewEnabled())
-                                @include(EcommerceHelper::viewPath('includes.rating'))
+                        <div class="bb-quick-search-item-price">
+                            <span class="new-price">{{ format_price($product->front_sale_price_with_taxes) }}</span>
+                            @if ($product->isOnSale())
+                                <span class="old-price">{{ format_price($product->price_with_taxes) }}</span>
                             @endif
-
-                            @include(EcommerceHelper::viewPath('includes.product-price'))
                         </div>
-                    </a>
-                </div>
+                    </div>
+                </a>
             @endforeach
-
-            @if ($products->hasMorePages() && $products->nextPageUrl())
-                <div class="bb-quick-search-load-more text-center">
-                    <a href="{{ $products->nextPageUrl() }}" data-bb-toggle="quick-search-load-more">
-                        {{ __('Load more') }}
-                    </a>
-                </div>
-            @endif
         </div>
+
+        @if ($products->hasMorePages() && $products->nextPageUrl())
+            <div class="bb-quick-search-load-more">
+                <a href="{{ $products->nextPageUrl() }}" data-bb-toggle="quick-search-load-more">
+                    {{ __('Load more') }}
+                </a>
+            </div>
+        @endif
     </div>
 
-    <div class="bb-quick-search-view-all text-center">
-        <a href="#" onclick="event.preventDefault(); document.getElementById('bb-form-quick-search').submit();">{{ __('View all results') }}</a>
+    <div class="bb-quick-search-view-all">
+        <a href="{{ route('public.products') }}">{{ __('View all results') }}</a>
     </div>
 @else
     <div class="bb-quick-search-empty">

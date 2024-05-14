@@ -1,8 +1,8 @@
 @extends(EcommerceHelper::viewPath('customers.master'))
 
-@section('title', SeoHelper::getTitle())
-
 @section('content')
+    <h3 class="customer-page-title mb-4">{{ SeoHelper::getTitle() }}</h3>
+
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead>
@@ -132,4 +132,4 @@
     </div>
 
     {!! $orderProducts->links() !!}
-@stop
+@endsection

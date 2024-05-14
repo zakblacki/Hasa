@@ -3,7 +3,8 @@
 namespace Botble\Ecommerce\Tables;
 
 use Botble\Table\Columns\FormattedColumn;
-use Illuminate\Database\Query\Builder;
+use Botble\Table\Columns\IdColumn;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductPriceTable extends ProductBulkEditableTable
 {
@@ -14,6 +15,17 @@ class ProductPriceTable extends ProductBulkEditableTable
         $this
             ->setView('plugins/ecommerce::product-prices.index')
             ->addColumns([
+                IdColumn::make()
+                    ->orderable(false),
+                FormattedColumn::make('name')
+                    ->title(trans('plugins/ecommerce::products.name'))
+                    ->renderUsing(function (FormattedColumn $column) {
+                        return view('plugins/ecommerce::product-prices.columns.name', [
+                            'product' => $column->getItem(),
+                        ]);
+                    })
+                    ->nowrap()
+                    ->orderable(false),
                 FormattedColumn::make('cost_per_item')
                     ->title(trans('plugins/ecommerce::products.form.cost_per_item'))
                     ->renderUsing(function (FormattedColumn $column) {
@@ -44,23 +56,16 @@ class ProductPriceTable extends ProductBulkEditableTable
                     })
                     ->nowrap()
                     ->orderable(false),
-            ]);
-    }
-
-    public function query()
-    {
-        /**
-         * @var Builder $query
-         */
-        $query = parent::query();
-
-        $query->addSelect([
-            'ec_products.cost_per_item',
-            'ec_products.price',
-            'ec_products.sale_price',
-            'ec_products.sale_type',
-        ]);
-
-        return $query;
+            ])
+            ->queryUsing(function (Builder $query) {
+                $this->applyQueryWithVariations($query, function (Builder $query) {
+                    $query->addSelect([
+                        'ec_products.cost_per_item',
+                        'ec_products.price',
+                        'ec_products.sale_price',
+                        'ec_products.sale_type',
+                    ]);
+                });
+            });
     }
 }

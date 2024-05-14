@@ -26,33 +26,6 @@ class StoreProductService
     {
         $data = $request->input();
         
-        if(is_null($data['sale_price']) || gettype($data['sale_price']) != 'double' || gettype($data['sale_price']) != 'integer') {
-            $data['sale_price'] = 0;
-        }
-
-        if(is_null($data['weight']) || gettype($data['weight']) != 'double' || gettype($data['weight']) != 'integer') {
-            $data['weight'] = 0;
-        }
-        
-        if(is_null($data['length']) || gettype($data['length']) != 'double' || gettype($data['length']) != 'integer') {
-            $data['length'] = 0;
-        }
-        
-        if(is_null($data['wide']) || gettype($data['wide']) != 'double' || gettype($data['wide']) != 'integer') {
-            $data['wide'] = 0;
-        }
-        
-        if(is_null($data['height']) || gettype($data['height']) != 'double' || gettype($data['height']) != 'integer') {
-            $data['height'] = 0;
-        }
-        
-        if(is_null($data['cost_per_item']) || gettype($data['cost_per_item']) != 'double' || gettype($data['cost_per_item']) != 'integer') {
-            $data['cost_per_item'] = 0;
-        }
-        
-        $data['contenu_de_paquet'] = (string) $data['contenu_de_paquet'];
-
-
         $hasVariation = $product->variations()->count() > 0;
 
         if ($hasVariation && ! $forceUpdateAll) {
@@ -87,7 +60,7 @@ class StoreProductService
 
         if (! $hasVariation || $forceUpdateAll) {
             if ($product->sale_price > $product->price) {
-                $product->sale_price = 0;
+                $product->sale_price = null;
             }
 
             if ($product->sale_type == 0) {

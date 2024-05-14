@@ -52,11 +52,26 @@
             </div>
         </div>
 
-        {!! apply_filters('after_contact_form', null) !!}
+        @if (is_plugin_active('captcha'))
+            @if (setting('enable_captcha'))
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {!! Captcha::display() !!}
+                    </div>
+                </div>
+            @endif
 
-        <div class="col-md-12">
-            {!! apply_filters('form_extra_fields_render', null, \Botble\Contact\Forms\Fronts\ContactForm::class) !!}
-        </div>
+            @if (setting('enable_math_captcha_for_contact_form', 0))
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="math-group" class="control-label required">{{ app('math-captcha')->label() }}</label>
+                        {!! app('math-captcha')->input(['class' => 'form-control', 'id' => 'math-group']) !!}
+                    </div>
+                </div>
+            @endif
+        @endif
+
+        {!! apply_filters('after_contact_form', null) !!}
     </div>
 
     <div class="form-group"><p>{!! BaseHelper::clean(__('The field with (<span style="color:#FF0000;">*</span>) is required.')) !!}</p></div>

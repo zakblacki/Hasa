@@ -41,7 +41,7 @@ class ProductRequest extends Request
         $rules = [
             'name' => 'required|string|max:250',
             'price' => 'numeric|nullable|min:0|max:100000000000',
-            'sale_price' => 'numeric|nullable|min:0|max:100000000000',
+            'sale_price' => 'numeric|nullable',
             'start_date' => 'date|nullable|required_if:sale_type,1',
             'end_date' => 'date|nullable|after:' . ($this->input('start_date') ?? Carbon::now()->toDateTimeString()),
             'wide' => 'numeric|nullable|min:0|max:100000000',
@@ -89,7 +89,6 @@ class ProductRequest extends Request
             'taille' => 'nullable|string',
             'grandes_occasions' => 'nullable|string',
             'personnage' => 'nullable|string',
-            'contenu_de_paquet' => 'nullable|string',
             'type_dencolure' => 'nullable|string',
             'type_des_manches' => 'nullable|string',
             'zone_dutilisation' => 'nullable|string',

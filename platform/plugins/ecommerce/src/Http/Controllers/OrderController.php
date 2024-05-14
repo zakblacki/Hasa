@@ -503,7 +503,7 @@ class OrderController extends BaseController
             ]);
 
             ShipmentHistory::query()->create([
-                'action' => 'create_from_order',
+                'action' => OrderHistoryActionEnum::CREATE_FROM_ORDER,
                 'description' => trans('plugins/ecommerce::order.shipping_was_created_from'),
                 'shipment_id' => $shipment->id,
                 'order_id' => $order->getKey(),

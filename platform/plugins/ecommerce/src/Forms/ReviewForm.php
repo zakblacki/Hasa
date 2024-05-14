@@ -6,7 +6,7 @@ use Botble\Base\Forms\FieldOptions\DatePickerFieldOption;
 use Botble\Base\Forms\FieldOptions\HtmlFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\TextareaFieldOption;
-use Botble\Base\Forms\Fields\DatePickerField;
+use Botble\Base\Forms\Fields\DatetimeField;
 use Botble\Base\Forms\Fields\EmailField;
 use Botble\Base\Forms\Fields\HtmlField;
 use Botble\Base\Forms\Fields\MediaImagesField;
@@ -101,11 +101,10 @@ class ReviewForm extends FormAbstract
             ])
             ->add(
                 'created_at',
-                DatePickerField::class,
+                DatetimeField::class,
                 DatePickerFieldOption::make()
                     ->label(trans('core/base::tables.created_at'))
                     ->value(Carbon::now())
-                    ->withTimePicker()
                     ->toArray()
             )
             ->setBreakFieldPoint('created_at');

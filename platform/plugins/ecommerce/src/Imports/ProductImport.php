@@ -328,7 +328,7 @@ class ProductImport implements
         
 
         if(is_null($productData['sale_price']) || gettype($productData['sale_price']) != 'double' || gettype($productData['sale_price']) != 'integer') {
-            $productData['sale_price'] = 0;
+            $productData['sale_price'] = null;
         }
 
         if(is_null($productData['weight']) || gettype($productData['weight']) != 'double' || gettype($productData['weight']) != 'integer') {
@@ -571,7 +571,7 @@ class ProductImport implements
         $productRelatedToVariation->product_type = $product->product_type;
         
         if(is_null($productRelatedToVariation['sale_price']) || gettype($productRelatedToVariation['sale_price']) != 'double' || gettype($productRelatedToVariation['sale_price']) != 'integer') {
-            $productRelatedToVariation['sale_price'] = 0;
+            $productRelatedToVariation['sale_price'] = null;
         }
 
         if(is_null($productRelatedToVariation['weight']) || gettype($productRelatedToVariation['weight']) != 'double' || gettype($productRelatedToVariation['weight']) != 'integer') {

@@ -3,9 +3,9 @@
 @endphp
 
 <main class="page--shop">
-    <div class="page__hero bg--cover" data-background="{{ theme_option('product_page_banner_image') ? RvMedia::getImageUrl(theme_option('product_page_banner_image')) : Theme::asset()->url('img/bg/shop.jpg') }}">
-        <h1>{{ theme_option('product_page_banner_title') ? theme_option('product_page_banner_title') : __('Enjoy Shopping with us') }}</h1>
-    </div>
+    <!--<div class="page__hero bg--cover" data-background="{{ theme_option('product_page_banner_image') ? RvMedia::getImageUrl(theme_option('product_page_banner_image')) : Theme::asset()->url('img/bg/shop.jpg') }}">-->
+    <!--    <h1>{{ theme_option('product_page_banner_title') ? theme_option('product_page_banner_title') : __('Enjoy Shopping with us') }}</h1>-->
+    <!--</div>-->
     <div class="page__content">
         <div class="container">
             <div class="shop shop--sidebar">
@@ -25,7 +25,8 @@
                                     @if ($products->count() > 0)
                                         <div class="row">
                                             @foreach($products as $product)
-                                                <div class="col-md-4 col-sm-6">
+                                                {{-- col-lg-3 col-md-4 col-6 --}}
+                                                <div class="col-lg-4 col-md-4 col-6">
                                                     {!! Theme::partial('product-item', compact('product')) !!}
                                                 </div>
                                             @endforeach

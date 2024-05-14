@@ -72,6 +72,4 @@ return [
     ],
     'duplicate_modal' => 'Duplicate product',
     'duplicate_modal_description' => 'Are you sure you want to duplicate this product?',
-    'wishlist' => 'Wishlist',
-    'product' => 'Product',
 ];

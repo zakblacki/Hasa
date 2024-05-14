@@ -1,9 +1,9 @@
 @extends(EcommerceHelper::viewPath('customers.master'))
 
-@section('title', __('Address books'))
-
 @section('content')
+    <h2 class="customer-page-title mb-4">{{ __('Address books') }}</h2>
+
     {!! Form::open(['route' => ['customer.address.edit', $address->id]]) !!}
-        @include(EcommerceHelper::viewPath('customers.address.form'), compact('form', 'address'))
+        @include(EcommerceHelper::viewPath('customers.address.form'), ['address' => $address])
     {!! Form::close() !!}
 @endsection

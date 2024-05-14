@@ -3,14 +3,15 @@
 namespace Database\Seeders;
 
 use Botble\Base\Supports\BaseSeeder;
-use Botble\Widget\Database\Traits\HasWidgetSeeder;
+use Botble\Theme\Facades\Theme;
+use Botble\Widget\Models\Widget as WidgetModel;
 
 class WidgetSeeder extends BaseSeeder
 {
-    use HasWidgetSeeder;
-
     public function run(): void
     {
+        WidgetModel::query()->truncate();
+
         $data = [
             [
                 'widget_id' => 'CustomMenuWidget',
@@ -24,6 +25,11 @@ class WidgetSeeder extends BaseSeeder
             ],
         ];
 
-        $this->createWidgets($data);
+        $theme = Theme::getThemeName();
+
+        foreach ($data as $item) {
+            $item['theme'] = $theme;
+            WidgetModel::query()->create($item);
+        }
     }
 }

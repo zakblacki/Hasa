@@ -32,9 +32,9 @@
                                         <input class="form-control" type="email" name="email" placeholder="{{ __('Please enter your email address') }}">
                                         <button type="submit">{{ __('Go') }}</button>
                                     </div>
-
-                                    {!! apply_filters('form_extra_fields_render', null, \Botble\Newsletter\Forms\Fronts\NewsletterForm::class) !!}
-
+                                    @if (setting('enable_captcha') && is_plugin_active('captcha'))
+                                        {!! Captcha::display() !!}
+                                    @endif
                                     <br>
                                     <div class="success-message text-success" style="display: none;">
                                         <span></span>

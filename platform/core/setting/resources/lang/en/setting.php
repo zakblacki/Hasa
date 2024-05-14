@@ -141,8 +141,6 @@ return [
         'log_channel' => 'Log channel',
         'sendmail_path' => 'Sendmail Path',
         'encryption_placeholder' => 'Encryption: ssl or tls',
-        'local_domain' => 'Local domain',
-        'local_domain_placeholder' => 'It can be empty. Needs to set to your domain when using SMTP Relay. E.g. your-domain.com',
 
         'ses_key' => 'Key',
         'ses_key_placeholder' => 'Key',
@@ -337,8 +335,10 @@ return [
     'website_tracking' => [
         'title' => 'Website Tracking',
         'description' => 'Configure website tracking',
-        'google_tag_id' => 'Google tag ID',
-        'google_tag_id_placeholder' => 'Example: G-123ABC4567',
-        'google_tag_code' => 'Google tag code',
+        'google_tag_manager_id' => 'Google Tag Manager ID',
+        'google_tag_manager_id_placeholder' => 'Example: G-123ABC4567',
+        'google_tag_manager_code' => 'Google Tag Manager Code',
+        'google_tag_manager_code_helper' => 'Go to https://tagmanager.google.com to configure your tags.',
+        'google_tag_manager_info' => 'Only setup one of Google Tag Manager ID or Google Tag Manager Code',
     ],
 ];

@@ -146,8 +146,7 @@ AdminHelper::registerRoutes(function () {
         });
 
         Route::group(['prefix' => 'order-returns', 'as' => 'order_returns.'], function () {
-            Route::resource('', 'OrderReturnController')->parameters(['' => 'order_return'])->except(
-                ['create', 'store']
+            Route::resource('', 'OrderReturnController')->parameters(['' => 'order_return'])->except(['create', 'store']
             );
         });
     });
