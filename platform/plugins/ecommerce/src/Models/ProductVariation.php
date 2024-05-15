@@ -144,7 +144,7 @@ class ProductVariation extends BaseModel
         return ProductVariationItem::query()->whereIn('id', $items)->delete();
     }
 
-    public static function getParentOfVariation(int|string $variationId, array $with = []): Product|null
+    public static function getParentOfVariation(int|string $variationId, array $with = []): ?Product
     {
         $variation = self::query()
             ->where('product_id', $variationId);
