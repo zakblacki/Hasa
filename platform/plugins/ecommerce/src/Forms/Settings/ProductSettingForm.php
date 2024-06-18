@@ -2,7 +2,6 @@
 
 namespace Botble\Ecommerce\Forms\Settings;
 
-use Botble\Base\Forms\Fields\OnOffField;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\Settings\ProductSettingRequest;
 use Botble\Setting\Forms\SettingForm;
@@ -27,27 +26,19 @@ class ProductSettingForm extends SettingForm
                 ],
                 'value' => get_ecommerce_setting('how_to_display_product_variation_images', 'only_variation_images'),
             ])
-            ->add('show_number_of_products', OnOffField::class, [
+            ->add('show_number_of_products', 'onOffCheckbox', [
                 'label' => trans('plugins/ecommerce::setting.product.form.show_number_of_products'),
                 'value' => EcommerceHelper::showNumberOfProductsInProductSingle(),
             ])
-            ->add('show_out_of_stock_products', OnOffField::class, [
+            ->add('show_out_of_stock_products', 'onOffCheckbox', [
                 'label' => trans('plugins/ecommerce::setting.product.form.show_out_of_stock_products'),
                 'value' => EcommerceHelper::showOutOfStockProducts(),
             ])
-            ->add('is_enabled_product_options', OnOffField::class, [
+            ->add('is_enabled_product_options', 'onOffCheckbox', [
                 'label' => trans('plugins/ecommerce::setting.product.form.enable_product_options'),
                 'value' => EcommerceHelper::isEnabledProductOptions(),
             ])
-            ->add('is_enabled_cross_sale_products', OnOffField::class, [
-                'label' => trans('plugins/ecommerce::setting.product.form.is_enabled_cross_sale_products'),
-                'value' => EcommerceHelper::isEnabledCrossSaleProducts(),
-            ])
-            ->add('is_enabled_related_products', OnOffField::class, [
-                'label' => trans('plugins/ecommerce::setting.product.form.is_enabled_related_products'),
-                'value' => EcommerceHelper::isEnabledRelatedProducts(),
-            ])
-            ->add('auto_generate_product_sku', OnOffField::class, [
+            ->add('auto_generate_product_sku', 'onOffCheckbox', [
                 'label' => trans('plugins/ecommerce::setting.product.form.auto_generate_product_sku'),
                 'value' => get_ecommerce_setting('auto_generate_product_sku', true),
                 'attr' => [

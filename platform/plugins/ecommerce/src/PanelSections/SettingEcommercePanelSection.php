@@ -85,7 +85,8 @@ class SettingEcommercePanelSection extends PanelSection
                     ->withIcon('ti ti-list-details')
                     ->withDescription(trans('plugins/ecommerce::invoice-template.setting_description'))
                     ->withPriority(120)
-                    ->withRoute('ecommerce.settings.invoice-template'),
+                    ->withRoute('ecommerce.settings.invoice-template')
+                    ->withPermissions(['ecommerce.settings.invoice-template.index']),
                 PanelSectionItem::make('settings.ecommerce.tax_settings')
                     ->setTitle(trans('plugins/ecommerce::setting.tax.name'))
                     ->withIcon('ti ti-receipt-tax')

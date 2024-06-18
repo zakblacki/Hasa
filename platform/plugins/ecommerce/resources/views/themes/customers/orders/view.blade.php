@@ -1,8 +1,8 @@
 @extends(EcommerceHelper::viewPath('customers.master'))
 
-@section('title', __('Order information'))
-
 @section('content')
+    <h2 class="customer-page-title mb-4">{{ __('Order information') }}</h2>
+
     <div class="customer-order-detail">
         @include(EcommerceHelper::viewPath('includes.order-tracking-detail'))
 
@@ -80,4 +80,4 @@
             </div>
         </div>
     @endif
-@stop
+@endsection

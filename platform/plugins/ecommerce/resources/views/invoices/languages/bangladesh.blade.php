@@ -1,7 +1,7 @@
 <style>
     @font-face {
         font-family: FreeSerif;
-        src: url('{{ url('vendor/core/core/base/fonts/FreeSerif.ttf') }}');
+        src: url('{{ url('vendor/core/plugins/ecommerce/fonts/FreeSerif.ttf') }}');
     }
 
     body {

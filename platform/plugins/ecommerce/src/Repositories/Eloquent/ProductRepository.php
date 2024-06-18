@@ -502,7 +502,7 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
                     ->where(function (EloquentBuilder $query) use ($keyword, $searchProductsBy, $isPartial) {
                         $hasWhere = false;
 
-                        if (in_array('name', $searchProductsBy) || in_array('sku', $searchProductsBy) || in_array('description', $searchProductsBy) || in_array('type_de_taille', $searchProductsBy) || in_array('type_de_tissu', $searchProductsBy) || in_array('coupe_pantalon', $searchProductsBy) || in_array('longueur', $searchProductsBy) || in_array('nom_darticle_arabe', $searchProductsBy) || in_array('nom_darticle_anglais', $searchProductsBy) || in_array('coupe_silouhette', $searchProductsBy) || in_array('contenu_de_paquet', $searchProductsBy) || in_array('type_dencolure', $searchProductsBy) || in_array('type_des_manches', $searchProductsBy) || in_array('zone_dutilisation', $searchProductsBy) || in_array('modele', $searchProductsBy) || in_array('longueur_des_manches', $searchProductsBy) || in_array('product_id', $searchProductsBy) || in_array('motif', $searchProductsBy) || in_array('couleur', $searchProductsBy) || in_array('poche', $searchProductsBy) || in_array('type_de_produit', $searchProductsBy) || in_array('taille', $searchProductsBy) || in_array('grandes_occasions', $searchProductsBy) || in_array('personnage', $searchProductsBy) || in_array('matiere', $searchProductsBy) || in_array('duree_de_livraison', $searchProductsBy)) {
+                        if (in_array('name', $searchProductsBy) || in_array('sku', $searchProductsBy) || in_array('description', $searchProductsBy) || in_array('type_de_taille', $searchProductsBy) || in_array('type_de_tissu', $searchProductsBy) || in_array('coupe_pantalon', $searchProductsBy) || in_array('longueur', $searchProductsBy) || in_array('nom_darticle_arabe', $searchProductsBy) || in_array('nom_darticle_anglais', $searchProductsBy) || in_array('silouhette', $searchProductsBy) || in_array('type_de_fermeture', $searchProductsBy) || in_array('kap', $searchProductsBy) || in_array('contenu_du_paquet', $searchProductsBy) || in_array('type_dencolure', $searchProductsBy) || in_array('type_de_manches', $searchProductsBy) || in_array('zone_dutilisation', $searchProductsBy) || in_array('modele', $searchProductsBy) || in_array('longueur_des_manches', $searchProductsBy) || in_array('product_id', $searchProductsBy) || in_array('motif', $searchProductsBy) || in_array('couleur', $searchProductsBy) || in_array('poche', $searchProductsBy) || in_array('type_de_produit', $searchProductsBy) || in_array('taille', $searchProductsBy) || in_array('occasions', $searchProductsBy) || in_array('persona', $searchProductsBy) || in_array('matiere', $searchProductsBy) || in_array('duree_de_livraison', $searchProductsBy)) {
                             $query
                                 ->where(function (BaseQueryBuilder $subQuery) use ($keyword, $searchProductsBy, $isPartial) {
                                     if (in_array('name', $searchProductsBy)) {
@@ -533,8 +533,16 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
                                         $subQuery->addSearch('ec_products.longueur', $keyword, false);
                                     }
 
-                                    if (in_array('coupe_silouhette', $searchProductsBy)) {
-                                        $subQuery->addSearch('ec_products.coupe_silouhette', $keyword, false);
+                                    if (in_array('silouhette', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.silouhette', $keyword, false);
+                                    }
+                                    
+                                    if (in_array('type_de_fermeture', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.type_de_fermeture', $keyword, false);
+                                    }
+                                    
+                                    if (in_array('kap', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.kap', $keyword, false);
                                     }
                                     
                                     if (in_array('nom_darticle_arabe', $searchProductsBy)) {
@@ -545,16 +553,16 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
                                         $subQuery->addSearch('ec_products.nom_darticle_anglais', $keyword, false);
                                     }
                                     
-                                    if (in_array('contenu_de_paquet', $searchProductsBy)) {
-                                        $subQuery->addSearch('ec_products.contenu_de_paquet', $keyword, false);
+                                    if (in_array('contenu_du_paquet', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.contenu_du_paquet', $keyword, false);
                                     }
 
                                     if (in_array('type_dencolure', $searchProductsBy)) {
                                         $subQuery->addSearch('ec_products.type_dencolure', $keyword, false);
                                     }
 
-                                    if (in_array('type_des_manches', $searchProductsBy)) {
-                                        $subQuery->addSearch('ec_products.type_des_manches', $keyword, false);
+                                    if (in_array('type_de_manches', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.type_de_manches', $keyword, false);
                                     }
 
                                     if (in_array('zone_dutilisation', $searchProductsBy)) {
@@ -593,12 +601,12 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
                                         $subQuery->addSearch('ec_products.taille', $keyword, false);
                                     }
 
-                                    if (in_array('grandes_occasions', $searchProductsBy)) {
-                                        $subQuery->addSearch('ec_products.grandes_occasions', $keyword, false);
+                                    if (in_array('occasions', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.occasions', $keyword, false);
                                     }
 
-                                    if (in_array('personnage', $searchProductsBy)) {
-                                        $subQuery->addSearch('ec_products.personnage', $keyword, false);
+                                    if (in_array('persona', $searchProductsBy)) {
+                                        $subQuery->addSearch('ec_products.persona', $keyword, false);
                                     }
 
                                     if (in_array('matiere', $searchProductsBy)) {

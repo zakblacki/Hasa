@@ -25,12 +25,10 @@ class EmailTemplateIframeController extends BaseController
 
         $emailHandler->setVariableValues($inputData);
 
-        if (in_array($template, ['header', 'footer'])) {
-            $content = file_get_contents(core_path('setting/resources/email-templates/test.tpl'));
-        } else {
-            $content = get_setting_email_template_content($type, $module, $template);
-        }
+        $content = get_setting_email_template_content($type, $module, $template);
 
-        return $emailHandler->prepareData($content);
+        $content = $emailHandler->prepareData($content);
+
+        return BaseHelper::clean($content);
     }
 }

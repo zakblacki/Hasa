@@ -1,5 +1,6 @@
 @props([
     'name',
+    'allowThumb' => true,
     'value',
     'defaultImage' => RvMedia::getDefaultImage(),
     'allowAddFromUrl' => $isInAdmin = is_in_admin(true) && auth()->guard()->check(),
@@ -7,7 +8,6 @@
 
 @php
     $value = BaseHelper::stringify($value);
-    $allowThumb = $attributes->get('allow_thumb', $attributes->get('allow-thumb', true));
 @endphp
 
 <div {{ $attributes->merge(['class' => "image-box image-box-$name"]) }}>
@@ -34,7 +34,10 @@
         style="width: 8rem"
         @class([
             'preview-image-wrapper mb-1',
-            'preview-image-wrapper-not-allow-thumb' => ! $allowThumb
+            'preview-image-wrapper-not-allow-thumb' => !($allowThumb = Arr::get(
+                $attributes,
+                'allow_thumb',
+                true)),
         ])
     >
         <div class="preview-image-inner">

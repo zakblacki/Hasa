@@ -213,7 +213,7 @@ trait HasBulkActions
             }
         }
 
-        return apply_filters('base_filter_table_bulk_changes', $bulkChanges, $this);
+        return $bulkChanges;
     }
 
     public function saveBulkChanges(array $ids, string $inputKey, ?string $inputValue): bool

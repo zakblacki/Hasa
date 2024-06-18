@@ -120,8 +120,8 @@ class LoginController extends BaseController
     {
         $usernameKey = match (EcommerceHelper::getLoginOption()) {
             'phone' => 'phone',
+            'email' => 'email',
             'email_or_phone' => $request->isEmail($request->input($this->username())) ? 'email' : 'phone',
-            default => 'email',
         };
 
         return [

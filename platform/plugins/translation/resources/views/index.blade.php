@@ -2,8 +2,15 @@
 
 @section('content')
     <x-core::alert type="warning">
-        <p class="mb-0">
+        <p>
             {{ trans('plugins/translation::translation.theme_translations_instruction') }}
+        </p>
+
+        <p class="mb-0">
+            {!! trans(
+                'plugins/translation::translation.re_import_alert',
+                ['here' => Html::link('#', trans('plugins/translation::translation.here'), ['data-bs-toggle' => 'modal', 'data-bs-target' => '#confirm-publish-modal'])]
+            ) !!}
         </p>
     </x-core::alert>
 

@@ -11,7 +11,7 @@
         </div>
         <div class="section__content row align-items-center">
             <div class="col-12">
-                <div class="cat_slider carousel-slider cat_style1 mt-4 mt-md-0 carousel_slider owl-carousel owl-theme nav_style5" data-loop="false" data-dots="false" data-nav="true" data-margin="30" data-responsive='{"0":{"items": "2"}, "480":{"items": "3"}, "576":{"items": "4"}, "768":{"items": "5"}, "991":{"items": "6"}, "1199":{"items": "7"}}'>
+                <div class="cat_slider carousel-slider cat_style1 mt-4 mt-md-0 carousel_slider owl-carousel owl-theme nav_style5" data-loop="false" data-dots="true" data-nav="true" data-margin="30" data-responsive='{"0":{"items": "2"}, "480":{"items": "3"}, "576":{"items": "4"}, "768":{"items": "5"}, "991":{"items": "6"}, "1199":{"items": "7"}}'>
                     @foreach($categories as $category)
                         <div class="item">
                             <div class="categories_box">
@@ -29,3 +29,30 @@
         </div>
     </div>
 </section>
+
+<script>
+    $(document).ready(function() {
+    $('.owl-carousel').owlCarousel({
+        loop: true,
+        dots: true,
+    });
+    });
+    
+    $(document).ready(function() {
+    $(".cat_slider.owl-carousel").owlCarousel({
+        loop: true, // Enable infinite looping
+        dots: true,  // Display pagination dots
+    });
+    });
+    
+    $('.owl-carousel').owlCarousel({
+            loop:true,
+            dots:true,
+        });
+        
+    $(".cat_slider.owl-carousel").owlCarousel({
+      loop: true,
+      dots: true,
+    });
+
+</script>

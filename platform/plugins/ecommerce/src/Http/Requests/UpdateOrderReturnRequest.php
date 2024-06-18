@@ -15,7 +15,7 @@ class UpdateOrderReturnRequest extends Request
                 'nullable',
                 Rule::requiredIf(fn () => $this->input('return_status') == OrderReturnStatusEnum::CANCELED),
                 'string',
-                'max:400',
+                'max:255',
             ],
             'return_status' => ['required', 'string', Rule::in(OrderReturnStatusEnum::values())],
         ];

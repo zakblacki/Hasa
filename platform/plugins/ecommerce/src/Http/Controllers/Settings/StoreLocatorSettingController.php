@@ -3,9 +3,10 @@
 namespace Botble\Ecommerce\Http\Controllers\Settings;
 
 use Botble\Base\Facades\Assets;
+use Botble\Base\Http\Controllers\BaseController;
 use Botble\Ecommerce\Models\StoreLocator;
 
-class StoreLocatorSettingController extends SettingController
+class StoreLocatorSettingController extends BaseController
 {
     public function index()
     {

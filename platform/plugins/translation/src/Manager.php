@@ -54,9 +54,9 @@ class Manager
     {
         $loader = Lang::getLoader();
 
-        if (str_contains($group, DIRECTORY_SEPARATOR)) {
-            $englishTranslations = $loader->load('en', Str::afterLast($group, DIRECTORY_SEPARATOR), Str::beforeLast($group, DIRECTORY_SEPARATOR));
-            $translations = $loader->load($locale, Str::afterLast($group, DIRECTORY_SEPARATOR), Str::beforeLast($group, DIRECTORY_SEPARATOR));
+        if (str_contains($group, '/')) {
+            $englishTranslations = $loader->load('en', Str::afterLast($group, '/'), Str::beforeLast($group, '/'));
+            $translations = $loader->load($locale, Str::afterLast($group, '/'), Str::beforeLast($group, '/'));
         } else {
             $englishTranslations = $loader->load('en', $group);
             $translations = $loader->load($locale, $group);
@@ -70,7 +70,7 @@ class Manager
 
         File::ensureDirectoryExists(lang_path($locale));
 
-        $groups = explode(DIRECTORY_SEPARATOR, $group);
+        $groups = explode('/', $group);
         if (count($groups) > 1) {
             $folderName = Arr::last($groups);
             Arr::forget($groups, count($groups) - 1);

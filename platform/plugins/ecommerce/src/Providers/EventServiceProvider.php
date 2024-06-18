@@ -33,7 +33,6 @@ use Botble\Ecommerce\Listeners\SendProductReviewsMailAfterOrderCompleted;
 use Botble\Ecommerce\Listeners\SendShippingStatusChangedNotification;
 use Botble\Ecommerce\Listeners\SendWebhookWhenOrderPlaced;
 use Botble\Ecommerce\Listeners\UpdateInvoiceAndShippingWhenOrderCancelled;
-use Botble\Ecommerce\Listeners\UpdateInvoiceWhenOrderCompleted;
 use Botble\Ecommerce\Listeners\UpdateProductStockStatus;
 use Botble\Ecommerce\Listeners\UpdateProductView;
 use Botble\Ecommerce\Services\HandleApplyCouponService;
@@ -83,7 +82,6 @@ class EventServiceProvider extends ServiceProvider
         OrderCompletedEvent::class => [
             SendProductReviewsMailAfterOrderCompleted::class,
             GenerateLicenseCodeAfterOrderCompleted::class,
-            UpdateInvoiceWhenOrderCompleted::class,
         ],
         ProductViewed::class => [
             UpdateProductView::class,

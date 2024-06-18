@@ -60,11 +60,7 @@
     </x-core::datagrid>
 </x-core::card.body>
 
-@if (
-    auth()->user()->hasPermission( 'ecommerce.shipments.edit')
-    && $shipment->status != Botble\Ecommerce\Enums\ShippingStatusEnum::CANCELED
-    && $order->status != Botble\Ecommerce\Enums\OrderStatusEnum::CANCELED
-)
+@if ($shipment->status != Botble\Ecommerce\Enums\ShippingStatusEnum::CANCELED && $order->status != Botble\Ecommerce\Enums\OrderStatusEnum::CANCELED)
     <x-core::card.footer class="shipment-actions-wrapper btn-list">
         @if (in_array($shipment->status, [
             Botble\Ecommerce\Enums\ShippingStatusEnum::NOT_APPROVED,
@@ -85,10 +81,6 @@
             icon="ti ti-truck-delivery"
         >
             {{ trans('plugins/ecommerce::shipping.update_shipping_status') }}
-        </x-core::button>
-
-        <x-core::button tag="a" :href="route('ecommerce.shipments.print', $shipment)" target="_blank" icon="ti ti-printer">
-            {{ trans('plugins/ecommerce::shipping.shipping_label.print_shipping_label') }}
         </x-core::button>
 
         {!! apply_filters('shipment_buttons_detail_order', null, $shipment) !!}

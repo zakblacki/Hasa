@@ -7,6 +7,12 @@ return [
     ],
 
     [
+        'name' => 'Settings',
+        'flag' => 'ecommerce.settings',
+        'parent_flag' => 'plugins.ecommerce',
+    ],
+
+    [
         'name' => 'Reports',
         'flag' => 'ecommerce.report.index',
         'parent_flag' => 'plugins.ecommerce',
@@ -52,7 +58,7 @@ return [
     [
         'name' => 'Update',
         'flag' => 'ecommerce.product-prices.edit',
-        'parent_flag' => 'ecommerce.product-prices.index',
+        'parent_flag' => 'plugins.ecommerce',
     ],
 
     /**
@@ -67,7 +73,7 @@ return [
     [
         'name' => 'Update',
         'flag' => 'ecommerce.product-inventory.edit',
-        'parent_flag' => 'ecommerce.product-inventory.index',
+        'parent_flag' => 'plugins.ecommerce',
     ],
 
     /**
@@ -255,6 +261,38 @@ return [
     ],
 
     [
+        'name' => 'Shipping',
+        'flag' => 'shipping_methods.index',
+        'parent_flag' => 'plugins.ecommerce',
+    ],
+
+    [
+        'name' => 'Shipping Rule Items',
+        'flag' => 'ecommerce.shipping-rule-items.index',
+        'parent_flag' => 'plugins.ecommerce',
+    ],
+    [
+        'name' => 'Create',
+        'flag' => 'ecommerce.shipping-rule-items.create',
+        'parent_flag' => 'ecommerce.shipping-rule-items.index',
+    ],
+    [
+        'name' => 'Edit',
+        'flag' => 'ecommerce.shipping-rule-items.edit',
+        'parent_flag' => 'ecommerce.shipping-rule-items.index',
+    ],
+    [
+        'name' => 'Delete',
+        'flag' => 'ecommerce.shipping-rule-items.destroy',
+        'parent_flag' => 'ecommerce.shipping-rule-items.index',
+    ],
+    [
+        'name' => 'Bulk Import',
+        'flag' => 'ecommerce.shipping-rule-items.bulk-import',
+        'parent_flag' => 'ecommerce.shipping-rule-items.index',
+    ],
+
+    [
         'name' => 'Shipments',
         'flag' => 'ecommerce.shipments.index',
         'parent_flag' => 'plugins.ecommerce',
@@ -381,13 +419,13 @@ return [
     [
         'name' => 'Import Products',
         'flag' => 'ecommerce.import.products.index',
-        'parent_flag' => 'tools.data-synchronize',
+        'parent_flag' => 'plugins.ecommerce',
     ],
 
     [
         'name' => 'Export Products',
         'flag' => 'ecommerce.export.products.index',
-        'parent_flag' => 'tools.data-synchronize',
+        'parent_flag' => 'plugins.ecommerce',
     ],
 
     [
@@ -447,123 +485,93 @@ return [
         'parent_flag' => 'ecommerce.invoice.index',
     ],
     [
-        'name' => 'Ecommerce',
-        'flag' => 'ecommerce.settings',
-        'parent_flag' => 'settings.index',
+        'name' => 'Invoice Template',
+        'flag' => 'ecommerce.invoice-template.index',
+        'parent_flag' => 'plugins.ecommerce',
     ],
     [
-        'name' => 'General',
+        'name' => 'General Settings',
         'flag' => 'ecommerce.settings.general',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Invoice Template',
-        'flag' => 'ecommerce.invoice-template.index',
-        'parent_flag' => 'ecommerce.settings',
-    ],
-    [
-        'name' => 'Currencies',
+        'name' => 'Currency Settings',
         'flag' => 'ecommerce.settings.currencies',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Product',
+        'name' => 'Product Settings',
         'flag' => 'ecommerce.settings.products',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Product Search',
+        'name' => 'Product Search Settings',
         'flag' => 'ecommerce.settings.product-search',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Digital Product',
+        'name' => 'Digital Product Settings',
         'flag' => 'ecommerce.settings.digital-products',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Store Locators',
+        'name' => 'Store Locators Settings',
         'flag' => 'ecommerce.settings.store-locators',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Invoice',
+        'name' => 'Invoice Settings',
         'flag' => 'ecommerce.settings.invoices',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Product Review',
+        'name' => 'Product Review Settings',
         'flag' => 'ecommerce.settings.product-reviews',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Customer',
+        'name' => 'Customer Settings',
         'flag' => 'ecommerce.settings.customers',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Shopping',
+        'name' => 'Shopping Settings',
         'flag' => 'ecommerce.settings.shopping',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Tax',
+        'name' => 'Tax Settings',
         'flag' => 'ecommerce.settings.taxes',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Shipping',
+        'name' => 'Shipping Settings',
         'flag' => 'ecommerce.settings.shipping',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Shipping Rule Items',
-        'flag' => 'ecommerce.shipping-rule-items.index',
-        'parent_flag' => 'settings.index.shipping',
-    ],
-    [
-        'name' => 'Create',
-        'flag' => 'ecommerce.shipping-rule-items.create',
-        'parent_flag' => 'ecommerce.shipping-rule-items.index',
-    ],
-    [
-        'name' => 'Edit',
-        'flag' => 'ecommerce.shipping-rule-items.edit',
-        'parent_flag' => 'ecommerce.shipping-rule-items.index',
-    ],
-    [
-        'name' => 'Delete',
-        'flag' => 'ecommerce.shipping-rule-items.destroy',
-        'parent_flag' => 'ecommerce.shipping-rule-items.index',
-    ],
-    [
-        'name' => 'Bulk Import',
-        'flag' => 'ecommerce.shipping-rule-items.bulk-import',
-        'parent_flag' => 'ecommerce.shipping-rule-items.index',
-    ],
-    [
-        'name' => 'Tracking',
+        'name' => 'Tracking Settings',
         'flag' => 'ecommerce.settings.tracking',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Standard and Format',
+        'name' => 'Standard and Format Settings',
         'flag' => 'ecommerce.settings.standard-and-format',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Checkout',
+        'name' => 'Checkout Settings',
         'flag' => 'ecommerce.settings.checkout',
         'parent_flag' => 'ecommerce.settings',
     ],
     [
-        'name' => 'Return',
+        'name' => 'Return Settings',
         'flag' => 'ecommerce.settings.return',
         'parent_flag' => 'ecommerce.settings',
     ],
 
     [
-        'name' => 'Flash Sale',
+        'name' => 'Flash Sale Settings',
         'flag' => 'ecommerce.settings.flash-sale',
         'parent_flag' => 'ecommerce.settings',
     ],

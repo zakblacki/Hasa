@@ -2,6 +2,7 @@
 
 namespace Botble\Newsletter\Http\Requests;
 
+use Botble\Captcha\Facades\Captcha;
 use Botble\Newsletter\Enums\NewsletterStatusEnum;
 use Botble\Newsletter\Models\Newsletter;
 use Botble\Support\Http\Requests\Request;
@@ -10,11 +11,9 @@ use Illuminate\Validation\Rule;
 
 class NewsletterRequest extends Request
 {
-    protected $errorBag = 'newsletter';
-
     public function rules(): array
     {
-        return [
+        $rules = [
             'email' => [
                 'required',
                 'email',
@@ -24,5 +23,12 @@ class NewsletterRequest extends Request
             ],
             'status' => Rule::in(NewsletterStatusEnum::values()),
         ];
+
+        return $rules;
+    }
+
+    public function attributes(): array
+    {
+        return is_plugin_active('captcha') ? Captcha::attributes() : [];
     }
 }

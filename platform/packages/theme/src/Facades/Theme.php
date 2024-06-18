@@ -80,8 +80,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string|null getSiteTitle()
  * @method static \Illuminate\Support\HtmlString|null getLogoImage(array $attributes = [], string $logoKey = 'logo')
  * @method static string|null formatDate(\Carbon\CarbonInterface|string|int|null $date, string|null $format = null)
- * @method static \Botble\Theme\Typography\Typography typography()
- * @method static string renderSocialSharing(string|null $url = null, string|null $title = null, string|null $thumbnail = null)
+ * @method static \Botble\Theme\Typograhpy\Typography typography()
  *
  * @see \Botble\Theme\Theme
  */

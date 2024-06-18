@@ -2,8 +2,6 @@
 
 namespace Botble\PayPal\Services\Abstracts;
 
-use Botble\Ecommerce\Models\Currency;
-use Botble\Payment\Models\Payment;
 use Botble\Payment\Services\Traits\PaymentErrorTrait;
 use Exception;
 use Illuminate\Http\Request;
@@ -301,27 +299,13 @@ abstract class PayPalPaymentAbstract
         try {
             $detail = $this->getPaymentDetails($paymentId);
             $captureId = null;
-
             if ($detail) {
                 // @phpstan-ignore-next-line
-                $purchase = Arr::first($detail->result->purchase_units);
-                $capture = Arr::first($purchase->payments->captures);
+                $purchase = Arr::get($detail->result->purchase_units, 0);
+                $capture = Arr::get($purchase->payments->captures, 0);
                 $captureId = $capture->id;
             }
-
             if ($captureId) {
-                $payment = Payment::query()->where('charge_id', $paymentId)->firstOrFail();
-                $paymentCurrency = $purchase->amount->currency_code;
-
-                if ($payment->currency !== $paymentCurrency) {
-                    $currency = Currency::query()->where('title', $paymentCurrency)->first();
-
-                    if ($currency) {
-                        $totalAmount = $totalAmount * $currency->exchange_rate;
-                        $this->paymentCurrency = $paymentCurrency;
-                    }
-                }
-
                 $refundRequest = new CapturesRefundRequest($captureId);
                 $refundRequest->body = $this->buildRefundRequestBody($totalAmount);
                 $refundRequest->prefer('return=representation');

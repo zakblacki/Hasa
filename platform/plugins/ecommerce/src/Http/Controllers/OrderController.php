@@ -2,7 +2,6 @@
 
 namespace Botble\Ecommerce\Http\Controllers;
 
-use Botble\ACL\Models\User;
 use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Facades\Assets;
@@ -15,6 +14,7 @@ use Botble\Ecommerce\Enums\OrderStatusEnum;
 use Botble\Ecommerce\Enums\ShippingCodStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
 use Botble\Ecommerce\Enums\ShippingStatusEnum;
+use Botble\Ecommerce\Events\OrderConfirmedEvent;
 use Botble\Ecommerce\Events\OrderCreated;
 use Botble\Ecommerce\Events\OrderPaymentConfirmedEvent;
 use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
@@ -176,12 +176,7 @@ class OrderController extends BaseController
                 $order->save();
 
                 if ($paymentStatus == PaymentStatusEnum::COMPLETED) {
-                    /**
-                     * @var User $user
-                     */
-                    $user = Auth::user();
-
-                    event(new OrderPaymentConfirmedEvent($order, $user));
+                    event(new OrderPaymentConfirmedEvent($order, Auth::user()));
 
                     OrderHistory::query()->create([
                         'action' => OrderHistoryActionEnum::CONFIRM_PAYMENT,
@@ -367,12 +362,38 @@ class OrderController extends BaseController
 
     public function postConfirm(Request $request)
     {
-        /**
-         * @var Order $order
-         */
         $order = Order::query()->findOrFail($request->input('order_id'));
+        $order->is_confirmed = 1;
+        if ($order->status == OrderStatusEnum::PENDING) {
+            $order->status = OrderStatusEnum::PROCESSING;
+        }
 
-        OrderHelper::confirmOrder($order);
+        $order->save();
+
+        OrderHistory::query()->create([
+            'action' => OrderHistoryActionEnum::CONFIRM_ORDER,
+            'description' => trans('plugins/ecommerce::order.order_was_verified_by'),
+            'order_id' => $order->getKey(),
+            'user_id' => Auth::id(),
+        ]);
+
+        $payment = Payment::query()->where('order_id', $order->getKey())->first();
+
+        if ($payment) {
+            $payment->user_id = Auth::id();
+            $payment->save();
+        }
+
+        event(new OrderConfirmedEvent($order, Auth::user()));
+
+        $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
+        if ($mailer->templateEnabled('order_confirm')) {
+            OrderHelper::setEmailVariables($order);
+            $mailer->sendUsingTemplate(
+                'order_confirm',
+                $order->user->email ?: $order->address->email
+            );
+        }
 
         return $this
             ->httpResponse()
@@ -482,7 +503,7 @@ class OrderController extends BaseController
             ]);
 
             ShipmentHistory::query()->create([
-                'action' => 'create_from_order',
+                'action' => OrderHistoryActionEnum::CREATE_FROM_ORDER,
                 'description' => trans('plugins/ecommerce::order.shipping_was_created_from'),
                 'shipment_id' => $shipment->id,
                 'order_id' => $order->getKey(),

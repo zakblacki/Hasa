@@ -22,10 +22,10 @@
 
 @once
     <script>
-        window.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
             function toggleClipboardActionIcon(element) {
-                const copiedState = element.querySelector('[data-clipboard-icon="copy"]');
-                const copyState = element.querySelector('[data-clipboard-icon="copied"]');
+                const copiedState = element.querySelector('[data-clipboard-icon="copy"]')
+                const copyState = element.querySelector('[data-clipboard-icon="copied"]')
 
                 copiedState.style.display = 'none';
                 copyState.style.display = 'inline-block';

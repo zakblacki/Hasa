@@ -148,29 +148,27 @@
                         </table>
                     </div>
 
-                    @if (EcommerceHelper::isTaxEnabled() && (float)$order->tax_amount)
+                    @if (EcommerceHelper::isTaxEnabled())
                         <p>
                             <span class="d-inline-block me-1">{{ __('Tax') }}:</span>
                             <strong class="order-detail-value"> {{ format_price($order->tax_amount) }} </strong>
                         </p>
                     @endif
 
-                    @if ((float)$order->discount_amount)
-                        <p>
-                            <span class="d-inline-block me-1">{{ __('Discount') }}:</span>
-                            <strong class="order-detail-value"> {{ format_price($order->discount_amount) }}
-                                @if ($order->discount_amount)
-                                    @if ($order->coupon_code)
-                                        ({!! BaseHelper::html(__('Coupon code: ":code"', ['code' => Html::tag('strong', $order->coupon_code)->toHtml()])) !!})
-                                    @elseif ($order->discount_description)
-                                        ({{ $order->discount_description }})
-                                    @endif
+                    <p>
+                        <span class="d-inline-block me-1">{{ __('Discount') }}:</span>
+                        <strong class="order-detail-value"> {{ format_price($order->discount_amount) }}
+                            @if ($order->discount_amount)
+                                @if ($order->coupon_code)
+                                    ({!! BaseHelper::html(__('Coupon code: ":code"', ['code' => Html::tag('strong', $order->coupon_code)->toHtml()])) !!})
+                                @elseif ($order->discount_description)
+                                    ({{ $order->discount_description }})
                                 @endif
-                            </strong>
-                        </p>
-                    @endif
+                            @endif
+                        </strong>
+                    </p>
 
-                    @if ((float)$order->shipping_amount && EcommerceHelper::countDigitalProducts($order->products) != $order->products->count())
+                    @if (EcommerceHelper::countDigitalProducts($order->products) != $order->products->count())
                         <p>
                             <span class="d-inline-block me-1">{{ __('Shipping fee') }}: </span>
                             <strong>{{ format_price($order->shipping_amount) }}</strong>

@@ -124,7 +124,6 @@ class ProductImport implements
         }
 
         if ($importType == 'variations' && $row['import_type'] == 'variation') {
-            
             $product = $this->getProduct($name, $slug);
             return $this->storeVariant($product, $row);
         }
@@ -147,10 +146,10 @@ class ProductImport implements
             } else {
                 $product = $this->getProduct($name, $slug);
             }
-
+            
             return $this->storeVariant($product, $row);
         }
-
+        
         return $this->storeProduct();
     }
 
@@ -187,6 +186,10 @@ class ProductImport implements
         ) {
             // update product
             $product = $this->updateProductData($existingProduct);
+
+            $attributeSets = $this->request->input('attribute_sets', []);
+
+            $product->productAttributeSets()->sync($attributeSets);
 
             self::$methodCallCount = 0;
 
@@ -248,7 +251,6 @@ class ProductImport implements
     protected function updateProductData($existingProduct)
     {
         if(!$existingProduct->is_variation) {
-            
             // Update labels
             $labels = (!empty($this->request->input('labels'))) ? $this->request->input('labels') : [];
             $labelIds = $this->getIdsFromNames('ec_product_labels', 'name', $labels);
@@ -292,8 +294,8 @@ class ProductImport implements
         $productData = array_merge($productData, $this->request->except('sku'));
 
         unset(
-            $productData['sku'],
-            $productData['original_price'],
+            $productData['sku'], 
+            $productData['original_price'], 
             $productData['front_sale_price'],
 
             $productData['_token'],
@@ -324,33 +326,7 @@ class ProductImport implements
             $productData['variation_info'],
             $productData['tag'],
         );
-        
-        
 
-        if(is_null($productData['sale_price']) || gettype($productData['sale_price']) != 'double' || gettype($productData['sale_price']) != 'integer') {
-            $productData['sale_price'] = null;
-        }
-
-        if(is_null($productData['weight']) || gettype($productData['weight']) != 'double' || gettype($productData['weight']) != 'integer') {
-            $productData['weight'] = 0;
-        }
-
-        if(is_null($productData['length']) || gettype($productData['length']) != 'double' || gettype($productData['length']) != 'integer') {
-            $productData['length'] = 0;
-        }
-
-        if(is_null($productData['wide']) || gettype($productData['wide']) != 'double' || gettype($productData['wide']) != 'integer') {
-            $productData['wide'] = 0;
-        }
-
-        if(is_null($productData['height']) || gettype($productData['height']) != 'double' || gettype($productData['height']) != 'integer') {
-            $productData['height'] = 0;
-        }
-
-        if(is_null($productData['cost_per_item']) || gettype($productData['cost_per_item']) != 'double' || gettype($productData['cost_per_item']) != 'integer') {
-            $productData['cost_per_item'] = 0;
-        }
-        
         // Update the product in the database using the DB facade
         DB::table('ec_products')
             ->where('id', $existingProduct->id)
@@ -396,7 +372,7 @@ class ProductImport implements
         DB::table($tableName)
           ->where($foreignKeyName, $existingProductId)
           ->delete();
-
+      
         // Insert new records from the data array
         collect($data)->each(function ($item) use ($tableName, $foreignKeyNameToUpdate, $existingProductId, $foreignKeyName) {
           $tableData = [
@@ -456,7 +432,7 @@ class ProductImport implements
         if ($row['import_type'] == 'variation') {
             // update variant
             $where = ['is_variation' => 1, 'name' => $row['product_name']];
-
+            
             if ($productVariant = Product::where($where)->skip(self::$methodCallCount)->first()) {
                 // update product
                 $product = $this->updateProductData($productVariant);
@@ -466,10 +442,10 @@ class ProductImport implements
         }
 
         self::$methodCallCount++;
-
+        
         $addedAttributes = $this->request->input('attribute_sets', []);
         $result = ProductVariation::getVariationByAttributesOrCreate($product->id, $addedAttributes);
-
+        
         if (! $result['created']) {
             if (method_exists($this, 'onFailure')) {
                 $failures[] = new Failure(
@@ -569,32 +545,6 @@ class ProductImport implements
         $productRelatedToVariation->status = strtolower(Arr::get($version, 'status', $product->status));
 
         $productRelatedToVariation->product_type = $product->product_type;
-        
-        if(is_null($productRelatedToVariation['sale_price']) || gettype($productRelatedToVariation['sale_price']) != 'double' || gettype($productRelatedToVariation['sale_price']) != 'integer') {
-            $productRelatedToVariation['sale_price'] = null;
-        }
-
-        if(is_null($productRelatedToVariation['weight']) || gettype($productRelatedToVariation['weight']) != 'double' || gettype($productRelatedToVariation['weight']) != 'integer') {
-            $productRelatedToVariation['weight'] = 0;
-        }
-
-        if(is_null($productRelatedToVariation['length']) || gettype($productRelatedToVariation['length']) != 'double' || gettype($productRelatedToVariation['length']) != 'integer') {
-            $productRelatedToVariation['length'] = 0;
-        }
-
-        if(is_null($productRelatedToVariation['wide']) || gettype($productRelatedToVariation['wide']) != 'double' || gettype($productRelatedToVariation['wide']) != 'integer') {
-            $productRelatedToVariation['wide'] = 0;
-        }
-
-        if(is_null($productRelatedToVariation['height']) || gettype($productRelatedToVariation['height']) != 'double' || gettype($productRelatedToVariation['height']) != 'integer') {
-            $productRelatedToVariation['height'] = 0;
-        }
-
-        if(is_null($productRelatedToVariation['cost_per_item']) || gettype($productRelatedToVariation['cost_per_item']) != 'double' || gettype($productRelatedToVariation['cost_per_item']) != 'integer') {
-            $productRelatedToVariation['cost_per_item'] = 0;
-        }
-        
-        
         $productRelatedToVariation->save();
 
         event(new CreatedContentEvent(PRODUCT_MODULE_SCREEN_NAME, $this->request, $productRelatedToVariation));

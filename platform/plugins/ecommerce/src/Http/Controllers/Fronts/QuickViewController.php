@@ -52,7 +52,7 @@ class QuickViewController extends BaseController
 
     protected function getQuickViewTemplate(): string
     {
-        if (view()->exists($view = Theme::getThemeNamespace('views.ecommerce.quick-view'))) {
+        if (view()->exists($view = Theme::getThemeNamespace('views.ecommerce.includes.quick-view'))) {
             return $view;
         }
 
@@ -64,6 +64,6 @@ class QuickViewController extends BaseController
             return $view;
         }
 
-        return EcommerceHelper::viewPath('includes.quick-view');
+        return 'plugins/ecommerce::themes.includes.quick-view';
     }
 }

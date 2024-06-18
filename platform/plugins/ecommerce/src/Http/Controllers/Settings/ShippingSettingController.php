@@ -27,7 +27,7 @@ class ShippingSettingController extends SettingController
         $shipping = Shipping::query()
             ->with([
                 'rules' => function ($query) {
-                    $query->withCount('items');
+                    $query->withCount(['items']);
                 },
             ])
             ->get();

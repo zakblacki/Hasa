@@ -93,17 +93,8 @@ Route::group(['namespace' => 'Botble\Setting\Http\Controllers'], function () {
             });
 
             Route::prefix('license')->name('license.')->group(function () {
-                /**
-                 * @deprecated
-                 */
-                Route::get('verify/old', [
-                    'as' => 'verify',
-                    'uses' => 'GeneralSettingController@getVerifyLicense',
-                    'permission' => false,
-                ]);
-
                 Route::get('verify', [
-                    'as' => 'verify.index',
+                    'as' => 'verify',
                     'uses' => 'GeneralSettingController@getVerifyLicense',
                     'permission' => false,
                 ]);
@@ -153,11 +144,6 @@ Route::group(['namespace' => 'Botble\Setting\Http\Controllers'], function () {
                         'uses' => 'EmailTemplateSettingController@index',
                     ]);
 
-                    Route::put('', [
-                        'as' => 'template.update-settings',
-                        'uses' => 'EmailTemplateSettingController@update',
-                    ]);
-
                     Route::prefix('{type}/{module}/{template}')->name('template.')->group(function () {
                         Route::post('status', [
                             'as' => 'status.update',
@@ -201,6 +187,19 @@ Route::group(['namespace' => 'Botble\Setting\Http\Controllers'], function () {
                     'as' => 'rules.update',
                     'uses' => 'EmailRuleSettingController@update',
                     'permission' => 'settings.email.rules',
+                ]);
+            });
+
+            Route::prefix('website-tracking')->group(function () {
+                Route::get('/', [
+                    'as' => 'website-tracking',
+                    'uses' => 'WebsiteTrackingSettingController@edit',
+                ]);
+
+                Route::put('/', [
+                    'as' => 'website-tracking.update',
+                    'uses' => 'WebsiteTrackingSettingController@update',
+                    'permission' => 'settings.website-tracking',
                 ]);
             });
         });

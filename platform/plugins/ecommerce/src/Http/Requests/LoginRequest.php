@@ -29,8 +29,8 @@ class LoginRequest extends Request
         return apply_filters('ecommerce_customer_login_form_validation_attributes', [
             'email' => match (EcommerceHelper::getLoginOption()) {
                 'phone' => __('Phone'),
+                'email' => __('Email'),
                 'email_or_phone' => __('Email or Phone number'),
-                default => __('Email'),
             },
             'password' => __('Password'),
         ]);

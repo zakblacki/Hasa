@@ -2,9 +2,8 @@
 
 return [
     [
-        'name' => 'Contact',
+        'name' => 'Contacts',
         'flag' => 'contacts.index',
-        'parent_flag' => 'core.cms',
     ],
     [
         'name' => 'Edit',
@@ -17,8 +16,8 @@ return [
         'parent_flag' => 'contacts.index',
     ],
     [
-        'name' => 'Contact',
+        'name' => 'Contact Settings',
         'flag' => 'contact.settings',
-        'parent_flag' => 'settings.others',
+        'parent_flag' => 'contacts.index',
     ],
 ];

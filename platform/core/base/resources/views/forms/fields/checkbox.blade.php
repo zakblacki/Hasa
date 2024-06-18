@@ -11,8 +11,7 @@
     <x-core::form.checkbox
         :label="($showLabel && $options['label'] !== false && $options['label_show']) ? $options['label'] : null"
         :name="$name"
-        :value="$options['value']"
-        :checked="$options['checked'] ?? $options['value']"
+        :checked="$options['value']"
         :attributes="new Illuminate\View\ComponentAttributeBag((array) $options['attr'])"
     />
 </x-core::form.field>

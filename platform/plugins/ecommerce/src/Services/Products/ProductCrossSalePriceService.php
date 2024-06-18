@@ -22,13 +22,6 @@ class ProductCrossSalePriceService extends ProductPriceHandlerService
 
         foreach ($product->crossSales as $crossSaleProduct) {
             $this->appliedProducts[$crossSaleProduct->getKey()] = $crossSaleProduct;
-
-            if ($crossSaleProduct->variations()->exists()) {
-                $crossSaleProduct->loadMissing('variations.product');
-                $crossSaleProduct->variations->each(function ($variation) {
-                    $this->appliedProducts[$variation->product->getKey()] = $variation->product;
-                });
-            }
         }
     }
 

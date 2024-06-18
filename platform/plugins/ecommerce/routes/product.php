@@ -1,8 +1,6 @@
 <?php
 
 use Botble\Base\Facades\AdminHelper;
-use Botble\Ecommerce\Http\Controllers\ExportProductController;
-use Botble\Ecommerce\Http\Controllers\ImportProductController;
 use Illuminate\Support\Facades\Route;
 
 AdminHelper::registerRoutes(function () {
@@ -124,24 +122,6 @@ AdminHelper::registerRoutes(function () {
                 'uses' => 'ProductController@setDefaultProductVariation',
                 'permission' => 'products.edit',
             ])->wherePrimaryKey();
-        });
-    });
-
-    Route::prefix('tools/data-synchronize')->name('tools.data-synchronize.')->group(function () {
-        Route::prefix('export')->name('export.')->group(function () {
-            Route::group(['prefix' => 'products', 'as' => 'products.', 'permission' => 'ecommerce.export.products.index'], function () {
-                Route::get('/', [ExportProductController::class, 'index'])->name('index');
-                Route::post('/', [ExportProductController::class, 'store'])->name('store');
-            });
-        });
-
-        Route::prefix('import')->name('import.')->group(function () {
-            Route::group(['prefix' => 'products', 'as' => 'products.', 'permission' => 'ecommerce.import.products.index'], function () {
-                Route::get('/', [ImportProductController::class, 'index'])->name('index');
-                Route::post('validate', [ImportProductController::class, 'validateData'])->name('validate');
-                Route::post('import', [ImportProductController::class, 'import'])->name('store');
-                Route::post('download-example', [ImportProductController::class, 'downloadExample'])->name('download-example');
-            });
         });
     });
 });

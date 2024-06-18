@@ -10,7 +10,6 @@ class Botble {
         this.manageSidebar()
         this.handleWayPoint()
         this.handleTurnOffDebugMode()
-        Botble.initNavbarMinimal()
         Botble.initResources()
         Botble.initGlobalResources()
         Botble.handleCounterUp()
@@ -198,7 +197,8 @@ class Botble {
         textArea.value = textToCopy
         textArea.style.position = 'absolute'
         textArea.style.left = '-999999px'
-        document.body.append(textArea)
+        document.body.prepend(textArea)
+        textArea.focus()
         textArea.select()
 
         try {
@@ -419,36 +419,9 @@ class Botble {
         })
     }
 
-    static initNavbarMinimal() {
-        $(document).on('click', '[data-bb-toggle="navbar-minimal"]', (event) => {
-            const _self = $(event.currentTarget)
-            const navbar = $(_self.data('bb-target'))
-
-            if (navbar.length > 0) {
-                navbar.toggleClass('navbar-minimal')
-
-                $httpClient
-                    .makeWithoutErrorHandler()
-                    .post(
-                        _self.data('url'),
-                        {
-                            _method: _self.data('method'),
-                            minimal_sidebar: navbar.hasClass('navbar-minimal') ? 'yes' : 'no'
-                        }
-                    )
-                    .then(() => {})
-                    .catch(() => {})
-            }
-        })
-    }
-
     static initDatePicker(element) {
         if (jQuery().flatpickr) {
-            const $element = $(document).find(element);
-
-            const $input = $element.find('input')
-
-            let format = $input.data('date-format')
+            let format = $(document).find(element).find('input').data('date-format')
 
             if (!format) {
                 format = 'Y-m-d'
@@ -460,34 +433,17 @@ class Botble {
                 locale = 'vn'
             }
 
-            let options = {
-                dateFormat: format,
-                wrap: true,
-                locale: locale || 'en',
-            }
-
-            if ($input.data('options')) {
-                options = Object.assign(options, $input.data('options'))
-            }
-
-            $element.flatpickr(options)
+            $(document)
+                .find(element)
+                .flatpickr({
+                    dateFormat: format,
+                    wrap: true,
+                    locale: locale || 'en',
+                })
         }
     }
 
     static initResources() {
-        $(document).on('click', '[data-bb-toggle="check-all"]', (e) => {
-            const currentTarget = $(e.currentTarget)
-            const targets = $(currentTarget.data('bb-target'))
-
-            if (currentTarget.prop('checked')) {
-                targets.prop('checked', true)
-                currentTarget.prop('checked', false)
-            } else {
-                targets.prop('checked', false)
-                currentTarget.prop('checked', true)
-            }
-        })
-
         $.each($(document).find('select.select-search-full'), function (index, element) {
             Botble.select(element)
         })
@@ -1288,7 +1244,7 @@ class Botble {
         if ($menuItems.length) {
             $httpClient
                 .make()
-                .get($menuItems.data('url') || BotbleVariables.menu_item_count_url)
+                .get($menuItems.data('url'))
                 .then(({ data }) => {
                     data.data.map((x) => {
                         if (x.value > 0) {
@@ -1404,10 +1360,6 @@ class Botble {
         $(document)
             .find('textarea[data-bb-code-editor]')
             .each(function () {
-                if ($(this).next().hasClass('CodeMirror')) {
-                    return
-                }
-
                 Botble.initCodeEditor(this, this.dataset.mode || 'htmlmixed')
             })
     }
@@ -1681,8 +1633,6 @@ class Botble {
             const copiedMessage = target.data('clipboard-message')
             const action = target.data('clipboard-action') || 'copy'
             const isCut = action.toLowerCase() === 'cut'
-            const iconClipboard = target.find('[data-clipboard-icon]')
-            const iconClipboardSuccess = target.find('[data-clipboard-success-icon]')
             let text = target.data('clipboard-text')
 
             if (!text) {
@@ -1700,14 +1650,6 @@ class Botble {
             if (copiedMessage) {
                 Botble.showSuccess(copiedMessage)
             }
-
-            iconClipboard.addClass('d-none')
-            iconClipboardSuccess.removeClass('d-none')
-
-            setTimeout(() => {
-                iconClipboard.removeClass('d-none')
-                iconClipboardSuccess.addClass('d-none')
-            }, 1000)
         })
     }
 

@@ -155,7 +155,7 @@ class HookServiceProvider extends ServiceProvider
                         'dateModified' => $post->updated_at->toDateString(),
                     ];
 
-                    return $html . Html::tag('script', json_encode($schema, JSON_UNESCAPED_UNICODE), ['type' => 'application/ld+json'])
+                    return $html . Html::tag('script', json_encode($schema), ['type' => 'application/ld+json'])
                             ->toHtml();
                 }, 35);
             }, 35, 2);

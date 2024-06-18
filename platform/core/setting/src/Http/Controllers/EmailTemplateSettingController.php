@@ -3,8 +3,6 @@
 namespace Botble\Setting\Http\Controllers;
 
 use Botble\Base\Facades\Assets;
-use Botble\Setting\Forms\EmailTemplateSettingForm;
-use Botble\Setting\Http\Requests\EmailTemplateSettingRequest;
 use Illuminate\Contracts\View\View;
 
 class EmailTemplateSettingController extends SettingController
@@ -15,15 +13,6 @@ class EmailTemplateSettingController extends SettingController
 
         Assets::addScriptsDirectly('vendor/core/core/setting/js/email-template.js');
 
-        $form = EmailTemplateSettingForm::create();
-
-        return view('core/setting::email-templates', compact('form'));
-    }
-
-    public function update(EmailTemplateSettingRequest $request)
-    {
-        return $this->performUpdate(
-            $request->validated()
-        )->withUpdatedSuccessMessage();
+        return view('core/setting::email-templates');
     }
 }

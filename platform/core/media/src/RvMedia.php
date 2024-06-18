@@ -280,6 +280,10 @@ class RvMedia
     {
         $this->deleteThumbnails($file);
 
+        if (! Storage::exists($file->url)) {
+            return false;
+        }
+
         return Storage::delete($file->url);
     }
 
@@ -529,8 +533,6 @@ class RvMedia
             $file->folder_id = $folderId;
             $file->user_id = Auth::guard()->check() ? Auth::guard()->id() : 0;
             $file->options = $request->input('options', []);
-
-            $file->visibility = $visibility;
 
             $file->save();
 

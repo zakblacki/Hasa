@@ -2,6 +2,7 @@
 
 namespace Botble\Ecommerce\Providers;
 
+use Botble\Ecommerce\Commands\BulkImportProductCommand;
 use Botble\Ecommerce\Commands\CancelExpiredDeletionRequests;
 use Botble\Ecommerce\Commands\SendAbandonedCartsEmailCommand;
 use Illuminate\Console\Scheduling\Schedule;
@@ -17,6 +18,7 @@ class CommandServiceProvider extends ServiceProvider
 
         $this->commands([
             SendAbandonedCartsEmailCommand::class,
+            BulkImportProductCommand::class,
             CancelExpiredDeletionRequests::class,
         ]);
 

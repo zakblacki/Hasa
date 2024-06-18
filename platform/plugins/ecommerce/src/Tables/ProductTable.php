@@ -4,8 +4,6 @@ namespace Botble\Ecommerce\Tables;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\Html;
-use Botble\DataSynchronize\Table\HeaderActions\ExportHeaderAction;
-use Botble\DataSynchronize\Table\HeaderActions\ImportHeaderAction;
 use Botble\Ecommerce\Enums\ProductTypeEnum;
 use Botble\Ecommerce\Enums\StockStatusEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
@@ -46,14 +44,6 @@ class ProductTable extends TableAbstract
             ->addActions([
                 EditAction::make()->route('products.edit'),
                 DeleteAction::make()->route('products.destroy'),
-            ])
-            ->addHeaderActions([
-                ExportHeaderAction::make()
-                    ->route('tools.data-synchronize.export.products.index')
-                    ->permission('ecommerce.export.products.index'),
-                ImportHeaderAction::make()
-                    ->route('tools.data-synchronize.import.products.index')
-                    ->permission('ecommerce.import.products.index'),
             ]);
     }
 
@@ -198,7 +188,7 @@ class ProductTable extends TableAbstract
                 ->title(trans('plugins/ecommerce::products.sku'))
                 ->alignStart(),
             Column::make('order')
-                ->title(trans('plugins/ecommerce::ecommerce.sort_order'))
+                ->title(trans('core/base::tables.order'))
                 ->width(50),
             CreatedAtColumn::make(),
             StatusColumn::make(),
@@ -208,7 +198,6 @@ class ProductTable extends TableAbstract
     public function buttons(): array
     {
         $buttons = [];
-
         if (EcommerceHelper::isEnabledSupportDigitalProducts() && $this->hasPermission('products.create')) {
             $buttons['create'] = [
                 'extend' => 'collection',
@@ -243,6 +232,28 @@ class ProductTable extends TableAbstract
             ];
         } else {
             $buttons = $this->addCreateButton(route('products.create'), 'products.create');
+        }
+
+        if ($this->hasPermission('ecommerce.import.products.index')) {
+            $buttons['import'] = [
+                'link' => route('ecommerce.import.products.index'),
+                'text' =>
+                    BaseHelper::renderIcon('ti ti-file-import')
+                    . trans(
+                        'plugins/ecommerce::bulk-import.import_products'
+                    ),
+            ];
+        }
+
+        if ($this->hasPermission('ecommerce.export.products.index')) {
+            $buttons['export'] = [
+                'link' => route('ecommerce.export.products.index'),
+                'text' =>
+                    BaseHelper::renderIcon('ti ti-file-export')
+                    . trans(
+                        'plugins/ecommerce::export.products.name'
+                    ),
+            ];
         }
 
         return $buttons;
@@ -299,7 +310,7 @@ class ProductTable extends TableAbstract
             NameBulkChange::make(),
             NumberBulkChange::make()
                 ->name('order')
-                ->title(trans('plugins/ecommerce::ecommerce.sort_order')),
+                ->title(trans('core/base::tables.order')),
             'category' => [
                 'title' => trans('plugins/ecommerce::products.category'),
                 'type' => 'select-ajax',

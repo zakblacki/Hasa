@@ -38,8 +38,7 @@ class TaxRuleRequest extends Request
         if (EcommerceHelper::isZipCodeEnabled()) {
             $rules['zip_code'] = [
                 'nullable',
-                'min:5',
-                'max:9',
+                'max:20',
                 Rule::unique(TaxRule::class, 'zip_code')->ignore($this->route('rule.id')),
             ];
         }

@@ -23,7 +23,7 @@ class TranslationTable extends TableAbstract
         parent::setup();
 
         $this->hasOperations = false;
-        $this->setView('core/table::base-table');
+        $this->setView('plugins/translation::table');
         $this->pageLength = 100;
 
         Assets::addScripts(['bootstrap-editable'])
@@ -179,7 +179,7 @@ class TranslationTable extends TableAbstract
                 ->getValueUsing(function (FormattedColumn $column) {
                     $item = $column->getItem();
 
-                    $trans = trans(Str::of($item->group)->replaceLast(DIRECTORY_SEPARATOR, '::')->append(".$item->key")->toString(), [], 'en');
+                    $trans = trans(Str::of($item->group)->replaceLast('/', '::')->append(".$item->key")->toString(), [], 'en');
 
                     return $this->formatKeyAndValue(is_array($trans) ? $item->key : $trans);
                 }),
@@ -189,7 +189,7 @@ class TranslationTable extends TableAbstract
                 ->getValueUsing(function (FormattedColumn $column) {
                     $item = $column->getItem();
 
-                    $trans = trans(Str::of($item->group)->replaceLast(DIRECTORY_SEPARATOR, '::')->append(".$item->key")->toString(), [], $this->locale);
+                    $trans = trans(Str::of($item->group)->replaceLast('/', '::')->append(".$item->key")->toString(), [], $this->locale);
 
                     $value = $this->formatKeyAndValue(is_array($trans) ? $item->value : $trans);
 

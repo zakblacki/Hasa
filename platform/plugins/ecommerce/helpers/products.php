@@ -243,10 +243,6 @@ if (! function_exists('the_product_price')) {
 if (! function_exists('get_related_products')) {
     function get_related_products(Product $product, int $limit = 4): Collection|LengthAwarePaginator|Product|null
     {
-        if (! EcommerceHelper::isEnabledRelatedProducts()) {
-            return new EloquentCollection();
-        }
-
         $params = [
             'condition' => [
                 'ec_products.is_variation' => 0,
@@ -266,16 +262,13 @@ if (! function_exists('get_related_products')) {
 
         $relatedIds = $product->products()->allRelatedIds()->toArray();
 
-        $filters = [];
-
         if (! empty($relatedIds)) {
             $params['condition'][] = ['ec_products.id', 'IN', $relatedIds];
         } else {
             $params['condition'][] = ['ec_products.id', '!=', $product->getKey()];
-            $filters = ['categories' => $product->categories()->pluck('ec_product_categories.id')->all()];
         }
 
-        return app(ProductInterface::class)->filterProducts($filters, $params);
+        return app(ProductInterface::class)->getProducts($params);
     }
 }
 

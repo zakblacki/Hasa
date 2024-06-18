@@ -9,7 +9,7 @@
 
 <v-license-form
     id="license-form"
-    verify-url="{{ route('settings.license.verify.index') }}"
+    verify-url="{{ route('settings.license.verify') }}"
     activate-license-url="{{ route('settings.license.activate') }}"
     deactivate-license-url="{{ route('settings.license.deactivate') }}"
     reset-license-url="{{ route('settings.license.reset') }}"

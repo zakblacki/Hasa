@@ -14,7 +14,7 @@
         <div>[featured-brands title="Our Brands"][/featured-brands]</div>
         <div>[news title="Visit Our Blog" subtitle="Our Blog updated the newest trend of the world regularly"][/news]</div>
         <div>[theme-galleries title="@ OUR GALLERIES" subtitle="Our latest fashion galleries images" limit="8"][/theme-galleries]</div>
-        <div>[site-features icon1="icon-truck" title1="FREE SHIPPING" subtitle1="Free shipping on all US order or order above $200" icon2="icon-life-buoy" title2="SUPPORT 24/7" subtitle2="Contact us 24 hours a day, 7 days a week" icon3="icon-refresh-ccw" title3="30 DAYS RETURN" subtitle3="Simply return it within 30 days for an exchange" icon4="icon-shield" title4="100% PAYMENT SECURE" subtitle4="We ensure secure payment with PEV"][/site-features]</div>
+        <div>[site-features icon1="icon-truck" title1="FREE SHIPPING" subtitle1="Free shipping on all US order or order above $200" icon2="icon-life-buoy" title2="SUPPORT 24/7" subtitle2="Contact us 24 hours a day, 7 days a week" icon3="icon-refresh-ccw" title3="Paiement Sécurisé CIB/Edahabia" subtitle3="Paiement en ligne" icon4="icon-shield" title4="100% PAYMENT SECURE" subtitle4="We ensure secure payment with PEV"][/site-features]</div>
     </div>
     <br>
     <div>- Template: <strong>Homepage</strong>.</div>

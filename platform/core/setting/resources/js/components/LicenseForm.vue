@@ -94,7 +94,7 @@ export default {
             return $httpClient
                 .make()
                 .post(this.deactivateLicenseUrl)
-                .then(() => {
+                .then((res) => {
                     this.verified = false
                 })
                 .finally(() => {

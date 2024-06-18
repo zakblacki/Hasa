@@ -10,8 +10,8 @@ class CreateAddressFromAdminRequest extends Request
     public function rules(): array
     {
         $rules = [
-            'is_default' => ['integer', 'min:0', 'max:1'],
-            'customer_id' => ['required', 'exists:ec_customers,id'],
+            'is_default' => 'integer|min:0|max:1',
+            'customer_id' => 'required',
         ];
 
         if (! EcommerceHelper::isUsingInMultipleCountries()) {

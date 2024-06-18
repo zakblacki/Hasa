@@ -8,8 +8,6 @@ use Botble\Media\Facades\RvMedia;
 use Botble\Media\Models\MediaFile;
 use Botble\Setting\Forms\MediaSettingForm;
 use Botble\Setting\Http\Requests\MediaSettingRequest;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
 use Throwable;
 
 class MediaSettingController extends SettingController
@@ -25,45 +23,28 @@ class MediaSettingController extends SettingController
 
     public function update(MediaSettingRequest $request): BaseHttpResponse
     {
-        $this->saveSettings([
+        return $this->performUpdate([
             ...$request->validated(),
             'media_folders_can_add_watermark' => $request->boolean('media_folders_can_add_watermark_all')
                 ? []
                 : $request->input('media_folders_can_add_watermark', []),
         ]);
-
-        return $this
-            ->httpResponse()
-            ->withUpdatedSuccessMessage()
-            ->setData(['files_count' => MediaFile::query()->count()]);
     }
 
-    public function generateThumbnails(Request $request): BaseHttpResponse
+    public function generateThumbnails(): BaseHttpResponse
     {
-        $request->validate([
-            'total' => ['required', 'numeric'],
-            'offset' => ['required', 'numeric'],
-            'limit' => ['required', 'numeric'],
-        ]);
-
         BaseHelper::maximumExecutionTimeAndMemoryLimit();
 
-        $totalFiles = $request->input('total');
-        $offset = $request->input('offset', 0);
-        $limit = $request->input('limit', RvMedia::getConfig('generate_thumbnails_chunk_limit'));
-
-        /** @var Collection<MediaFile> */
-        $files = MediaFile::query()
-            ->select(['url', 'mime_type', 'folder_id'])
-            ->skip($offset)
-            ->take($limit)
-            ->get();
+        $files = MediaFile::query()->select(['url', 'mime_type', 'folder_id'])->get();
 
         $errors = [];
 
         if ($files->isNotEmpty()) {
             foreach ($files as $file) {
                 try {
+                    /**
+                     * @var MediaFile $file
+                     */
                     RvMedia::generateThumbnails($file);
                 } catch (Throwable $exception) {
                     BaseHelper::logError($exception);
@@ -71,7 +52,11 @@ class MediaSettingController extends SettingController
                 }
             }
 
-            $errors = array_map(fn ($item) => [$item], array_unique($errors));
+            $errors = array_unique($errors);
+
+            $errors = array_map(function ($item) {
+                return [$item];
+            }, $errors);
         }
 
         if ($errors) {
@@ -83,10 +68,6 @@ class MediaSettingController extends SettingController
 
         return $this
             ->httpResponse()
-            ->setMessage(trans('core/setting::setting.generate_thumbnails_success', ['count' => $totalFiles]))
-            ->setData([
-                'total' => $totalFiles,
-                'next' => $offset + $limit,
-            ]);
+            ->setMessage(trans('core/setting::setting.generate_thumbnails_success', ['count' => count($files)]));
     }
 }

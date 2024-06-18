@@ -76,7 +76,7 @@ final class Core
 
     private string $licenseKey = 'CAF4B17F6D3F656125F9';
 
-    private string $cacheLicenseKeyName = '45d0da541764682476f833028d945a46270ba404';
+    private string $cacheLicenseKeyName = '45d0da541764682476f822028d945a46270ba404';
 
     private string $skipLicenseReminderFilePath;
 
@@ -459,8 +459,6 @@ final class Core
     public function publishPackagesAssets(): void
     {
         $this->publishAssets(package_path());
-
-        $this->publishAssets(base_path('vendor'));
 
         SystemUpdatePublished::dispatch();
     }

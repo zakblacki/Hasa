@@ -10,10 +10,8 @@ class CustomerSettingRequest extends Request
     public function rules(): array
     {
         return [
-            'verify_customer_email' => [$onOffRule = new OnOffRule()],
-            'enabled_customer_account_deletion' => [$onOffRule],
-            'login_using_phone' => [$onOffRule],
-            'enabled_customer_dob_field' => [$onOffRule],
+            'verify_customer_email' => [new OnOffRule()],
+            'login_using_phone' => [new OnOffRule()],
             'login_option' => ['required', 'string', 'in:email,phone,email_or_phone'],
         ];
     }

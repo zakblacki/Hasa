@@ -11,7 +11,7 @@ use Botble\Theme\Exceptions\UnknownPartialFileException;
 use Botble\Theme\Exceptions\UnknownThemeException;
 use Botble\Theme\Supports\SocialLink;
 use Botble\Theme\Supports\ThemeSupport;
-use Botble\Theme\Typography\Typography;
+use Botble\Theme\Typograhpy\Typography;
 use Carbon\CarbonInterface;
 use Closure;
 use Illuminate\Config\Repository;
@@ -816,7 +816,7 @@ class Theme implements ThemeContract
             $index++;
         }
 
-        $schema = json_encode($schema, JSON_UNESCAPED_UNICODE);
+        $schema = json_encode($schema);
 
         $this
             ->asset()
@@ -989,11 +989,9 @@ class Theme implements ThemeContract
 
     public function htmlAttributes(): string
     {
-        $lang = str_replace('_', '-', app()->getLocale());
-
-        if ($lang) {
-            $this->addHtmlAttributes(['lang' => $lang]);
-        }
+        $this->addHtmlAttributes([
+            'lang' => str_replace('_', '-', app()->getLocale()),
+        ]);
 
         return apply_filters('theme_html_attributes', Html::attributes($this->htmlAttributes));
     }

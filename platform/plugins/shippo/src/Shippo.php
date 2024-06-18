@@ -452,10 +452,10 @@ class Shippo
         }
 
         $parcel = [
-            'weight' => round(EcommerceHelper::validateOrderWeight(Arr::get($inParams, 'weight', 0)), 2) ?: 200,
-            'length' => round($length, 2) ?: 10,
-            'width' => round($width, 2) ?: 10,
-            'height' => round($height, 2) ?: 10,
+            'weight' => round(EcommerceHelper::validateOrderWeight(Arr::get($inParams, 'weight', 0)), 2),
+            'length' => round($length, 2),
+            'width' => round($width, 2),
+            'height' => round($height, 2),
             'distance_unit' => $this->distanceUnit,
             'mass_unit' => $this->massUnit,
         ];
@@ -552,17 +552,18 @@ class Shippo
                 $city = Location::getCityById($cityId);
                 if ($city) {
                     $addr['city'] = $city->name;
-                    $addr['state'] = $city->state->abbreviation ?: $city->state->name;
+                    $addr['state'] = $city->state->abbreviation;
                     $addr['country'] = $city->state->country->code;
                 }
             } else {
                 $state = State::query()->find($addr['state']);
 
                 if ($state) {
-                    $addr['state'] = $state->abbreviation ?: $state->name;
+                    $addr['state'] = $state->abbreviation;
                     $addr['country'] = $state->country->code;
                 }
             }
+
         }
 
         return $addr;

@@ -441,8 +441,6 @@ return [
             ['link', 'color', 'Text'],
             ['audio', 'controls', 'Bool'],
             ['div', 'data-bs-theme', 'Text'],
-            ['button', 'data-bb-toggle', 'Text'],
-            ['button', 'data-value', 'Text'],
         ],
     ],
     'enable_system_updater' => env('CMS_ENABLE_SYSTEM_UPDATER', true),

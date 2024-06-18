@@ -58,7 +58,7 @@ class RegisterController extends BaseController
         )->render();
     }
 
-    public function register(RegisterRequest $request)
+    public function register(Request $request)
     {
         $this->validator($request->input())->validate();
 

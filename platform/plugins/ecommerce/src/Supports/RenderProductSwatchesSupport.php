@@ -44,17 +44,12 @@ class RenderProductSwatchesSupport
 
         $productVariationsInfo = ProductVariationItem::getVariationsInfo($productVariations->pluck('id')->toArray());
 
-        if ($productVariationsInfo->isNotEmpty()) {
-            $productVariationsInfo = $productVariationsInfo
-                ->reject(function (ProductVariationItem $productVariation) use ($productVariations) {
-                    $variationItem = $productVariations->where('id', $productVariation->variation_id)->first();
+        if ($productVariationsInfo->count()) {
+            $productVariationsInfo->loadMissing(['productVariation.product']);
 
-                    if (! $variationItem) {
-                        return false;
-                    }
-
-                    return $variationItem->product->isOutOfStock();
-                });
+            $productVariationsInfo = $productVariationsInfo->reject(function (ProductVariationItem $productVariation) {
+                return $productVariation->productVariation->product->isOutOfStock();
+            });
         }
 
         $selected = $params['selected'];

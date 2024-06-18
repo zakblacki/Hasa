@@ -33,7 +33,9 @@ class CookieConsentServiceProvider extends ServiceProvider
                 $this->app['view']->composer('plugins/cookie-consent::index', function (View $view) {
                     $cookieConsentConfig = config('plugins.cookie-consent.general', []);
 
-                    $view->with(compact('cookieConsentConfig'));
+                    $alreadyConsentedWithCookies = Cookie::has($cookieConsentConfig['cookie_name'] ?? 'cookie_for_consent');
+
+                    $view->with(compact('alreadyConsentedWithCookies', 'cookieConsentConfig'));
                 });
 
                 if (! Cookie::has(config('plugins.cookie-consent.general.cookie_name'))) {
@@ -211,11 +213,7 @@ class CookieConsentServiceProvider extends ServiceProvider
 
     public function registerCookieConsent(?string $html): string
     {
-        $cookieConsentConfig = config('plugins.cookie-consent.general', []);
-
-        $alreadyConsentedWithCookies = Cookie::has($cookieConsentConfig['cookie_name'] ?? 'cookie_for_consent');
-
-        if (is_in_admin() || $alreadyConsentedWithCookies) {
+        if (is_in_admin()) {
             return $html;
         }
 

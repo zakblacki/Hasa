@@ -17,8 +17,6 @@ use Botble\Blog\Repositories\Eloquent\TagRepository;
 use Botble\Blog\Repositories\Interfaces\CategoryInterface;
 use Botble\Blog\Repositories\Interfaces\PostInterface;
 use Botble\Blog\Repositories\Interfaces\TagInterface;
-use Botble\DataSynchronize\PanelSections\ExportPanelSection;
-use Botble\DataSynchronize\PanelSections\ImportPanelSection;
 use Botble\Language\Facades\Language;
 use Botble\LanguageAdvanced\Supports\LanguageAdvancedManager;
 use Botble\SeoHelper\Facades\SeoHelper;
@@ -125,28 +123,6 @@ class BlogServiceProvider extends ServiceProvider
                     ->withPriority(120)
                     ->withRoute('blog.settings')
             );
-        });
-
-        PanelSectionManager::setGroupId('data-synchronize')->beforeRendering(function () {
-            PanelSectionManager::default()
-                ->registerItem(
-                    ExportPanelSection::class,
-                    fn () => PanelSectionItem::make('posts')
-                        ->setTitle(trans('plugins/blog::posts.posts'))
-                        ->withDescription(trans('plugins/blog::posts.export.description'))
-                        ->withPriority(999)
-                        ->withPermission('posts.export')
-                        ->withRoute('tools.data-synchronize.export.posts.index')
-                )
-                ->registerItem(
-                    ImportPanelSection::class,
-                    fn () => PanelSectionItem::make('posts')
-                        ->setTitle(trans('plugins/blog::posts.posts'))
-                        ->withDescription(trans('plugins/blog::posts.import.description'))
-                        ->withPriority(999)
-                        ->withPermission('posts.import')
-                        ->withRoute('tools.data-synchronize.import.posts.index')
-                );
         });
 
         if (defined('LANGUAGE_MODULE_SCREEN_NAME')) {

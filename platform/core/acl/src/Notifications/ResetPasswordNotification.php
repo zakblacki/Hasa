@@ -16,21 +16,21 @@ class ResetPasswordNotification extends Notification
         $this->token = $token;
     }
 
-    public function via($notifiable): array
+    public function via($notifiable)
     {
         return ['mail'];
     }
 
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable)
     {
-        $emailHandler = EmailHandler::setModule('acl')
-            ->setTemplate('password-reminder')
-            ->setType('core')
-            ->addTemplateSettings('acl', config('core.acl.email', []))
-            ->setVariableValue('reset_link', route('access.password.reset', ['token' => $this->token, 'email' => request()->input('email')]));
+        EmailHandler::setModule('acl')
+            ->setVariableValue('reset_link', route('access.password.reset', ['token' => $this->token]));
+
+        $template = 'password-reminder';
+        $content = EmailHandler::prepareData(EmailHandler::getTemplateContent($template, 'core'));
 
         return (new MailMessage())
-            ->view(['html' => new HtmlString($emailHandler->getContent())])
-            ->subject($emailHandler->getSubject());
+            ->view(['html' => new HtmlString($content)])
+            ->subject(EmailHandler::getTemplateSubject($template));
     }
 }

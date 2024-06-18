@@ -156,8 +156,6 @@ return new class () extends Migration {
             $table->id();
             $table->foreignId('attribute_id');
             $table->foreignId('variation_id');
-
-            $table->unique(['attribute_id', 'variation_id']);
         });
 
         Schema::create('ec_taxes', function (Blueprint $table) {

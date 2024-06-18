@@ -4,7 +4,6 @@ namespace Botble\Ecommerce\Http\Controllers\Fronts;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Http\Controllers\BaseController;
-use Botble\Base\Rules\EmailRule;
 use Botble\Ecommerce\Enums\DiscountTypeEnum;
 use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
@@ -30,10 +29,10 @@ use Botble\Ecommerce\Models\Shipment;
 use Botble\Ecommerce\Services\Footprints\FootprinterInterface;
 use Botble\Ecommerce\Services\HandleApplyCouponService;
 use Botble\Ecommerce\Services\HandleApplyPromotionsService;
-use Botble\Ecommerce\Services\HandleCheckoutOrderData;
 use Botble\Ecommerce\Services\HandleRemoveCouponService;
 use Botble\Ecommerce\Services\HandleShippingFeeService;
 use Botble\Ecommerce\Services\HandleTaxService;
+use Botble\Location\Models\Country;
 use Botble\Optimize\Facades\OptimizerHelper;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Supports\PaymentHelper;
@@ -43,7 +42,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -59,8 +57,11 @@ class PublicCheckoutController extends BaseController
     public function getCheckout(
         string $token,
         Request $request,
-        HandleTaxService $handleTaxService,
-        HandleCheckoutOrderData $handleCheckoutOrderData,
+        HandleShippingFeeService $shippingFeeService,
+        HandleApplyCouponService $applyCouponService,
+        HandleRemoveCouponService $removeCouponService,
+        HandleApplyPromotionsService $applyPromotionsService,
+        HandleTaxService $handleTaxService
     ) {
         if (! EcommerceHelper::isCartEnabled()) {
             abort(404);
@@ -125,21 +126,145 @@ class PublicCheckoutController extends BaseController
 
         $sessionCheckoutData = $this->processOrderData($token, $sessionCheckoutData, $request);
 
+        $paymentMethod = null;
+
+        if (is_plugin_active('payment')) {
+            $paymentMethod = $request->input(
+                'payment_method',
+                session('selected_payment_method') ?: PaymentHelper::defaultPaymentMethod()
+            );
+        }
+
+        if ($paymentMethod) {
+            session()->put('selected_payment_method', $paymentMethod);
+        }
+
+        add_filter('payment_checkout_country', function ($default) use ($sessionCheckoutData) {
+            if ($country = Arr::get($sessionCheckoutData, 'country')) {
+                if (EcommerceHelper::loadCountriesStatesCitiesFromPluginLocation()) {
+                    $country = Country::query()
+                        ->where('id', $country)
+                        ->value('code');
+                }
+
+                return $country;
+            }
+
+            return $default;
+        }, 999);
+
+        if (is_plugin_active('marketplace')) {
+            [
+                $sessionCheckoutData,
+                $shipping,
+                $defaultShippingMethod,
+                $defaultShippingOption,
+                $shippingAmount,
+                $promotionDiscountAmount,
+                $couponDiscountAmount,
+            ] = apply_filters(PROCESS_CHECKOUT_ORDER_DATA_ECOMMERCE, $products, $token, $sessionCheckoutData, $request);
+        } else {
+            $promotionDiscountAmount = $applyPromotionsService->execute($token);
+
+            $sessionCheckoutData['promotion_discount_amount'] = $promotionDiscountAmount;
+
+            $couponDiscountAmount = 0;
+            if (session()->has('applied_coupon_code')) {
+                $couponDiscountAmount = Arr::get($sessionCheckoutData, 'coupon_discount_amount', 0);
+            }
+
+            $orderTotal = Cart::instance('cart')->rawTotal() - $promotionDiscountAmount - $couponDiscountAmount;
+            $orderTotal = max($orderTotal, 0);
+
+            $isAvailableShipping = EcommerceHelper::isAvailableShipping($products);
+
+            $shipping = [];
+            $defaultShippingMethod = $request->input(
+                'shipping_method',
+                Arr::get($sessionCheckoutData, 'shipping_method', ShippingMethodEnum::DEFAULT)
+            );
+            $defaultShippingOption = $request->input(
+                'shipping_option',
+                Arr::get($sessionCheckoutData, 'shipping_option')
+            );
+            $shippingAmount = 0;
+
+            if ($isAvailableShipping) {
+                $origin = EcommerceHelper::getOriginAddress();
+                $shippingData = EcommerceHelper::getShippingData(
+                    $products,
+                    $sessionCheckoutData,
+                    $origin,
+                    $orderTotal,
+                    $paymentMethod
+                );
+
+                $shipping = $shippingFeeService->execute($shippingData);
+
+                foreach ($shipping as $key => &$shipItem) {
+                    if (get_shipping_setting('free_ship', $key)) {
+                        foreach ($shipItem as &$subShippingItem) {
+                            Arr::set($subShippingItem, 'price', 0);
+                        }
+                    }
+                }
+
+                if ($shipping) {
+                    if (! $defaultShippingMethod) {
+                        $defaultShippingMethod = old(
+                            'shipping_method',
+                            Arr::get($sessionCheckoutData, 'shipping_method', Arr::first(array_keys($shipping)))
+                        );
+                    }
+                    if (! $defaultShippingOption) {
+                        $defaultShippingOption = old(
+                            'shipping_option',
+                            Arr::get($sessionCheckoutData, 'shipping_option', $defaultShippingOption)
+                        );
+
+                        if (! $defaultShippingOption) {
+                            $defaultShippingOption = Arr::first(array_keys(Arr::first($shipping)));
+                        }
+                    }
+                }
+
+                $shippingAmount = Arr::get(
+                    $shipping,
+                    $defaultShippingMethod . '.' . $defaultShippingOption . '.price',
+                    0
+                );
+
+                Arr::set($sessionCheckoutData, 'shipping_method', $defaultShippingMethod);
+                Arr::set($sessionCheckoutData, 'shipping_option', $defaultShippingOption);
+                Arr::set($sessionCheckoutData, 'shipping_amount', $shippingAmount);
+
+                OrderHelper::setOrderSessionData($token, $sessionCheckoutData);
+            }
+
+            if (session()->has('applied_coupon_code')) {
+                if (! $request->input('applied_coupon')) {
+                    $discount = $applyCouponService->getCouponData(
+                        session('applied_coupon_code'),
+                        $sessionCheckoutData
+                    );
+                    if (empty($discount)) {
+                        $removeCouponService->execute();
+                    } else {
+                        $shippingAmount = Arr::get($sessionCheckoutData, 'is_free_shipping') ? 0 : $shippingAmount;
+                    }
+                } else {
+                    $shippingAmount = Arr::get($sessionCheckoutData, 'is_free_shipping') ? 0 : $shippingAmount;
+                }
+            }
+
+            $sessionCheckoutData['is_available_shipping'] = $isAvailableShipping;
+
+            if (! $sessionCheckoutData['is_available_shipping']) {
+                $shippingAmount = 0;
+            }
+        }
+
         $isShowAddressForm = EcommerceHelper::isSaveOrderShippingAddress($products);
-
-        $checkoutOrderData = $handleCheckoutOrderData->execute(
-            $request,
-            $products,
-            $token,
-            $sessionCheckoutData
-        );
-
-        $shipping = $checkoutOrderData->shipping;
-        $defaultShippingMethod = $checkoutOrderData->defaultShippingMethod;
-        $defaultShippingOption = $checkoutOrderData->defaultShippingOption;
-        $promotionDiscountAmount = $checkoutOrderData->promotionDiscountAmount;
-        $couponDiscountAmount = $checkoutOrderData->couponDiscountAmount;
-        $shippingAmount = $checkoutOrderData->shippingAmount;
 
         $data = compact(
             'token',
@@ -229,7 +354,7 @@ class PublicCheckoutController extends BaseController
                 $validator = Validator::make($request->input(), [
                     'password' => ['required', 'min:6'],
                     'password_confirmation' => ['required', 'same:password'],
-                    'address.email' => ['required', new EmailRule(), Rule::unique((new Customer())->getTable(), 'email')],
+                    'address.email' => ['required', 'max:60', 'min:6', 'email', 'unique:ec_customers,email'],
                     'address.name' => ['required', 'min:3', 'max:120'],
                 ]);
 
@@ -524,33 +649,6 @@ class PublicCheckoutController extends BaseController
                 ->setMessage(__('Your shopping cart has digital product(s), so you need to sign in to continue!'));
         }
 
-        $totalQuality = Cart::instance('cart')->rawTotalQuantity();
-
-        if (($minimumQuantity = EcommerceHelper::getMinimumOrderQuantity()) > 0
-            && $totalQuality < $minimumQuantity) {
-            return $this
-                ->httpResponse()
-                ->setError()
-                ->setMessage(
-                    __('Minimum order quantity is :qty, you need to buy more :more to place an order!', [
-                        'qty' => $totalQuality,
-                        'more' => $minimumQuantity - $totalQuality,
-                    ])
-                );
-        }
-
-        if (($maximumQuantity = EcommerceHelper::getMaximumOrderQuantity()) > 0
-            && $totalQuality > $maximumQuantity) {
-            return $this
-                ->httpResponse()
-                ->setError()
-                ->setMessage(
-                    __('Maximum order quantity is :qty, please check your cart and retry again!', [
-                        'qty' => $maximumQuantity,
-                    ])
-                );
-        }
-
         if (EcommerceHelper::getMinimumOrderAmount() > Cart::instance('cart')->rawSubTotal()) {
             return $this
                 ->httpResponse()
@@ -577,33 +675,6 @@ class PublicCheckoutController extends BaseController
                     ->setError()
                     ->setMessage(
                         __('Product :product is out of stock!', ['product' => $product->original_product->name])
-                    );
-            }
-
-            $quantityOfProduct = Cart::instance('cart')->rawQuantityByItemId($product->id);
-
-            if ($product->minimum_order_quantity > 0 && $quantityOfProduct < $product->minimum_order_quantity) {
-                return $this
-                    ->httpResponse()
-                    ->setError()
-                    ->setMessage(
-                        __('Minimum order quantity of product :product is :quantity, you need to buy more :more to place an order! ', [
-                            'product' => $product->original_product->name,
-                            'quantity' => $product->minimum_order_quantity,
-                            'more' => $product->minimum_order_quantity - $quantityOfProduct,
-                        ])
-                    );
-            }
-
-            if ($product->maximum_order_quantity > 0 && $quantityOfProduct > $product->maximum_order_quantity) {
-                return $this
-                    ->httpResponse()
-                    ->setError()
-                    ->setMessage(
-                        __('Maximum order quantity of product :product is :quantity! ', [
-                            'product' => $product->original_product->name,
-                            'quantity' => $product->minimum_order_quantity,
-                        ])
                     );
             }
         }

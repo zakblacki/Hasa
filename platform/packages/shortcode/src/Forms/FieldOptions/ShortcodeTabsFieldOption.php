@@ -2,7 +2,6 @@
 
 namespace Botble\Shortcode\Forms\FieldOptions;
 
-use Botble\Base\Contracts\BaseModel;
 use Botble\Base\Forms\FormFieldOptions;
 use Illuminate\Support\Arr;
 
@@ -20,12 +19,8 @@ class ShortcodeTabsFieldOption extends FormFieldOptions
         return $this;
     }
 
-    public function attrs(array|BaseModel $attributes = []): static
+    public function attrs(array $attributes = []): static
     {
-        if ($attributes instanceof BaseModel) {
-            $attributes = $attributes->toArray();
-        }
-
         $this->addAttribute('shortcode_attributes', $attributes);
 
         return $this;

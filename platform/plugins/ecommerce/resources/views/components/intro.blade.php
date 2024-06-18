@@ -18,12 +18,8 @@
                         >
                             {{ $actionLabel }}
                         </x-core::button>
-
-                        {!! $extraButtons ?? '' !!}
                     </div>
                 @endif
-
-                {!! $extra ?? '' !!}
             </div>
         </div>
     </div>

@@ -3,7 +3,6 @@
 use Botble\Base\Facades\AdminHelper;
 use Botble\Base\Http\Middleware\RequiresJsonRequestMiddleware;
 use Botble\Ecommerce\Facades\EcommerceHelper;
-use Botble\Ecommerce\Http\Controllers\Fronts\PublicUpdateCheckoutController;
 use Botble\Ecommerce\Http\Controllers\Fronts\QuickShopController;
 use Botble\Ecommerce\Http\Controllers\Fronts\QuickViewController;
 use Botble\Theme\Events\ThemeRoutingBeforeEvent;
@@ -175,6 +174,42 @@ AdminHelper::registerRoutes(function () {
         Route::group(['prefix' => 'product-labels', 'as' => 'product-label.'], function () {
             Route::resource('', 'ProductLabelController')->parameters(['' => 'product-label']);
         });
+
+        Route::group(['prefix' => 'import', 'as' => 'ecommerce.import.'], function () {
+            Route::group(['prefix' => 'products', 'as' => 'products.'], function () {
+                Route::get('/', [
+                    'as' => 'index',
+                    'uses' => 'BulkImportController@index',
+                ]);
+
+                Route::post('/', [
+                    'as' => 'index.post',
+                    'uses' => 'BulkImportController@postImport',
+                    'permission' => 'ecommerce.import.products.index',
+                ]);
+
+                Route::post('/download-template', [
+                    'as' => 'download-template',
+                    'uses' => 'BulkImportController@downloadTemplate',
+                    'permission' => 'ecommerce.import.products.index',
+                ]);
+            });
+        });
+
+        Route::group(['prefix' => 'export', 'as' => 'ecommerce.export.'], function () {
+            Route::group(['prefix' => 'products', 'as' => 'products.'], function () {
+                Route::get('/', [
+                    'as' => 'index',
+                    'uses' => 'ExportController@products',
+                ]);
+
+                Route::post('/', [
+                    'as' => 'index.post',
+                    'uses' => 'ExportController@exportProducts',
+                    'permission' => 'ecommerce.export.products.index',
+                ]);
+            });
+        });
     });
 });
 
@@ -210,10 +245,6 @@ Theme::registerRoutes(function () {
                 ->middleware(RequiresJsonRequestMiddleware::class)
                 ->name('public.ajax.quick-shop')
                 ->wherePrimaryKey();
-
-            Route::post('ajax/checkout/update', [PublicUpdateCheckoutController::class, '__invoke'])
-                ->middleware(RequiresJsonRequestMiddleware::class)
-                ->name('public.ajax.checkout.update');
         });
     });
 });

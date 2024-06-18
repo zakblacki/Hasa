@@ -61,16 +61,4 @@ abstract class AuthForm extends FormFront
     {
         return $this->setFormOption('description', $description);
     }
-
-    public function ignoreBaseTemplate(): static
-    {
-        $this
-            ->banner('')
-            ->icon('')
-            ->heading('')
-            ->description('')
-            ->contentOnly();
-
-        return $this;
-    }
 }

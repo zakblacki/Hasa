@@ -5,7 +5,6 @@ namespace Botble\Table\Columns;
 use BackedEnum;
 use Botble\Base\Supports\Enum;
 use Botble\Table\Contracts\FormattedColumn as FormattedColumnContract;
-use Throwable;
 
 class EnumColumn extends FormattedColumn implements FormattedColumnContract
 {
@@ -14,13 +13,8 @@ class EnumColumn extends FormattedColumn implements FormattedColumnContract
         return parent::make($data, $name)
             ->alignCenter()
             ->width(100)
-            ->withEmptyState()
             ->renderUsing(function (EnumColumn $column, $value) {
-                try {
-                    return $column->formattedValue($value);
-                } catch (Throwable) {
-                    return $value;
-                }
+                return $column->formattedValue($value);
             });
     }
 

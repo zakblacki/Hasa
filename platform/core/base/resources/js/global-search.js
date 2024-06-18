@@ -29,7 +29,7 @@ $(function () {
             clearTimeout(searchTimeout)
         }
 
-        searchTimeout = setTimeout(() => searchHandler(e), 200)
+        searchTimeout = setTimeout(() => searchHandler(e), 500)
     }
 
     const getResults = () => $('[data-bb-toggle="gs-result"]')
@@ -176,7 +176,7 @@ $(function () {
     })
 
     $globalSearchModal.on('shown.bs.modal', () => {
-        $input.trigger('focus')
+        $input.focus()
         autoSelectHandler()
     })
 

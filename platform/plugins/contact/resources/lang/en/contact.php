@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'name' => 'Contacts',
     'contact_form' => 'Contact form',
     'menu' => 'Contact',
     'edit' => 'View contact',
@@ -87,28 +86,4 @@ return [
     'display_fields' => 'Display fields',
     'mandatory_fields' => 'Mandatory fields',
     'mandatory_fields_helper_text' => 'If it is blank, it will be validated by default configuration. Name and Message are always required.',
-    'custom_field' => [
-        'name' => 'Custom Fields',
-        'create' => 'Create Custom Field',
-        'type' => 'Type',
-        'required' => 'Required',
-        'placeholder' => 'Placeholder',
-        'order' => 'Order',
-        'options' => 'Options',
-        'option' => [
-            'label' => 'Label',
-            'value' => 'Value',
-            'add' => 'Add new option',
-        ],
-        'enums' => [
-            'types' => [
-                'text' => 'Text',
-                'number' => 'Number',
-                'dropdown' => 'Dropdown',
-                'checkbox' => 'Checkbox',
-                'radio' => 'Radio',
-                'textarea' => 'Textarea',
-            ],
-        ],
-    ],
 ];

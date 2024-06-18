@@ -2,9 +2,8 @@
 
 return [
     [
-        'name' => 'Localization',
+        'name' => 'Translation',
         'flag' => 'plugins.translation',
-        'parent_flag' => 'settings.index',
     ],
     [
         'name' => 'Locales',

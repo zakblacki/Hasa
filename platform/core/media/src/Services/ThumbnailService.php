@@ -129,7 +129,7 @@ class ThumbnailService
                     return $destinationPath;
                 }
 
-                $thumbImage->scale($this->thumbWidth);
+                $thumbImage->resize($this->thumbWidth);
 
                 break;
 
@@ -138,7 +138,7 @@ class ThumbnailService
                     return $destinationPath;
                 }
 
-                $thumbImage->scale(null, $this->thumbHeight);
+                $thumbImage->resize(null, $this->thumbHeight);
 
                 break;
 

@@ -106,7 +106,9 @@ class HandleFrontPages
                 $card->addMeta('label1', 'Price');
                 $card->addMeta(
                     'data1',
-                    $product->price()->displayAsText() . ' ' . strtoupper(get_application_currency()->title)
+                    format_price($product->front_sale_price_with_taxes) . ' ' . strtoupper(
+                        get_application_currency()->title
+                    )
                 );
                 $card->addMeta('label2', 'Website');
                 $card->addMeta('data2', SeoHelper::openGraph()->getProperty('site_name'));

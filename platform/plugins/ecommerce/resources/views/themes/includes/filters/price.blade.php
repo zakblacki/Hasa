@@ -1,7 +1,3 @@
-@php
-    Theme::asset()->container('footer')->add('range-slider-js', 'vendor/core/plugins/ecommerce/libraries/range-slider.js', ['jquery']);
-@endphp
-
 <div class="bb-product-filter">
     <h4 class="bb-product-filter-title border-0 mb-3">{{ __('Price Filter') }}</h4>
 

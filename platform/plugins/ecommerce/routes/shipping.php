@@ -7,9 +7,14 @@ AdminHelper::registerRoutes(function () {
     Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'prefix' => 'ecommerce'], function () {
         Route::group([
             'prefix' => 'shipping-methods',
-            'permission' => 'settings.index.shipping',
+            'permission' => 'shipping_methods.index',
             'as' => 'shipping_methods.',
         ], function () {
+            Route::get('', [
+                'as' => 'index',
+                'uses' => 'ShippingMethodController@index',
+            ]);
+
             Route::post('region/create', [
                 'as' => 'region.create',
                 'uses' => 'ShippingMethodController@postCreateRegion',

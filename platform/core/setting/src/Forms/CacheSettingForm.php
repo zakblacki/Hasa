@@ -2,8 +2,6 @@
 
 namespace Botble\Setting\Forms;
 
-use Botble\Base\Forms\Fields\HtmlField;
-use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Setting\Http\Requests\CacheSettingRequest;
 
 class CacheSettingForm extends SettingForm
@@ -20,11 +18,11 @@ class CacheSettingForm extends SettingForm
             ->add('enable_cache', 'html', [
                 'html' => view('core/setting::partials.cache.cache-fields')->render(),
             ])
-            ->add('cache_admin_menu_enable', OnOffCheckboxField::class, [
+            ->add('cache_admin_menu_enable', 'onOffCheckbox', [
                 'label' => trans('core/setting::setting.cache.form.cache_admin_menu'),
                 'value' => setting('cache_admin_menu_enable', false),
             ])
-            ->add('enable_site_map_cache', HtmlField::class, [
+            ->add('enable_site_map_cache', 'html', [
                 'html' => view('core/setting::partials.cache.cache-site-map-fields')->render(),
             ]);
     }

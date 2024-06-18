@@ -4,7 +4,6 @@ namespace Botble\Ecommerce\Http\Requests\Settings;
 
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Rules\OnOffRule;
-use Botble\Ecommerce\Facades\InvoiceHelper;
 use Botble\Support\Http\Requests\Request;
 use Illuminate\Validation\Rule;
 
@@ -36,7 +35,6 @@ class InvoiceSettingRequest extends Request
             'invoice_code_prefix' => ['nullable', 'string', 'max:120'],
             'disable_order_invoice_until_order_confirmed' => $onOffRule,
             'invoice_font_family' => ['nullable', Rule::in($googleFonts)],
-            'invoice_date_format' => [Rule::in(InvoiceHelper::supportedDateFormats())],
         ];
     }
 }

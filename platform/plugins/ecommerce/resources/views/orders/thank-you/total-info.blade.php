@@ -10,18 +10,18 @@
             ($order->is_free_shipping
                 ? ' <small>(' . __('Using coupon code') . ': <strong>' . $order->coupon_code . '</strong>)</small>'
                 : ''),
-        'value' => $order->shipping_method_name . ((float) $order->shipping_amount ? ' - ' . format_price($order->shipping_amount) : null),
+        'value' => $order->shipping_method_name . ' - ' . format_price($order->shipping_amount),
     ])
 @endif
 
-@if (EcommerceHelper::isTaxEnabled() && (float) $order->tax_amount)
+@if (EcommerceHelper::isTaxEnabled())
     @include('plugins/ecommerce::orders.thank-you.total-row', [
         'label' => __('Tax'),
         'value' => format_price($order->tax_amount),
     ])
 @endif
 
-@if ((float) $order->discount_amount)
+@if ($order->discount_amount !== null)
     @include('plugins/ecommerce::orders.thank-you.total-row', [
         'label' => __('Discount'),
         'value' =>

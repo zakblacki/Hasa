@@ -161,11 +161,6 @@ class SeoMeta implements SeoMetaContract
         return $this->title->getTitle();
     }
 
-    public function getTitleOnly(): ?string
-    {
-        return $this->title->getTitleOnly();
-    }
-
     /**
      * Set the title.
      *

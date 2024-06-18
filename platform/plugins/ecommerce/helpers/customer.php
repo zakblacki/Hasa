@@ -1,6 +1,7 @@
 <?php
 
 use Botble\Ecommerce\Models\Address;
+use Botble\Ecommerce\Models\Wishlist;
 use Illuminate\Support\Collection;
 
 if (! function_exists('is_added_to_wishlist')) {
@@ -10,10 +11,11 @@ if (! function_exists('is_added_to_wishlist')) {
             return false;
         }
 
-        return auth('customer')
-            ->user()
-            ->wishlist()
-            ->where('product_id', $productId)
+        return Wishlist::query()
+            ->where([
+                'product_id' => $productId,
+                'customer_id' => auth('customer')->id(),
+            ])
             ->exists();
     }
 }

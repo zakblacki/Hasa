@@ -18,8 +18,8 @@ class RoleForm extends FormAbstract
 {
     public function setup(): void
     {
-        Assets::addStyles(['jquery-ui', 'jqueryTreeView'])
-            ->addScripts(['jquery-ui', 'jqueryTreeView'])
+        Assets::addStyles(['jquery-ui', 'jqueryTree'])
+            ->addScripts(['jquery-ui', 'jqueryTree'])
             ->addScriptsDirectly('vendor/core/core/acl/js/role.js');
 
         $flags = (new Role())->getAvailablePermissions();
@@ -48,7 +48,6 @@ class RoleForm extends FormAbstract
                 'permissions' => [
                     'title' => trans('core/acl::permissions.permission_flags'),
                     'content' => view('core/acl::roles.permissions', compact('active', 'flags', 'children'))->render(),
-                    'header_actions' => view('core/acl::roles.permissions-actions')->render(),
                 ],
             ]);
     }

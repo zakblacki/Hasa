@@ -2,6 +2,9 @@
 
 namespace Botble\Base\Forms\FieldTypes;
 
-abstract class FormField extends \Botble\Base\Forms\FormField
+use Botble\Base\Traits\Forms\CanSpanColumns;
+
+abstract class FormField extends \Kris\LaravelFormBuilder\Fields\FormField
 {
+    use CanSpanColumns;
 }

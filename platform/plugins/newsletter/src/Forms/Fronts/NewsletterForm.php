@@ -13,8 +13,6 @@ use Botble\Theme\FormFront;
 
 class NewsletterForm extends FormFront
 {
-    protected string $errorBag = 'newsletter';
-
     public static function formTitle(): string
     {
         return trans('plugins/newsletter::newsletter.newsletter_form');
@@ -39,7 +37,6 @@ class NewsletterForm extends FormFront
                     ->wrapperAttributes(false)
                     ->maxLength(-1)
                     ->placeholder(__('Enter Your Email'))
-                    ->addAttribute('id', 'newsletter-email')
                     ->toArray()
             )
             ->add(

@@ -2,9 +2,11 @@
 
 namespace Botble\Ecommerce\Supports;
 
+use ArPHP\I18N\Arabic;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Barryvdh\DomPDF\PDF as PDFHelper;
 use Botble\Base\Facades\BaseHelper;
-use Botble\Base\Supports\Pdf;
+use Botble\Base\Supports\TwigCompiler;
 use Botble\Ecommerce\Enums\InvoiceStatusEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper as EcommerceHelperFacade;
 use Botble\Ecommerce\Models\Invoice;
@@ -16,9 +18,12 @@ use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Models\Payment;
 use Carbon\Carbon;
+use Dompdf\Dompdf;
+use Dompdf\Image\Cache;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
+use Throwable;
+use Twig\Extension\DebugExtension;
 
 class InvoiceHelper
 {
@@ -105,32 +110,76 @@ class InvoiceHelper
         return $invoice;
     }
 
-    public function makeInvoicePDF(Invoice $invoice): PDFHelper
+    public function makeInvoicePDF(Invoice $invoice): PDFHelper|Dompdf
     {
-        return (new Pdf())
-            ->templatePath(plugin_path('ecommerce/resources/templates/invoice.tpl'))
-            ->supportLanguage($this->getLanguageSupport())
-            ->paperSizeA4()
-            ->data($this->getDataForInvoiceTemplate($invoice))
-            ->twigExtensions([
-                new TwigExtension(),
-            ])
-            ->compile();
+        $fontsPath = storage_path('fonts');
+
+        if (! File::isDirectory($fontsPath)) {
+            File::makeDirectory($fontsPath);
+        }
+
+        $content = $this->getInvoiceTemplate();
+
+        if ($content) {
+            $twigCompiler = new TwigCompiler([
+                'autoescape' => false,
+                'debug' => true,
+            ]);
+
+            $twigCompiler
+                ->addExtension(new TwigExtension())
+                ->addExtension(new DebugExtension());
+
+            $content = $twigCompiler->compile($content, $this->getDataForInvoiceTemplate($invoice));
+
+            $currencies = [
+                '₼' => 'azeri-manat',
+                '₹' => 'indian-rupee',
+                '৳' => 'bangladeshi-taka',
+            ];
+
+            foreach ($currencies as $currency => $icon) {
+                $content = str_replace($currency, '<img src="' . asset('vendor/core/plugins/ecommerce/images/currencies/' . $icon . '.svg') . '" width="10" style="margin-right: 2px;" alt="currency" />', $content);
+            }
+
+            if ($this->getLanguageSupport() === 'arabic') {
+                $arabic = new Arabic();
+                $p = $arabic->arIdentify($content);
+
+                for ($i = count($p) - 1; $i >= 0; $i -= 2) {
+                    try {
+                        $utf8ar = $arabic->utf8Glyphs(substr($content, $p[$i - 1], $p[$i] - $p[$i - 1]));
+                        $content = substr_replace($content, $utf8ar, $p[$i - 1], $p[$i] - $p[$i - 1]);
+                    } catch (Throwable) {
+                        continue;
+                    }
+                }
+            }
+        }
+
+        Cache::$error_message = null;
+
+        return Pdf::setWarnings(false)
+            ->setOption('chroot', [public_path(), base_path()])
+            ->setOption('tempDir', storage_path('app'))
+            ->setOption('logOutputFile', storage_path('logs/pdf.log'))
+            ->setOption('isRemoteEnabled', true)
+            ->loadHTML($content, 'UTF-8')
+            ->setPaper('a4');
     }
 
     public function generateInvoice(Invoice $invoice): string
     {
-        $storageDisk = Storage::disk('local');
-
-        $invoiceFile = sprintf('ecommerce/invoices/invoice-%s.pdf', $invoice->code);
-
-        $invoicePath = $storageDisk->path($invoiceFile);
-
-        if ($storageDisk->exists($invoiceFile)) {
-            return $invoicePath;
+        $folderPath = storage_path('app/public');
+        if (! File::isDirectory($folderPath)) {
+            File::makeDirectory($folderPath);
         }
 
-        File::ensureDirectoryExists(dirname($invoicePath));
+        $invoicePath = sprintf('%s/invoice-%s.pdf', $folderPath, $invoice->code);
+
+        if (File::exists($invoicePath)) {
+            return $invoicePath;
+        }
 
         $this->makeInvoicePDF($invoice)->save($invoicePath);
 
@@ -231,7 +280,6 @@ class InvoiceHelper
                     ? get_ecommerce_setting('invoice_font_family', 'DejaVu Sans')
                     : 'DejaVu Sans',
                 'enable_invoice_stamp' => get_ecommerce_setting('enable_invoice_stamp'),
-                'date_format' => get_ecommerce_setting('invoice_date_format', 'F d, Y'),
             ],
             'invoice_header_filter' => apply_filters('ecommerce_invoice_header', null, $invoice),
             'invoice_body_filter' => apply_filters('ecommerce_invoice_body', null, $invoice),
@@ -393,24 +441,5 @@ class InvoiceHelper
         }
 
         return '';
-    }
-
-    public function supportedDateFormats(): array
-    {
-        $formats = [
-            'M d, Y',
-            'F j, Y',
-            'F d, Y',
-            'Y-m-d',
-            'Y-M-d',
-            'd-m-Y',
-            'd-M-Y',
-            'm/d/Y',
-            'M/d/Y',
-            'd/m/Y',
-            'd/M/Y',
-        ];
-
-        return apply_filters('invoice_date_formats', $formats);
     }
 }

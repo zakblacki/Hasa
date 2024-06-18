@@ -149,10 +149,6 @@ abstract class FormAbstract extends Form implements ExtensibleContract
 
         $metaBox = $this->metaBoxes[$name];
 
-        if ($metaBox instanceof MetaBox) {
-            $metaBox = $metaBox->toArray();
-        }
-
         if (isset($metaBox['content']) && $metaBox['content'] instanceof Closure) {
             $metaBox['content'] = call_user_func($metaBox['content'], $this->getModel());
         }
@@ -173,13 +169,6 @@ abstract class FormAbstract extends Form implements ExtensibleContract
         }
 
         $this->metaBoxes = array_merge($this->metaBoxes, $boxes);
-
-        return $this;
-    }
-
-    public function addMetaBox(MetaBox $metaBox): static
-    {
-        $this->metaBoxes[$metaBox->getId()] = $metaBox;
 
         return $this;
     }

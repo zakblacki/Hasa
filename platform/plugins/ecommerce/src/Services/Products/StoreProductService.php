@@ -25,7 +25,7 @@ class StoreProductService
     public function execute(Request $request, Product $product, bool $forceUpdateAll = false): Product
     {
         $data = $request->input();
-
+        
         $hasVariation = $product->variations()->count() > 0;
 
         if ($hasVariation && ! $forceUpdateAll) {
@@ -76,6 +76,7 @@ class StoreProductService
                 $product->product_type = $request->input('product_type');
             }
         }
+        
 
         $product->save();
 
@@ -110,10 +111,7 @@ class StoreProductService
         }
 
         if ($request->has('cross_sale_products')) {
-            $product->crossSales()->detach();
-
             $crossSaleProducts = $request->input('cross_sale_products', []);
-
             $crossSaleProducts = array_map(function ($item) {
                 unset($item['id']);
 
@@ -197,29 +195,19 @@ class StoreProductService
 
     public function saveProductFile(UploadedFile $file): array
     {
-        $folderPath = Product::getDigitalProductFilesDirectory();
-
+        $folderPath = 'product-files';
         $fileExtension = $file->getClientOriginalExtension();
         $content = File::get($file->getRealPath());
         $name = File::name($file->getClientOriginalName());
-
-        $storageDisk = Storage::disk('local');
-
         $fileName = MediaFile::createSlug(
             $name,
             $fileExtension,
-            $storageDisk->path($folderPath)
+            Storage::path($folderPath)
         );
 
-        $uploadManager = app(UploadsManager::class);
-
         $filePath = $folderPath . '/' . $fileName;
-
-        $storageDisk->put($filePath, $content);
-
-        $data = $uploadManager->fileDetails($filePath);
-        $data['size'] = $file->getSize();
-
+        app(UploadsManager::class)->saveFile($filePath, $content, $file);
+        $data = app(UploadsManager::class)->fileDetails($filePath);
         $data['name'] = $name;
         $data['extension'] = $fileExtension;
 
@@ -235,16 +223,13 @@ class StoreProductService
 
         try {
             foreach ($options as $opt) {
-                /**
-                 * @var Option $option
-                 */
                 $option = $product->options()->find($opt['id']);
 
                 if (! $option) {
                     $option = new Option();
                 }
 
-                $opt['required'] = isset($opt['required']) && $opt['required'] == 1;
+                $opt['required'] = isset($opt['required']) && $opt['required'] === 'on';
                 $option->fill($opt);
                 $option->product_id = $product->getKey();
                 $option->save();
@@ -264,7 +249,7 @@ class StoreProductService
                     $option->values()->saveMany($optionValues);
                 }
 
-                $optionIds[] = $option->getKey();
+                $optionIds[] = $option->id;
             }
 
             $product->options()->whereNotIn('id', $optionIds)->get()->each(function (Option $deletedOption) {

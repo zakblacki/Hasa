@@ -51,7 +51,6 @@ class OrderStatusEnum extends Enum
             self::COMPLETED => 'ti ti-circle-check',
             self::CANCELED => 'ti ti-circle-x',
             self::PARTIAL_RETURNED, self::RETURNED => 'ti ti-reload',
-            default => 'ti ti-circle',
         };
     }
 }

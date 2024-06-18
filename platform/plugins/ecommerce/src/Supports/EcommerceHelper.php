@@ -49,8 +49,6 @@ class EcommerceHelper
 {
     protected array $availableCountries = [];
 
-    protected bool $loadLocationDataFromPluginLocation;
-
     public function isCartEnabled(): bool
     {
         return (bool) get_ecommerce_setting('shopping_cart_enabled', 1);
@@ -64,11 +62,6 @@ class EcommerceHelper
     public function isCompareEnabled(): bool
     {
         return (bool) get_ecommerce_setting('compare_enabled', 1);
-    }
-
-    public function isProductInCompare(int|string $productId): bool
-    {
-        return Cart::instance('compare')->search(fn ($cartItem) => $cartItem->id == $productId)->isNotEmpty();
     }
 
     public function isReviewEnabled(): bool
@@ -183,7 +176,7 @@ class EcommerceHelper
 
     public function getAvailableCountries(): array
     {
-        if (! empty($this->availableCountries)) {
+        if (count($this->availableCountries)) {
             return $this->availableCountries;
         }
 
@@ -385,16 +378,6 @@ class EcommerceHelper
         return (bool) get_ecommerce_setting('is_enabled_product_options', 1);
     }
 
-    public function isEnabledCrossSaleProducts(): bool
-    {
-        return (bool) get_ecommerce_setting('is_enabled_cross_sale_products', 1);
-    }
-
-    public function isEnabledRelatedProducts(): bool
-    {
-        return (bool) get_ecommerce_setting('is_enabled_related_products', 1);
-    }
-
     public function getPhoneValidationRule(): string
     {
         $rule = BaseHelper::getPhoneValidationRule();
@@ -498,23 +481,15 @@ class EcommerceHelper
 
     public function loadCountriesStatesCitiesFromPluginLocation(): bool
     {
-        if (isset($this->loadLocationDataFromPluginLocation)) {
-            return $this->loadLocationDataFromPluginLocation;
-        }
-
         if (
             ! is_plugin_active('location')
             || ! Country::query()->exists()
             || ! State::query()->exists()
         ) {
-            $this->loadLocationDataFromPluginLocation = false;
-
             return false;
         }
 
-        $this->loadLocationDataFromPluginLocation = (bool) get_ecommerce_setting('load_countries_states_cities_from_location_plugin', 0);
-
-        return $this->loadLocationDataFromPluginLocation;
+        return (bool) get_ecommerce_setting('load_countries_states_cities_from_location_plugin', 0);
     }
 
     public function getCountryNameById(int|string|null $countryId): ?string
@@ -617,7 +592,7 @@ class EcommerceHelper
         }
 
         if ($this->isZipCodeEnabled()) {
-            $rules[$prefix . 'zip_code'] = 'required|min:5|max:9';
+            $rules[$prefix . 'zip_code'] = 'required|max:20';
         }
 
         $availableMandatoryFields = $this->getEnabledMandatoryFieldsAtCheckout();
@@ -626,8 +601,6 @@ class EcommerceHelper
 
         if ($nullableFields) {
             foreach ($nullableFields as $key) {
-                $key = $prefix . $key;
-
                 if (! isset($rules[$key])) {
                     continue;
                 }
@@ -1076,11 +1049,11 @@ class EcommerceHelper
     public function getProductMaxPrice(array $categoryIds = []): int
     {
         return Cache::remember(
-            'ecommerce_product_price_range' . (! empty($categoryIds) ? '_' . implode('_', $categoryIds) : null),
+            'ecommerce_product_price_range' . (implode('_', $categoryIds) ? '_' . implode('_', $categoryIds) : null),
             Carbon::now()->addHour(),
             function () use ($categoryIds): int {
                 $price = Product::query()
-                    ->when(! empty($categoryIds), function (BaseQueryBuilder $query) use ($categoryIds): void {
+                    ->when(count($categoryIds), function (BaseQueryBuilder $query) use ($categoryIds): void {
                         $query
                             ->whereHas('categories', function (BaseQueryBuilder $query) use ($categoryIds): void {
                                 $query->whereIn('ec_product_categories.id', $categoryIds);
@@ -1305,12 +1278,12 @@ class EcommerceHelper
 
     public function isLoginUsingPhone(): bool
     {
-        return $this->getLoginOption() == 'phone';
+        return (bool) get_ecommerce_setting('login_using_phone', false);
     }
 
     public function getLoginOption(): string
     {
-        return get_ecommerce_setting('login_option', 'email');
+        return get_ecommerce_setting('login_option', $this->isLoginUsingPhone() ? 'phone' : 'email');
     }
 
     public function registerThemeAssets(): void
@@ -1384,15 +1357,7 @@ class EcommerceHelper
         return theme_option(sprintf('ecommerce_%s_page_slug', $key)) ?: $this->getDefaultPageSlug($key);
     }
 
-    /**
-     * @deprecated since 05/2024
-     */
     public function getGtmAttributes(string $action, Product $product, array $additional = []): string
-    {
-        return $this->jsAttributes($action, $product, $additional);
-    }
-
-    public function jsAttributes(string $action, Product $product, array $additional = []): string
     {
         $attributes = [
             'data-bb-toggle' => $action,
@@ -1445,15 +1410,5 @@ class EcommerceHelper
                 })->where('route', '.*');
             });
         });
-    }
-
-    public function getMinimumOrderQuantity(): int
-    {
-        return (int) get_ecommerce_setting('minimum_order_quantity', 0);
-    }
-
-    public function getMaximumOrderQuantity(): int
-    {
-        return (int) get_ecommerce_setting('maximum_order_quantity', 0);
     }
 }

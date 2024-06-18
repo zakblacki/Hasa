@@ -31,7 +31,7 @@ class PaymentMethods
 
     public function getSelectedMethod(): ?string
     {
-        return session('selected_payment_method', $this->getDefaultMethod());
+        return session('selected_payment_method');
     }
 
     public function getSelectingMethod(): ?string
@@ -52,20 +52,13 @@ class PaymentMethods
             ],
         ] + $this->methods;
 
-        $methods = collect($this->methods)->sortBy('priority');
-        $defaultMethod = $methods->pull(PaymentHelper::defaultPaymentMethod());
-
-        if ($defaultMethod) {
-            $methods = $methods->prepend($defaultMethod, PaymentHelper::defaultPaymentMethod());
-        }
-
-        event(new RenderingPaymentMethods($methods->all()));
+        event(new RenderingPaymentMethods($this->methods));
 
         $country = apply_filters('payment_checkout_country', null);
 
         $html = '';
 
-        foreach ($methods as $name => $method) {
+        foreach (collect($this->methods)->sortBy('priority') as $name => $method) {
             if (! get_payment_setting('status', $name) == 1) {
                 continue;
             }

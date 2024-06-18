@@ -9,7 +9,7 @@ class AccountDeletionRequest extends Request
     public function rules(): array
     {
         return [
-            'password' => ['required', 'string', 'current_password:customer'],
+            'password' => ['required', 'string', 'current_password'],
             'reason' => ['nullable', 'string', 'max:255'],
         ];
     }

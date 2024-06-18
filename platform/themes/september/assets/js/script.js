@@ -387,7 +387,7 @@
                 center: $(el).data('center'),
                 nav: $(el).data('nav'),
                 rewind: $(el).data('rewind'),
-                navText: ['<i class="feather icon-arrow-left"></i>', '<i class="feather icon-arrow-right"></i>'],
+                navText: ['<i class="ion-ios-arrow-left"></i>', '<i class="ion-ios-arrow-right"></i>'],
                 autoplay: $(el).data('autoplay'),
                 animateIn: $(el).data('animate-in'),
                 animateOut: $(el).data('animate-out'),

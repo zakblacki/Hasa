@@ -60,8 +60,6 @@ class LocaleSessionRedirect extends LaravelLocalizationMiddlewareBase
 
         $this->updatePreviousLanguage($defaultLocale);
 
-        $locale = $locale ?: $defaultLocale;
-
         Session::put(['language' => $locale]);
 
         App::setLocale($locale);

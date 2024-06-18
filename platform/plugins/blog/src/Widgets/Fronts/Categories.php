@@ -3,13 +3,12 @@
 namespace Botble\Blog\Widgets\Fronts;
 
 use Botble\Base\Forms\FieldOptions\NameFieldOption;
-use Botble\Base\Forms\FieldOptions\SelectFieldOption;
-use Botble\Base\Forms\Fields\SelectField;
+use Botble\Base\Forms\FieldOptions\NumberFieldOption;
+use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\TextField;
 use Botble\Blog\Models\Category;
 use Botble\Widget\AbstractWidget;
 use Botble\Widget\Forms\WidgetForm;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class Categories extends AbstractWidget
@@ -19,72 +18,32 @@ class Categories extends AbstractWidget
         parent::__construct([
             'name' => __('Blog Categories'),
             'description' => __('Widget display blog categories'),
-            'display_posts_count' => 'yes',
-            'category_ids' => [],
+            'number_display' => 10,
         ]);
     }
 
     protected function data(): array|Collection
     {
-        $config = $this->getConfig();
-
-        $categoryIds = Arr::get($config, 'category_ids', []);
-
         $categories = Category::query()
-            ->select(['id', 'name'])
-            ->with('slugable')
-            ->when($config['display_posts_count'], function ($query) {
-                return $query->withCount('posts');
-            })
             ->wherePublished()
-            ->when($categoryIds, function ($query) use ($categoryIds) {
-                return $query->whereIn('id', $categoryIds);
-            }, function ($query) {
-                return $query
-                    ->take(5)
-                    ->where(fn ($query) => $query->whereNull('parent_id')->orWhere('parent_id', 0));
-            })
-            ->orderBy('order')
-            ->orderByDesc('created_at')
+            ->with('slugable')
+            ->take((int) $this->getConfig('number_display') ?: 10)
             ->get();
 
-        return compact('categories');
+        return [
+            'categories' => $categories,
+        ];
     }
 
     protected function settingForm(): WidgetForm|string|null
     {
-        $data = $this->getConfig();
-
-        $categories = Category::query()->pluck('name', 'id')->all();
-        $categoryIds = Arr::get($data, 'category_ids', []);
-
-        if (! is_array($categoryIds)) {
-            $categoryIds = $categoryIds ? explode(',', $categoryIds) : null;
-        }
-
-        return WidgetForm::createFromArray($data)
+        return WidgetForm::createFromArray($this->getConfig())
             ->add('name', TextField::class, NameFieldOption::make()->toArray())
             ->add(
-                'category_ids',
-                SelectField::class,
-                SelectFieldOption::make()
-                    ->label(__('Choose categories'))
-                    ->choices($categories)
-                    ->selected($categoryIds)
-                    ->searchable()
-                    ->multiple()
-                    ->toArray(),
-            )
-            ->add(
-                'display_posts_count',
-                SelectField::class,
-                SelectFieldOption::make()
-                    ->label(__('Display posts count?'))
-                    ->choices([
-                        'yes' => __('Yes'),
-                        'no' => __('No'),
-                    ])
-                    ->selected($data['display_posts_count'])
+                'number_display',
+                NumberField::class,
+                NumberFieldOption::make()
+                    ->label(__('Number categories to display'))
                     ->toArray()
             );
     }

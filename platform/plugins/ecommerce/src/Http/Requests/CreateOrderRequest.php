@@ -14,7 +14,7 @@ class CreateOrderRequest extends Request
     public function rules(): array
     {
         $rules = [
-            'customer_id' => ['required', 'exists:ec_customers,id'],
+            'customer_id' => 'required|exists:ec_customers,id',
         ];
 
         $products = Product::query()
@@ -23,7 +23,6 @@ class CreateOrderRequest extends Request
 
         if (EcommerceHelper::isAvailableShipping($products)) {
             $rules['customer_address.phone'] = 'required|' . BaseHelper::getPhoneValidationRule();
-            $rules = [...$rules, ...EcommerceHelper::getCustomerAddressValidationRules('customer_address.')];
         }
 
         if (is_plugin_active('payment')) {

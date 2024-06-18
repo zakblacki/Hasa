@@ -190,7 +190,7 @@
             </div>
             
             <div class="tab active d-none" id="tab-features"> 
-              @if (!empty($product->type_de_taille) || !empty($product->type_de_tissu) || !empty($product->type_dencolure) || !empty($product->type_des_manches) || !empty($product->modele) || !empty($product->type_de_tissu) || !empty($product->longueur_des_manches) || !empty($product->coupe_pantalon) || !empty($product->longueur) || !empty($product->coupe_silouhette) || !empty($product->motif) || !empty($product->couleur) || !empty($product->poche) || !empty($product->type_de_produit) || !empty($product->taille) || !empty($product->grandes_occasions) || !empty($product->personnage) || !empty($product->matiere) || !empty($product->duree_de_livraison))
+              @if (!empty($product->type_de_taille) || !empty($product->type_de_tissu) || !empty($product->type_dencolure) || !empty($product->type_de_manches) || !empty($product->modele) || !empty($product->type_de_tissu) || !empty($product->longueur_des_manches) || !empty($product->coupe_pantalon) || !empty($product->longueur) || !empty($product->silouhette) || !empty($product->type_de_fermeture) || !empty($product->kap) || !empty($product->motif) || !empty($product->couleur) || !empty($product->poche) || !empty($product->type_de_produit) || !empty($product->taille) || !empty($product->occasions) || !empty($product->persona) || !empty($product->matiere) || !empty($product->duree_de_livraison))
               <div style="margin-top: 4%; margin-bottom: 3%">
                 <h4>{{trans('Product Features')}}</h4>
                 <div class="row" style="margin-top: 2%">
@@ -220,10 +220,22 @@
                                 <td><b>{{$product->longueur}}</b></td>
                             </tr>
                             @endif
-                            @if (!empty($product->coupe_silouhette))
+                            @if (!empty($product->silouhette))
                             <tr>
                                 <th>{{trans('Silhouette Cut')}}</th>
-                                <td><b>{{$product->coupe_silouhette}}</b></td>
+                                <td><b>{{$product->silouhette}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->type_de_fermeture))
+                            <tr>
+                                <th>{{trans('Type de fermeture')}}</th>
+                                <td><b>{{$product->type_de_fermeture}}</b></td>
+                            </tr>
+                            @endif
+                            @if (!empty($product->kap))
+                            <tr>
+                                <th>{{trans('Kap')}}</th>
+                                <td><b>{{$product->kap}}</b></td>
                             </tr>
                             @endif
                             @if (!empty($product->motif))
@@ -238,10 +250,10 @@
                                 <td><b>{{$product->type_dencolure}}</b></td>
                             </tr>
                             @endif
-                            @if (!empty($product->type_des_manches))
+                            @if (!empty($product->type_de_manches))
                             <tr>
                                 <th>{{trans('Type de manche')}}</th>
-                                <td><b>{{$product->type_des_manches}}</b></td>
+                                <td><b>{{$product->type_de_manches}}</b></td>
                             </tr>
                             @endif
                             @if (!empty($product->couleur))
@@ -272,16 +284,16 @@
                                 <td><b>{{$product->taille}}</b></td>
                             </tr>
                             @endif
-                            @if (!empty($product->grandes_occasions))
+                            @if (!empty($product->occasions))
                             <tr>
                                 <th>{{trans('Great occasions')}}</th>
-                                <td><b>{{$product->grandes_occasions}}</b></td>
+                                <td><b>{{$product->occasions}}</b></td>
                             </tr>
                             @endif
-                            @if (!empty($product->personnage))
+                            @if (!empty($product->persona))
                             <tr>
                                 <th>{{trans('Character')}}</th>
-                                <td><b>{{$product->personnage}}</b></td>
+                                <td><b>{{$product->persona}}</b></td>
                             </tr>
                             @endif
                             @if (!empty($product->matiere))

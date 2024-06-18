@@ -36,9 +36,9 @@ class ProductAttributeSetsController extends BaseController
     {
         $productAttributeSet = $service->execute($request, new ProductAttributeSet());
 
-        $productAttributeSet->categories()->detach();
-
-        $productAttributeSet->categories()->sync((array) $request->input('categories', []));
+        if ($request->has('categories')) {
+            $productAttributeSet->categories()->sync((array) $request->input('categories', []));
+        }
 
         return $this
             ->httpResponse()
@@ -61,8 +61,6 @@ class ProductAttributeSetsController extends BaseController
         StoreAttributeSetService $service,
     ) {
         $service->execute($request, $productAttributeSet);
-
-        $productAttributeSet->categories()->detach();
 
         $productAttributeSet->categories()->sync((array) $request->input('categories', []));
 

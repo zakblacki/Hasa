@@ -112,7 +112,7 @@ class ShippingRuleItemTable extends TableAbstract
 
     public function buttons(): array
     {
-        $buttons = $this->addCreateButton(route('ecommerce.shipping-rule-items.create'), 'settings.index.shipping');
+        $buttons = $this->addCreateButton(route('ecommerce.shipping-rule-items.create'), 'shipping_methods.index');
 
         if ($this->hasPermission('ecommerce.shipping-rule-items.bulk-import')) {
             $buttons['import'] = [
@@ -129,7 +129,7 @@ class ShippingRuleItemTable extends TableAbstract
     public function bulkActions(): array
     {
         return [
-            DeleteBulkAction::make()->permission('settings.index.shipping'),
+            DeleteBulkAction::make()->permission('shipping_methods.index'),
         ];
     }
 

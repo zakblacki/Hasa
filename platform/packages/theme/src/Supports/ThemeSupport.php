@@ -583,32 +583,6 @@ class ThemeSupport
         return $socialLinks;
     }
 
-    public static function getDefaultSocialLinksData(): array
-    {
-        return [
-            [
-                ['key' => 'name', 'value' => 'Facebook'],
-                ['key' => 'icon', 'value' => 'ti ti-brand-facebook'],
-                ['key' => 'url', 'value' => 'https://www.facebook.com'],
-            ],
-            [
-                ['key' => 'name', 'value' => 'X'],
-                ['key' => 'icon', 'value' => 'ti ti-brand-x'],
-                ['key' => 'url', 'value' => 'https://x.com'],
-            ],
-            [
-                ['key' => 'name', 'value' => 'Youtube'],
-                ['key' => 'icon', 'value' => 'ti ti-brand-youtube'],
-                ['key' => 'url', 'value' => 'https://www.youtube.com'],
-            ],
-            [
-                ['key' => 'name', 'value' => 'Instagram'],
-                ['key' => 'icon', 'value' => 'ti ti-brand-linkedin'],
-                ['key' => 'url', 'value' => 'https://www.linkedin.com'],
-            ],
-        ];
-    }
-
     public static function getThemeIcons(): array
     {
         return apply_filters('theme_icon_list_icons', []);
@@ -726,11 +700,7 @@ class ThemeSupport
                         Theme.lazyLoadInstance = new LazyLoad({
                             elements_selector: '[loading="lazy"]',
                         });
-                    });
-
-                    document.addEventListener('shortcode.loaded', function () {
-                        Theme.lazyLoadInstance.update()
-                    });
+                    })
                 </script>
             HTML;
         });
@@ -840,18 +810,6 @@ class ThemeSupport
                 continue;
             }
 
-            $title = match ($social) {
-                'linkedin' => rawurldecode(strip_tags($title)),
-                'email' => $title,
-                'x' => Str::limit(strip_tags($title), 200),
-                default => strip_tags($title),
-            };
-
-            $url = match ($social) {
-                'x' => $url,
-                default => urlencode($url),
-            };
-
             $items[$social] = [
                 'name' => $name = match ($social) {
                     'facebook' => __('Facebook'),
@@ -865,18 +823,21 @@ class ThemeSupport
                 },
                 'icon' => $image ? Html::image(RvMedia::getImageUrl($image), $name) : BaseHelper::renderIcon($icon),
                 'url' => match ($social) {
-                    'facebook' => sprintf('https://www.facebook.com/sharer.php?u=%s', $url),
-                    'x' => sprintf('https://x.com/intent/tweet?url=%s&text=%s', $url, $title),
-                    'linkedin' => sprintf('https://www.linkedin.com/sharing/share-offsite?url=%s&sumary=%s', $url, $title),
+                    'facebook' => sprintf('https://www.facebook.com/sharer.php?u=%s', urlencode($url)),
+                    'x' => sprintf('https://x.com/intent/tweet?url=%s&text=%s', urlencode($url), $title),
+                    'linkedin' => sprintf(
+                        'https://www.linkedin.com/sharing/share-offsite/?url=%s',
+                        rawurldecode(strip_tags($url))
+                    ),
                     'pinterest' => sprintf(
                         'https://pinterest.com/pin/create/button/?url=%s&description=%s&media=%s',
-                        $url,
+                        urlencode($url),
                         $title,
                         $thumbnail
                     ),
-                    'whatsapp' => sprintf('https://api.whatsapp.com/send?text=%s %s', $title, $url),
-                    'telegram' => sprintf('https://t.me/share/url?url=%s&text=%s', $url, $title),
-                    'email' => sprintf('mailto:?subject=%s&body=%s', $title, $url),
+                    'whatsapp' => sprintf('https://api.whatsapp.com/send?text=%s %s', $title, urlencode($url)),
+                    'telegram' => sprintf('https://t.me/share/url?url=%s&text=%s', urlencode($url), $title),
+                    'email' => sprintf('mailto:?subject=%s&body=%s', $title, urlencode($url)),
                     default => $url,
                 },
                 'color' => $color === 'transparent' ? null : $color,
@@ -907,7 +868,6 @@ class ThemeSupport
         $formats = [
             'M d, Y',
             'F j, Y',
-            'F d, Y',
             'Y-m-d',
             'Y-M-d',
             'd-m-Y',

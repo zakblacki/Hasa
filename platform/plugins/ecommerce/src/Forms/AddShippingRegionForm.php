@@ -21,7 +21,7 @@ class AddShippingRegionForm extends FormAbstract
             }
         }
 
-        $countries = ['' => trans('plugins/ecommerce::shipping.all_countries')] + EcommerceHelper::getAvailableCountries();
+        $countries = ['' => trans('plugins/ecommerce::shipping.all')] + EcommerceHelper::getAvailableCountries();
 
         $countries = array_diff_key($countries, array_flip($existedCountries));
 

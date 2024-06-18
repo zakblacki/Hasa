@@ -66,10 +66,8 @@ class ShortcodeController extends BaseController
 
         $code = Shortcode::generateShortcode($name, $request->input('attributes', []));
 
-        $content = Shortcode::compile($code, true)->toHtml();
-
         return $this
             ->httpResponse()
-            ->setData($content);
+            ->setData(Shortcode::compile($code, true)->toHtml());
     }
 }

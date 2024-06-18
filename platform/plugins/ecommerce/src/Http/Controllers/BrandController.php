@@ -38,14 +38,11 @@ class BrandController extends BaseController
 
     public function store(BrandRequest $request)
     {
-        /**
-         * @var Brand $brand
-         */
         $brand = Brand::query()->create($request->input());
 
-        $brand->categories()->detach();
-
-        $brand->categories()->sync((array) $request->input('categories', []));
+        if ($request->has('categories')) {
+            $brand->categories()->sync((array) $request->input('categories', []));
+        }
 
         event(new CreatedContentEvent(BRAND_MODULE_SCREEN_NAME, $request, $brand));
 
@@ -68,9 +65,9 @@ class BrandController extends BaseController
         $brand->fill($request->input());
         $brand->save();
 
-        $brand->categories()->detach();
-
-        $brand->categories()->sync((array) $request->input('categories', []));
+        if ($request->has('categories')) {
+            $brand->categories()->sync((array) $request->input('categories', []));
+        }
 
         event(new UpdatedContentEvent(BRAND_MODULE_SCREEN_NAME, $request, $brand));
 

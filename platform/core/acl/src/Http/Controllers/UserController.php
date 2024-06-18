@@ -8,7 +8,6 @@ use Botble\ACL\Forms\ProfileForm;
 use Botble\ACL\Forms\UserForm;
 use Botble\ACL\Http\Requests\AvatarRequest;
 use Botble\ACL\Http\Requests\CreateUserRequest;
-use Botble\ACL\Http\Requests\PreferencePatchRequest;
 use Botble\ACL\Http\Requests\PreferenceRequest;
 use Botble\ACL\Http\Requests\UpdatePasswordRequest;
 use Botble\ACL\Http\Requests\UpdateProfileRequest;
@@ -206,17 +205,6 @@ class UserController extends BaseSystemController
         return $this
             ->httpResponse()
             ->setMessage(trans('core/acl::users.update_preferences_success'));
-    }
-
-    public function patchUpdatePreferences(User $user, PreferencePatchRequest $request)
-    {
-        foreach ($request->validated() as $key => $value) {
-            $user->setMeta($key, $value);
-        }
-
-        $user->save();
-
-        return $this->httpResponse()->withUpdatedSuccessMessage();
     }
 
     public function postAvatar(User $user, AvatarRequest $request)

@@ -21,7 +21,6 @@ return [
             'can_off' => false,
             'variables' => [
                 'verify_link' => 'Verify email link',
-                'customer_name' => 'Customer name',
             ],
         ],
         'password-reminder' => [

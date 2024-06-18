@@ -61,7 +61,7 @@ class CustomerController extends BaseController
         return $this
             ->httpResponse()
             ->setPreviousUrl(route('customers.index'))
-            ->setNextUrl(route('customers.edit', $customer->getKey()))
+            ->setNextUrl(route('customers.edit', $customer->id))
             ->withCreatedSuccessMessage();
     }
 

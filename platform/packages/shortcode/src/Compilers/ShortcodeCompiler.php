@@ -138,10 +138,6 @@ class ShortcodeCompiler
         $name = $compiled->getName();
 
         if ($compiled->enable_lazy_loading === 'yes' && ! request()->ajax()) {
-            add_filter(THEME_FRONT_FOOTER, function (?string $html) {
-                return $html . view('packages/shortcode::partials.lazy-loading-script')->render();
-            }, 120);
-
             $placeholderView = Theme::getThemeNamespace('partials.lazy-loading-placeholder');
 
             if (! view()->exists($placeholderView)) {

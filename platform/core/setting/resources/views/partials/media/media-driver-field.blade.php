@@ -196,7 +196,6 @@
             :label="trans('core/setting::setting.media.wasabi_root')"
             :value="config('filesystems.disks.wasabi.root')"
             placeholder="Default: /"
-            :helperText="trans('core/setting::setting.media.wasabi_root_helper')"
         />
     </x-core::form.fieldset>
 

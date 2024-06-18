@@ -92,7 +92,7 @@ class HookServiceProvider extends ServiceProvider
                             ],
                         ];
 
-                        return $html . Html::tag('script', json_encode($schema, JSON_UNESCAPED_UNICODE), ['type' => 'application/ld+json'])
+                        return $html . Html::tag('script', json_encode($schema), ['type' => 'application/ld+json'])
                                 ->toHtml();
                     }, 2);
                 }, 2, 2);

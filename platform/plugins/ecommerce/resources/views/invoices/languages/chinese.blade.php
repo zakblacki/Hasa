@@ -3,7 +3,7 @@
         font-family: 'msyh';
         font-style: normal;
         font-weight: normal;
-        src: url('{{ url('vendor/core/core/base/fonts/msyh.ttf') }}') format('truetype');
+        src: url('{{ url('vendor/core/plugins/ecommerce/fonts/msyh.ttf') }}') format('truetype');
     }
 
     body {

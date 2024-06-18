@@ -12,7 +12,6 @@ use Botble\Table\Columns\Concerns\Maskable;
 use Botble\Table\Contracts\FormattedColumn as FormattedColumnContract;
 use Closure;
 use Illuminate\Support\Str;
-use stdClass;
 
 class FormattedColumn extends Column implements FormattedColumnContract
 {
@@ -147,7 +146,7 @@ class FormattedColumn extends Column implements FormattedColumnContract
         return $this->getItem()->{$this->name};
     }
 
-    public function renderCell(BaseModel|stdClass|array $item, TableAbstract $table): string
+    public function renderCell(BaseModel|array $item, TableAbstract $table): string
     {
         $item = $item instanceof BaseModel ? $item : (object) $item;
 

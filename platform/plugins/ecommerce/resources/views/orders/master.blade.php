@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html {!! Theme::htmlAttributes() !!}>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="UTF-8">
     <meta
@@ -19,26 +20,17 @@
         >
     @endif
 
-    {!! Theme::typography()->renderCssVariables() !!}
-
-    <style>
-        :root {
-            --primary-color: {{ $primaryColor = theme_option('primary_color', '#58b3f0') }};
-            --primary-color-rgb: {{ implode(',', BaseHelper::hexToRgb($primaryColor)) }};
-        }
-    </style>
-
     {!! Html::style('vendor/core/core/base/libraries/font-awesome/css/fontawesome.min.css') !!}
-    {!! Html::style('vendor/core/core/base/libraries/ckeditor/content-styles.css?v=3.6.0') !!}
-    {!! Html::style('vendor/core/plugins/ecommerce/css/front-theme.css?v=3.6.0') !!}
+    {!! Html::style('vendor/core/core/base/libraries/ckeditor/content-styles.css?v=3.4.0') !!}
+    {!! Html::style('vendor/core/plugins/ecommerce/css/front-theme.css?v=3.4.0') !!}
 
     @if (BaseHelper::isRtlEnabled())
-        {!! Html::style('vendor/core/plugins/ecommerce/css/front-theme-rtl.css?v=3.6.0') !!}
+        {!! Html::style('vendor/core/plugins/ecommerce/css/front-theme-rtl.css?v=3.4.0') !!}
     @endif
 
     {!! Html::style('vendor/core/core/base/libraries/toastr/toastr.min.css') !!}
 
-    {!! Html::script('vendor/core/plugins/ecommerce/js/checkout.js?v=3.6.0') !!}
+    {!! Html::script('vendor/core/plugins/ecommerce/js/checkout.js?v=3.4.0') !!}
 
     @if (EcommerceHelper::loadCountriesStatesCitiesFromPluginLocation())
         <link
@@ -46,7 +38,7 @@
             rel="stylesheet"
         >
         <script src="{{ asset('vendor/core/core/base/libraries/select2/js/select2.min.js') }}"></script>
-        <script src="{{ asset('vendor/core/plugins/location/js/location.js?v=3.6.0') }}"></script>
+        <script src="{{ asset('vendor/core/plugins/location/js/location.js') }}?v=3.4.0"></script>
     @endif
 
     {!! apply_filters('ecommerce_checkout_header', null) !!}
@@ -54,21 +46,22 @@
     @stack('header')
 </head>
 
-@php
-    Theme::addBodyAttributes([
-        'class' => 'checkout-page',
-    ]);
-@endphp
-
-<body{!! Theme::bodyAttributes() !!}>
+<body
+    class="checkout-page"
+    @if (BaseHelper::isRtlEnabled()) dir="rtl" @endif
+>
     {!! apply_filters('ecommerce_checkout_body', null) !!}
-    <div class="container my-0 my-md-3 my-lg-5 checkout-content-wrap">
-        @yield('content')
+    <div class="checkout-content-wrap">
+        <div class="container">
+            <div class="row">
+                @yield('content')
+            </div>
+        </div>
     </div>
 
     @stack('footer')
 
-    {!! Html::script('vendor/core/plugins/ecommerce/js/utilities.js?v=3.6.0') !!}
+    {!! Html::script('vendor/core/plugins/ecommerce/js/utilities.js') !!}
     {!! Html::script('vendor/core/core/base/libraries/toastr/toastr.min.js') !!}
 
     <script type="text/javascript">
@@ -97,4 +90,5 @@
     {!! apply_filters('ecommerce_checkout_footer', null) !!}
 
 </body>
+
 </html>

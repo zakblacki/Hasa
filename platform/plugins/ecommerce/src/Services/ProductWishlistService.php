@@ -4,6 +4,7 @@ namespace Botble\Ecommerce\Services;
 
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Models\Product;
+use Botble\Ecommerce\Models\Wishlist;
 
 class ProductWishlistService
 {
@@ -30,18 +31,18 @@ class ProductWishlistService
         }
 
         $customer = $guard->user();
-
         $data = [
             'product_id' => $product->getKey(),
+            'customer_id' => $customer->getAuthIdentifier(),
         ];
 
         if (is_added_to_wishlist($product->getKey())) {
-            $customer->wishlist()->where($data)->delete();
+            Wishlist::query()->where($data)->delete();
 
             return false;
         }
 
-        $customer->wishlist()->create($data);
+        Wishlist::query()->create($data);
 
         return true;
     }

@@ -122,10 +122,9 @@ class SelectFieldOption extends FormFieldOptions
             $data['selected'] = $this->getDefaultValue();
         }
 
-        if (isset($this->emptyValue) && $placeholder = $this->getEmptyValue()) {
-            $data['attr']['placeholder'] = $placeholder;
-            $data['attr']['data-placeholder'] = $placeholder;
-
+        if (isset($this->emptyValue)) {
+            $data['attr']['placeholder'] = $this->getEmptyValue();
+            $data['attr']['data-placeholder'] = $this->getEmptyValue();
         }
 
         if ($this->searchable) {

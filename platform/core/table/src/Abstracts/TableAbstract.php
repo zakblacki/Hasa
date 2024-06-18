@@ -41,12 +41,9 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use LogicException;
-use stdClass;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\DataTableAbstract;
 use Yajra\DataTables\DataTables;
-use Yajra\DataTables\EloquentDataTable;
-use Yajra\DataTables\QueryDataTable;
 use Yajra\DataTables\Services\DataTable;
 
 abstract class TableAbstract extends DataTable implements ExtensibleContract
@@ -705,11 +702,7 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
             }
         }
 
-        return parent::applyScopes(
-            $query instanceof EloquentBuilder
-                ? apply_filters(BASE_FILTER_TABLE_QUERY, $query, $this)
-                : $query
-        );
+        return parent::applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $this));
     }
 
     public function getValueInput(?string $title, ?string $value, ?string $type, array $data = []): array
@@ -819,7 +812,7 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
                     break;
 
                 case $column instanceof Column && $column instanceof FormattedColumn:
-                    $table->editColumn($column->name, function (BaseModelContract|stdClass|array $item) use ($column) {
+                    $table->editColumn($column->name, function (BaseModelContract|array $item) use ($column) {
                         return $column->renderCell($item, $this);
                     });
 
@@ -836,13 +829,7 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
 
         $this->dispatchBeforeRendering();
 
-        $data = match (true) {
-            $data instanceof EloquentDataTable
-                => apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->getModel(), $this),
-            $data instanceof QueryDataTable
-                => apply_filters(BASE_FILTER_GET_LIST_DATA_FOR_QUERY_TABLE, $data, $this),
-            default => apply_filters(BASE_FILTER_GET_LIST_DATA, $data, new BaseModel(), $this),
-        };
+        $data = apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->getModel(), $this);
 
         return tap(
             $data

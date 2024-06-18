@@ -40,7 +40,7 @@ class AnalyticsSettingForm extends SettingForm
                         OnOffField::class,
                         OnOffFieldOption::make()
                             ->label(trans('plugins/analytics::analytics.settings.enable_dashboard_widgets'))
-                            ->value($targetValue = old('analytics_dashboard_widgets', setting('analytics_dashboard_widgets', 0)))
+                            ->value($targetValue = old('analytics_dashboard_widgets', setting('analytics_dashboard_widgets', 1)))
                             ->toArray()
                     )
                     ->isOpened($targetValue == '1')

@@ -7,7 +7,6 @@ use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Base\Supports\Breadcrumb;
-use Botble\PluginManagement\Enums\PluginFilterStatus;
 use Botble\PluginManagement\Events\RenderingPluginListingPage;
 use Botble\PluginManagement\Services\MarketplaceService;
 use Botble\PluginManagement\Services\PluginService;
@@ -85,9 +84,7 @@ class PluginManagementController extends BaseController
             $plugins = collect($plugins)->sortByDesc('status');
         }
 
-        $filterStatuses = PluginFilterStatus::labels();
-
-        return view('packages/plugin-management::index', compact('plugins', 'filterStatuses'));
+        return view('packages/plugin-management::index', compact('plugins'));
     }
 
     public function update(Request $request): BaseHttpResponse

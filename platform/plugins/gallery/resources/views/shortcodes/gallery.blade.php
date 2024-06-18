@@ -3,7 +3,7 @@
         @foreach ($galleries as $gallery)
             <div class="gallery-item">
                 <div class="img-wrap">
-                    <a href="{{ $gallery->url }}" class="d-inline-block">
+                    <a href="{{ $gallery->url }}">
                         {{ RvMedia::image($gallery->image, $gallery->name, 'medium') }}
                     </a>
                 </div>

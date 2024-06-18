@@ -19,8 +19,6 @@ class ImportLocationService
 
     protected Collection $states;
 
-    protected int $count = 0;
-
     public function __construct()
     {
         $this->countries = collect();
@@ -53,7 +51,6 @@ class ImportLocationService
         );
 
         $this->countries->push($country);
-        $this->count++;
 
         if ($country->wasRecentlyCreated) {
             event(new ImportedCountryEvent($row, $country));
@@ -79,7 +76,6 @@ class ImportLocationService
         );
 
         $this->states->push($state);
-        $this->count++;
 
         if ($state->wasRecentlyCreated) {
             event(new ImportedStateEvent($row, $state));
@@ -103,8 +99,6 @@ class ImportLocationService
                 'status' => $row['status'],
             ],
         );
-
-        $this->count++;
 
         if ($city->wasRecentlyCreated) {
             event(new ImportedCityEvent($row, $city));
@@ -165,10 +159,5 @@ class ImportLocationService
         }
 
         return Str::substr($name, 0, 2);
-    }
-
-    public function count(): int
-    {
-        return $this->count;
     }
 }

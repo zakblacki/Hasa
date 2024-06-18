@@ -46,8 +46,8 @@ return [
         'parent_flag' => 'faq_category.index',
     ],
     [
-        'name' => 'FAQ',
+        'name' => 'FAQ Settings',
         'flag' => 'faqs.settings',
-        'parent_flag' => 'settings.others',
+        'parent_flag' => 'plugin.faq',
     ],
 ];
